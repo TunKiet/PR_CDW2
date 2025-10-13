@@ -80,13 +80,13 @@ export default function LoginPage() {
         {activeTab === 'login' && (
           <div className="form">
             <div className="form-group">
-              <label className="label">Email</label>
+              <label className="label">Số điện thoại</label>
               <input
-                type="email"
-                name="email"
-                value={loginData.email}
+                type="text"
+                name="phone"
+                value={loginData.phone}
                 onChange={handleLoginChange}
-                placeholder="email@example.com"
+                placeholder="Nhập số điện thoại ở đây"
                 className="input"
               />
             </div>
@@ -141,13 +141,13 @@ export default function LoginPage() {
             </div>
 
             <div className="form-group">
-              <label className="label">Email</label>
+              <label className="label">Số điện thoại</label>
               <input
-                type="email"
-                name="email"
-                value={registerData.email}
+                type="text"
+                name="phone"
+                value={registerData.phone}
                 onChange={handleRegisterChange}
-                placeholder="email@example.com"
+                placeholder="Nhập số điện thoại"
                 className="input"
               />
             </div>
