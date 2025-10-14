@@ -1,17 +1,18 @@
+import React from 'react'
 import './App.css'
 import Dashboard from './components/Dashboard/Dashboard'
-import Header from './components/Header/Header'
 import Sidebar from './components/Sidebar/Sidebar'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Header from './components/Header/Header'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/sidebar" element={<Sidebar />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   )
 }
 
