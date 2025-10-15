@@ -1,15 +1,26 @@
 import React, { useState } from 'react'
 import Button from '@mui/material/Button';
-import { FaStar } from "react-icons/fa";
+import Dialog from '@mui/material/Dialog';
+import Tooltip from '@mui/material/Tooltip';
+import Avatar from '@mui/material/Avatar';
+import Rating from '@mui/material/Rating';
+import { IoClose } from "react-icons/io5";
 import Star from './Star';
+import { FaStar } from "react-icons/fa";
 import { MdAccessTime } from "react-icons/md";
 import { FaChevronRight } from "react-icons/fa";
 import { BsChatRightText } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
+import { AiOutlineLike } from "react-icons/ai";
+import { AiOutlineDislike } from "react-icons/ai";
 
 const Review = () => {
-    const [showFeedback, setShowFeedback] = useState(false);
+    const [showFeedback, setShowFeedback] = useState(false); //close or hide feedback
     const [activeFilter, setActiveFilter] = useState(1);
+    const [openFormReview, setOpenFormReview] = useState(false);
+    const [likes, setLikes] = useState(0);
+    const [disLikes, setDisLikes] = useState(0);
+    const [values, setValues] = useState(null);
 
     const handToggle = () => {
         setShowFeedback(!showFeedback);
@@ -23,6 +34,24 @@ const Review = () => {
         { id: 5, label: "2 sao" },
         { id: 6, label: "1 sao" },
     ];
+
+    const handleClickOpen = () => {
+        setOpenFormReview(true);
+    }
+    const handleClose = () => {
+        setOpenFormReview(false);
+    }
+
+    const handleLike = () => {
+        setLikes(likes + 1)
+    }
+
+    const handleDisLike = () => {
+        setDisLikes(disLikes + 1)
+    }
+
+
+
     return (
         <>
             <div className="container-review w-[80%] h-auto m-auto border border-[#333] p-2 bg-gray-100 rounded-[10px]">
@@ -37,7 +66,39 @@ const Review = () => {
                                 <Star />
                             </div>
                             <div className="count-review py-1 ">100 lượt đánh giá</div>
-                            <Button variant="contained" color='error'>Viết đánh giá</Button>
+                            <Button variant="contained" color='error' onClick={handleClickOpen}>Viết đánh giá</Button>
+                            <Dialog open={openFormReview} onClose={handleClose}>
+                                <div className="container p-3 m-3 max-w-xl w-full mx-auto">
+                                    <div className="absolute top-1 right-1 !p-3 !rounded-full !me-auto hover:bg-gray-300 !w-[40px] cursor-pointer" onClick={handleClose}><IoClose /></div>
+                                    <h2 className='text-5xl font-bold pt-5'>Đánh giá về chúng tôi</h2>
+                                    <div className="formReview-info flex items-center">
+                                        <div className="formReview-info-avatar">
+                                            <Avatar />
+                                        </div>
+                                        <div className="formReview-info-name">
+                                            <p className='mx-3 m-0'>User 1</p>
+                                        </div>
+                                    </div>
+                                    <div className="formReview-select-rating py-2">
+                                        <Rating name="no-value" value={values} size='large' onChange={(event, newValue) => { setValues(newValue) }} />
+                                    </div>
+                                    <div className="formReview-upload">
+                                        <div className="formReview-upload-title">
+                                            <span>Upload hinh anh</span>
+                                        </div>
+                                        <input type="file" />
+                                    </div>
+                                    <div className="formReview-comment">
+                                        <div className="formReview-comment-title">
+                                            <span>Nhap danh gia cua ban</span>
+                                        </div>
+                                        <div className="formReview-comment-content">
+                                            <textarea className='w-[500px] h-[200px] border border[#333] focus:ring-0 focus:outline-none resize-none p-2' name="comment" id="comment" placeholder='Nhap danh gia cua ban ve chung toi'></textarea>
+                                        </div>
+                                    </div>
+                                    <Button variant='contained' color='error'>Gui</Button>
+                                </div>
+                            </Dialog>
                         </div>
                     </div>
                     <div className="boxReview-star w-[500px] space-y-2 mt-3">
@@ -131,9 +192,24 @@ const Review = () => {
                                 <MdAccessTime />
                                 <span>2025-10-30 08:30</span>
                             </div>
-                            <div className="comment-feedback w-[90px] flex items-center text-red-600 cursor-pointer my-2">
-                                <BsChatRightText />
-                                <p className='ms-2 m-0'>Phản hồi</p>
+                            <div className="comment-control flex items-center">
+                                <div className="comment-control-like flex items-center me-2 cursor-pointer">
+                                    <Tooltip title="Like">
+                                        <div className="rounded-full p-2 hover:bg-gray-300" onClick={handleLike}><AiOutlineLike size={20} /></div>
+                                    </Tooltip>
+                                    <span className='text-[18px]'>{likes}</span>
+                                </div>
+                                <div className="comment-control-dislike flex items-center me-2 cursor-pointer">
+                                    <Tooltip title="Dislike">
+                                        <div className="rounded-full p-2 hover:bg-gray-300" onClick={handleDisLike}><AiOutlineDislike size={20} /></div>
+                                    </Tooltip>
+                                    <span className='text-[18px]'>{disLikes}</span>
+                                </div>
+
+                                <div className="comment-feedback w-[90px] flex items-center text-red-600 cursor-pointer my-2 ms-2">
+                                    <BsChatRightText />
+                                    <p className='ms-2 m-0'>Phản hồi</p>
+                                </div>
                             </div>
                             <div className="comment-view-feedback w-[180px] flex items-center hover:text-blue-500 cursor-pointer my-2" onClick={handToggle}>
                                 {showFeedback ? "Thu gọn phản hồi" : "Xem tất cả 1 phản hồi"}
