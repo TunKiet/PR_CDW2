@@ -7,6 +7,8 @@ import Tooltip from '@mui/material/Tooltip';
 import { MdAccessTime } from "react-icons/md";
 import Star from './Star';
 import Feedback from './Feedback';
+import AdminFeedback from './AdminFeedback';
+import UserFeedback from './UserFeedback';
 
 
 const BoxReview = () => {
@@ -46,6 +48,10 @@ const BoxReview = () => {
                     <div className="comment-item-rating flex items-center">
                         <Star />
                         <span className='ms-2'>Tuyệt vời</span>
+                        <div className="comment-item-time flex items-center ms-2 text-gray-500">
+                            <MdAccessTime className='me-1'/>
+                            <span>2025-10-30 08:30</span>
+                        </div>
                     </div>
                     <div className="comment-item-review">
                         <div className="comment-content text-justify">
@@ -57,10 +63,13 @@ const BoxReview = () => {
                             trọng khách hàng.
                         </div>
                     </div>
-                    <div className="comment-item-time flex items-center my-2">
-                        <MdAccessTime />
-                        <span>2025-10-30 08:30</span>
+
+                    <div className="comment-item-view-image my-3">
+                        <div className="view-image-item w-[200px] h-[100px]">
+                            <img src="https://fit.tdc.edu.vn/assets/images/news/chupchung.jpg" alt="" />
+                        </div>
                     </div>
+
                     <div className="comment-control flex items-center">
                         <div className="comment-control-like flex items-center me-2 cursor-pointer">
                             <Tooltip title="Like">
@@ -80,7 +89,7 @@ const BoxReview = () => {
                             <p className='ms-2 m-0'>Phản hồi</p>
                         </div>
 
-                    
+
 
                     </div>
                     <div className="comment-view-feedback w-[180px] flex items-center hover:text-blue-500 cursor-pointer my-2" onClick={handToggle}>
@@ -91,63 +100,14 @@ const BoxReview = () => {
                         showFeedback &&
                         (
                             <div className="list-rep-comment my-4">
-                                <div className="item-rep-comment my-4">
-                                    <div className="box-rep-info flex items-center">
-                                        <div className="box-info flex items-center">
-                                            <div className="box-info-avatar">
-                                                <div className='flex justify-center items-center w-[40px] h-[40px] bg-red-600 rounded-full'>
-                                                    <p className='flex justify-center items-center text-white font-bold text-2xl m-0 p-0'>AD</p>
-                                                </div>
-                                            </div>
-
-                                            <span className="box-info-name flex items-center mx-2 text-2xl font-bold">Quản Trị Viên</span>
-
-                                            <div className="box-info-tag w-[40px] h-[20px] flex justify-center items-center bg-red-600 rounded-[5px]">
-                                                <p className='text-white font-bold m-0'>QTV</p>
-                                            </div>
-                                        </div>
-                                        <div className="box-time flex items-center text-gray-400 mx-2">
-                                            <MdAccessTime />
-                                            <span>1 giờ trước</span>
-                                        </div>
-                                    </div>
-                                    <div className="box-rep-question">
-                                        <div className="box-rep-content text-justify ms-5 p-1">
-                                            Dạ trường hợp này mình dành chút thời gian mang sản phẩm qua bên em để được kỹ thuật kiểm tra cho mình nhé.
-                                            Thân mến.
-                                        </div>
-                                    </div>
-                                </div>
-
+                               
+                                <AdminFeedback/>
                                 <hr />
 
-                                <div className="item-rep-comment">
-                                    <div className="box-rep-info flex items-center">
-                                        <div className="box-info flex items-center">
-                                            <div className="box-info-avatar">
-                                                <div className='flex justify-center items-center w-[40px] h-[40px] bg-red-600 rounded-full'>
-                                                    <p className='flex justify-center items-center text-white font-bold text-2xl m-0 p-0'>AD</p>
-                                                </div>
-                                            </div>
-
-                                            <span className="box-info-name flex items-center mx-2 text-2xl font-bold">Quản Trị Viên</span>
-
-                                            <div className="box-info-tag w-[40px] h-[20px] flex justify-center items-center bg-red-600 rounded-[5px]">
-                                                <p className='text-white font-bold m-0'>QTV</p>
-                                            </div>
-                                        </div>
-                                        <div className="box-time flex items-center text-gray-400 mx-2">
-                                            <MdAccessTime />
-                                            <span>1 giờ trước</span>
-                                        </div>
-                                    </div>
-                                    <div className="box-rep-question">
-                                        <div className="box-rep-content text-justify ms-5 p-1">
-                                            Dạ trường hợp này mình dành chút thời gian mang sản phẩm qua bên em để được kỹ thuật kiểm tra cho mình nhé.
-                                            Thân mến.
-                                        </div>
-                                    </div>
-                                </div>
+                                <AdminFeedback/>
+                                <hr />
+                                <UserFeedback/>
+                                
                             </div>
                         )
                     }
