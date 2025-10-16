@@ -17,7 +17,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - mssql
+      - mysql
       - redis
     command: php artisan serve --host=0.0.0.0 --port=8000
 
@@ -40,7 +40,7 @@ services:
     stdin_open: true
     tty: true
 
-# MySQL Database
+  # MySQL Database
   mysql:
     image: mysql:8.0
     container_name: mysql
@@ -57,6 +57,23 @@ services:
     networks:
       - app-network
 
+  # ✅ phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: YourStrongPassword@123
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
   # Redis
   redis:
     image: redis:alpine
@@ -67,7 +84,7 @@ services:
     ports:
       - "6379:6379"
 
-  # Nginx (Optional - nếu muốn dùng Nginx thay vì php artisan serve)
+  # Nginx (Optional)
   nginx:
     image: nginx:alpine
     container_name: nginx
