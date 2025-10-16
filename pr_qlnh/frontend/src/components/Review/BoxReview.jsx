@@ -6,12 +6,14 @@ import { AiOutlineDislike } from "react-icons/ai";
 import Tooltip from '@mui/material/Tooltip';
 import { MdAccessTime } from "react-icons/md";
 import Star from './Star';
+import Feedback from './Feedback';
 
 
 const BoxReview = () => {
     const [showFeedback, setShowFeedback] = useState(false); //close or hide feedback
     const [likes, setLikes] = useState(0);
     const [disLikes, setDisLikes] = useState(0);
+    const [showReply, setShowReply] = useState(false);
 
     const handToggle = () => {
         setShowFeedback(!showFeedback);
@@ -22,6 +24,10 @@ const BoxReview = () => {
 
     const handleDisLike = () => {
         setDisLikes(disLikes + 1)
+    }
+
+    const handleOpenReply = () => {
+        setShowReply(!showReply);
     }
     return (
         <>
@@ -69,10 +75,13 @@ const BoxReview = () => {
                             <span className='text-[18px]'>{disLikes}</span>
                         </div>
 
-                        <div className="comment-feedback w-[90px] flex items-center text-red-600 cursor-pointer my-2 ms-2">
+                        <div className="comment-feedback w-[90px] flex items-center text-red-600 cursor-pointer my-2 ms-2" onClick={handleOpenReply}>
                             <BsChatRightText />
                             <p className='ms-2 m-0'>Phản hồi</p>
                         </div>
+
+                    
+
                     </div>
                     <div className="comment-view-feedback w-[180px] flex items-center hover:text-blue-500 cursor-pointer my-2" onClick={handToggle}>
                         {showFeedback ? "Thu gọn phản hồi" : "Xem tất cả 1 phản hồi"}
@@ -144,6 +153,11 @@ const BoxReview = () => {
                     }
                 </div>
             </div>
+            {showReply && (
+                <div className="mt-2">
+                    <Feedback />
+                </div>
+            )}
         </>
     )
 }

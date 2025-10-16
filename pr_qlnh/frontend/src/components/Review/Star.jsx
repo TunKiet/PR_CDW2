@@ -1,14 +1,12 @@
 import React from 'react'
 import { FaStar } from "react-icons/fa";
+import Rating from '@mui/material/Rating';
 const Star = () => {
+    // const [values, setValues] = useState(0)
     return (
         <>
             <div className="star flex text-2xl py-1">
-                <div className="icon"><FaStar className='text-yellow-400 text-[20px]' /></div>
-                <div className="icon mx-1"><FaStar className='text-yellow-400 text-[20px]' /></div>
-                <div className="icon mx-1"><FaStar className='text-yellow-400 text-[20px]' /></div>
-                <div className="icon mx-1"><FaStar className='text-yellow-400 text-[20px]' /></div>
-                <div className="icon "><FaStar className='text-yellow-400 text-[20px]' /></div>
+                <Rating name="simple-controlled" value={5}/>
             </div>
         </>
     )

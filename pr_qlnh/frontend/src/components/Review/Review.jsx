@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Avatar from '@mui/material/Avatar';
@@ -8,15 +8,18 @@ import Star from './Star';
 import { FaStar } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import BoxReview from './BoxReview';
-import { CiImageOn } from "react-icons/ci";
+import { CiCamera } from "react-icons/ci";
+import Feedback from './Feedback';
 
 const Review = () => {
-    
+
     const [activeFilter, setActiveFilter] = useState(1);
     const [openFormReview, setOpenFormReview] = useState(false);
     const [values, setValues] = useState(null);
+    const fileInputRef = useRef(null);
+    const [preview, setPreview] = useState(null);
 
-    
+
     const filters = [
         { id: 1, label: "Tất cả" },
         { id: 2, label: "5 sao" },
@@ -33,7 +36,17 @@ const Review = () => {
         setOpenFormReview(false);
     }
 
+    const handleIconClick = () => {
+        fileInputRef.current.click();
+    }
 
+    const handleChangeFile = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const urlImage = URL.createObjectURL(file);
+            setPreview(urlImage);
+        }
+    };
 
     return (
         <>
@@ -69,7 +82,14 @@ const Review = () => {
                                         <div className="formReview-upload-title">
                                             <span>Upload hình ảnh</span>
                                         </div>
-                                        <input type="file" />
+                                        <div className="formReview-upload-image flex justify-center items-center w-[200px] h-[100px] border border-[#333] rounded-[5px] cursor-pointer" onClick={handleIconClick}>
+                                            {
+                                                preview ? (
+                                                    <img src={preview} alt="preview" className='w-full h-full object-cover rounded-[5px]' />
+                                                ) : (<CiCamera size={50} />)
+                                            }
+                                            <input type="file" className='hidden' accept='image/*' ref={fileInputRef} onChange={handleChangeFile} />
+                                        </div>
                                     </div>
                                     <div className="formReview-comment">
                                         <div className="formReview-comment-title my-2">
@@ -135,7 +155,7 @@ const Review = () => {
                         <div className="container-filter flex items-center">
                             {
                                 filters.map((filter) => (
-                                    <div key={filters.id} className={`filter-item py-1 px-2 rounded-2xl border border[#333] mx-2 cursor-pointer
+                                    <div key={filter.id} className={`filter-item py-1 px-2 rounded-2xl border border[#333] mx-2 cursor-pointer
                                     ${activeFilter === filter.id ? "bg-blue-100 text-blue-600" : 'bg-gray-100 text-black'}`}
                                         onClick={() => setActiveFilter(filter.id)}>
                                         {filter.label}
@@ -146,11 +166,17 @@ const Review = () => {
                     </div>
 
                     {/* Info review */}
-                    <BoxReview/>
+                    <BoxReview />
+                    {/* <Feedback /> */}
+
                     <hr />
-                    <BoxReview/>
+                    <BoxReview />
+                    {/* <Feedback /> */}
+
                     <hr />
-                    <BoxReview/>
+                    <BoxReview />
+
+                    {/* <Feedback /> */}
 
                     <div className="flex justify-center">
                         <Button variant='contained'>Xem tất cả đánh giá <FaChevronRight /> </Button>
