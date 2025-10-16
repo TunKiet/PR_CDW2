@@ -9,18 +9,6 @@ RUN apt-get update && apt-get install -y \
     libxml2-dev \
     zip \
     unzip
-# Install SQL Server PDO driver
-RUN apt-get update && apt-get install -y gnupg2 unixodbc-dev && \
-    pecl install sqlsrv pdo_sqlsrv && \
-    docker-php-ext-enable sqlsrv pdo_sqlsrv
-# Install dependencies + ODBC driver + SQLSRV extensions
-RUN apt-get update && apt-get install -y gnupg2 unixodbc-dev curl apt-transport-https software-properties-common && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/debian/$(grep -oE '[0-9]+' /etc/debian_version | head -1)/prod.list -o /etc/apt/sources.list.d/mssql-release.list && \
-    apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18 && \
-    pecl install sqlsrv pdo_sqlsrv && \
-    docker-php-ext-enable sqlsrv pdo_sqlsrv
-
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*

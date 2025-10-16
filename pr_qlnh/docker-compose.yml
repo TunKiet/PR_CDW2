@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Laravel Backend
@@ -40,19 +40,20 @@ services:
     stdin_open: true
     tty: true
 
-  # SQL Server
-  mssql:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: mssql
+# MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
     restart: unless-stopped
     environment:
-      SA_PASSWORD: "YourStrongPassword@123"
-      ACCEPT_EULA: "Y"
-      MSSQL_PID: "Express"
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: YourStrongPassword@123
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
     ports:
-      - "1433:1433"
+      - "3306:3306"
     volumes:
-      - mssqldata:/var/opt/mssql
+      - mysql_data:/var/lib/mysql
     networks:
       - app-network
 
@@ -65,7 +66,7 @@ services:
       - app-network
     ports:
       - "6379:6379"
-      
+
   # Nginx (Optional - nếu muốn dùng Nginx thay vì php artisan serve)
   nginx:
     image: nginx:alpine
@@ -86,5 +87,5 @@ networks:
     driver: bridge
 
 volumes:
-  mssqldata:
+  mysql_data:
     driver: local
