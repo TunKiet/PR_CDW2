@@ -26,7 +26,7 @@ const ReviewModerator = () => {
                   <div className="search-icon">
                     <CiSearch className='absolute right-0 top-2.5 me-2' />
                   </div>
-                  <input type="search" className='form-control' placeholder='Tim kiem danh gia...' />
+                  <input type="search" className='form-control' placeholder='Tìm kiếm đánh giá...' />
                 </div>
               </div>
               <div className="reviewModerator-box-view flex ms-auto">

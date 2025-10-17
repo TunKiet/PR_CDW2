@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('ingredient_name', 100);
             $table->decimal('price', 10, 2);
             $table->string('unit', 20);
+            $table->decimal('total_price', 12, 2);
             $table->integer('stock_quantity');
             $table->integer('min_stock_level');
             $table->timestamps();
