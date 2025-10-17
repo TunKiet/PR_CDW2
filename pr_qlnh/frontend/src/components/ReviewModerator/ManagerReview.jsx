@@ -16,22 +16,24 @@ const ManagerReview = () => {
                     <table className='min-w-full border border-gray-300'>
                         <thead className='bg-gray-200'>
                             <tr>
-                                <th className='px-4 py-2 text-center border-b'>Mã đánh giá</th>
-                                <th className='px-4 py-2 text-center border-b'>Khách hàng</th>
+                                <th className='px-4 py-2 text-center border-b'>Mã</th>
+                                <th className='px-4 py-2 text-center border-b'>Tên</th>
+                                <th className='px-4 py-2 text-center border-b'>Món ăn</th>
                                 <th className='px-4 py-2 text-center border-b'>Sao</th>
                                 <th className='px-4 py-2 text-center border-b'>Hình</th>
-                                <th className='px-4 py-2 text-center border-b'>Tóm tắt đánh giá</th>
+                                <th className='px-4 py-2 text-center border-b'>Nội dung</th>
                                 <th className='px-4 py-2 text-center border-b'>Thời gian</th>
                                 <th className='px-4 py-2 text-center border-b'>Like</th>
                                 <th className='px-4 py-2 text-center border-b'>Dislike</th>
-                                <th className='px-4 py-2 text-center border-b'>Trang thái</th>
-                                <th className='px-4 py-2 text-center border-b'>Hành động</th>
+                                <th className='px-4 py-2 text-center border-b'>Status</th>
+                                <th className='px-4 py-2 text-center border-b'>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr className='hover:bg-gray-300 transition cursor-pointer'>
                                 <td className='px-4 py-2 text-center border-b'>1</td>
                                 <td className='px-4 py-2 text-center border-b'>An</td>
+                                <td className='px-4 py-2 text-center border-b'>Phở bò</td>
                                 <td className='px-4 py-2 text-center border-b'>5</td>
                                 <td className='px-4 py-2 text-center border-b flex justify-center'><CiImageOff size={30}/></td>
                                 <td className='px-4 py-2 text-center border-b'>Tuyet voi</td>

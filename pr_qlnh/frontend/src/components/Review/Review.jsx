@@ -10,14 +10,21 @@ import { FaChevronRight } from "react-icons/fa";
 import BoxReview from './BoxReview';
 import { CiCamera } from "react-icons/ci";
 import Feedback from './Feedback';
+import axios from "axios";
 
 const Review = () => {
 
     const [activeFilter, setActiveFilter] = useState(1);
     const [openFormReview, setOpenFormReview] = useState(false);
-    const [values, setValues] = useState(null);
-    const fileInputRef = useRef(null);
+    // const [values, setValues] = useState(null);
+
+    //get information review
+    const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState("");
     const [preview, setPreview] = useState(null);
+    const [image, setImage] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const fileInputRef = useRef(null);
 
 
     const filters = [
@@ -36,17 +43,47 @@ const Review = () => {
         setOpenFormReview(false);
     }
 
+    //Handle open choose file
     const handleIconClick = () => {
         fileInputRef.current.click();
     }
 
+    //Handle change file
     const handleChangeFile = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const urlImage = URL.createObjectURL(file);
-            setPreview(urlImage);
-        }
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
     };
+
+    //Handle button submit
+    const handleSubmit = async () => {
+        if (!rating) return alert('Vui long chon sao!');
+        setLoading(true);
+
+        const formData = new FormData();
+        formData.append("menu_item_id", 1);
+        formData.append("rating", rating);
+        formData.append("comment", comment);
+        if (image) {
+            formData.append("image_url", image);
+        }
+        try {
+            const res = await axios.post("http://localhost:8000/api/reviews", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            alert(res.data.message);
+            handleClose();
+        } catch (error) {
+            console.log(error);
+            alert("Gui danh gia that bai");
+        }
+        finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <>
@@ -76,7 +113,7 @@ const Review = () => {
                                         </div>
                                     </div>
                                     <div className="formReview-select-rating py-2">
-                                        <Rating name="no-value" value={values} size='large' onChange={(event, newValue) => { setValues(newValue) }} />
+                                        <Rating value={rating} size='large' onChange={(e, newValue) => { setRating(newValue) }} />
                                     </div>
                                     <div className="formReview-upload mb-2">
                                         <div className="formReview-upload-title">
@@ -96,10 +133,18 @@ const Review = () => {
                                             <h5>Nhập đánh giá của bạn</h5>
                                         </div>
                                         <div className="formReview-comment-content">
-                                            <textarea className='w-[500px] h-[200px] border border[#333] focus:ring-0 focus:outline-none !resize-none p-2' name="comment" id="comment" placeholder='Nhập đánh giá của bạn về chúng tôi...'></textarea>
+                                            <textarea
+                                                className='w-[500px] h-[200px] border border-[#333] focus:ring-0 focus:outline-none !resize-none p-2'
+                                                placeholder='Nhập đánh giá của bạn về chúng tôi...'
+                                                value={comment}
+                                                onChange={(e) => setComment(e.target.value)}></textarea>
                                         </div>
                                     </div>
-                                    <Button variant='contained' color='error'>Gửi</Button>
+                                    <Button
+                                        variant='contained'
+                                        color='error'
+                                        onClick={handleSubmit}
+                                        disabled={loading}>{loading ? "Dang gui..." : "Gui"}</Button>
                                 </div>
                             </Dialog>
                         </div>
