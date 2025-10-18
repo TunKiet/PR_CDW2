@@ -11,15 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_roles', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id'); // Nguoi dung | ham unsigned co nghia la chi nhan gia tri tuong duong >= 0
+        Schema::create('role_permissions', function (Blueprint $table) {
             $table->unsignedBigInteger('role_id'); // Vai tro
+            $table->unsignedBigInteger('permission_id'); // Quyen
             // Primary key
-            $table->primary(['user_id', 'role_id']);
+            $table->primary(['role_id', 'permission_id']);
             // Foreign keys
-            // Ham onDelete co nghia la khi mot user bi xoa thi cac ban ghi tuong ung trong bang se bi xoa theo
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+            $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('cascade');
         });
     }
 
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_roles');
+        Schema::dropIfExists('role_permissions');
     }
 };
