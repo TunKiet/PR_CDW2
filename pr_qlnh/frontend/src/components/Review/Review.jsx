@@ -64,9 +64,15 @@ const Review = () => {
         formData.append("menu_item_id", 1);
         formData.append("rating", rating);
         formData.append("comment", comment);
+
         if (image) {
             formData.append("image_url", image);
         }
+
+        for (let pair of formData.entries()) {
+            console.log(pair[0], pair[1]);
+        }
+
         try {
             const res = await axios.post("http://localhost:8000/api/reviews", formData, {
                 headers: {
@@ -211,7 +217,7 @@ const Review = () => {
                     </div>
 
                     {/* Info review */}
-                    <BoxReview />
+                    <BoxReview menuItemId={1}/>
                     {/* <Feedback /> */}
 
                     <hr />

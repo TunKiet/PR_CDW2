@@ -10,7 +10,7 @@ class ReviewController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'menu_item_id' => 'required|exists:menu_items,id',
+            'menu_item_id' => 'required|exists:menu_items,menu_item_id',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string',
             'image_url' => 'nullable|image|max:2048',
@@ -21,10 +21,10 @@ class ReviewController extends Controller
             $path = $request->file('image_url')->store('reviews', 'public');
         }
 
-        
+
         $review = Review::create([
             'user_id' => 1,
-            'menu_item_id' => $validated['menu_item_id'],
+            'menu_item_id' => 1,
             'rating' => $validated['rating'],
             'comment' => $validated['comment'] ?? null,
             'image_url' => $path,
@@ -36,10 +36,11 @@ class ReviewController extends Controller
         ]);
     }
 
+    //get review
     public function index($menuItemId)
     {
         $reviews = Review::where('menu_item_id', $menuItemId)
-            ->where('status', 'approved')
+            ->where('status', 'pendding')
             ->with('user:id,name')
             ->latest()
             ->get();
