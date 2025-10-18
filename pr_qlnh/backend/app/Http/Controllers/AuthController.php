@@ -30,4 +30,25 @@ class AuthController extends Controller
             'user' => $user,
         ], 201);
     }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required',
+            'password' => 'required',
+        ]);
+
+        $user = User::where('phone', $request->phone)
+                    ->where('password', md5($request->password))
+                    ->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Số điện thoại hoặc mật khẩu không đúng!'], 401);
+        }
+
+        return response()->json([
+            'message' => 'Đăng nhập thành công!',
+            'user' => $user,
+        ], 200);
+    }
 }

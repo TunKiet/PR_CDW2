@@ -3,10 +3,7 @@ import "./LoginPage.css";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faEye,
-  faEyeSlash,
-} from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import axios from "axios";
 
@@ -52,9 +49,12 @@ export default function LoginPage() {
           phone: values.phone,
           password: values.password,
         });
-        alert(res.data.message || "Đăng nhập thành công!");
+
+        alert(res.data.message);
+        console.log("User:", res.data.user);
       } catch (err) {
-        alert(err.response?.data?.message || "Sai thông tin đăng nhập!");
+        const msg = err.response?.data?.message || "Đăng nhập thất bại!";
+        alert(msg);
       }
     },
   });
@@ -299,9 +299,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   className="eye-btn"
-                  onClick={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   <FontAwesomeIcon
                     icon={showConfirmPassword ? faEyeSlash : faEye}
