@@ -1,18 +1,12 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginPage from "./components/LoginPage";
-import TableManagementPage from "./pages/TableManagement";
-//import About from "./components/About";
-
-function App() {
+export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/quanlyban" element={<TableManagementPage />} />
-        {/* <Route path="/about" element={<About />} /> */}
-      </Routes>
-    </BrowserRouter>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-sky-400 to-indigo-600">
+      <h1 className="text-5xl font-bold text-white mb-6 drop-shadow-lg">
+        ✅ Tailwind v4 hoạt động ngon lành!
+      </h1>
+      <button className="px-6 py-3 bg-white text-indigo-600 rounded-xl shadow-lg hover:bg-indigo-100 transition">
+        Kiểm tra hiệu ứng
+      </button>
+    </div>
   );
-  }
-
-export default App;
+}
