@@ -1,7 +1,6 @@
 <?php
 
 namespace Database\Seeders;
-use Illuminate\Support\Facades\DB;
 
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -20,11 +19,5 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
-        // Dang ky them cac seeder khac o day
-        // lenh: php artisan db:seed (chay toan bo cac seeder)
-        // lenh: php artisan db:seed --class=RolePermissionsSeeder (chay tung seeder)
-        $this->call(
-            [RolePermissionsSeeder::class]
-        );
     }
 }
