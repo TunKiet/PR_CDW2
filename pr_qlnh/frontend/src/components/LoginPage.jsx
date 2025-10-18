@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // ✅ Validate schema cho đăng nhập
+  // Validate schema cho đăng nhập
   const loginSchema = Yup.object({
     phone: Yup.string()
       .required("Vui lòng nhập số điện thoại")
@@ -22,7 +22,7 @@ export default function LoginPage() {
       .min(6, "Mật khẩu ít nhất 6 ký tự"),
   });
 
-  // ✅ Validate schema cho đăng ký
+  // Validate schema cho đăng ký
   const registerSchema = Yup.object({
     fullName: Yup.string().required("Vui lòng nhập họ tên"),
     email: Yup.string()
@@ -39,7 +39,7 @@ export default function LoginPage() {
       .required("Vui lòng xác nhận mật khẩu"),
   });
 
-  // ✅ Đăng nhập
+  // Đăng nhập
   const loginFormik = useFormik({
     initialValues: { phone: "", password: "", rememberMe: false },
     validationSchema: loginSchema,
@@ -59,7 +59,7 @@ export default function LoginPage() {
     },
   });
 
-  // ✅ Đăng ký
+  // Đăng ký
   const registerFormik = useFormik({
     initialValues: {
       fullName: "",
