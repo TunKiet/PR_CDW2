@@ -35,6 +35,9 @@ Route::post('/login', function (Request $request) {
         return response()->json(['message' => 'Số điện thoại hoặc mật khẩu không đúng!'], 401);
     }
 
+    // Lưu session
+    session(['id' => $user->id]);
+
     return response()->json([
         'message' => 'Đăng nhập thành công!',
         'user' => $user
