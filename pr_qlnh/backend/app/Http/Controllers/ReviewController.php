@@ -31,22 +31,46 @@ class ReviewController extends Controller
             'image_url' => $path,
         ]);
 
+        $reviewWithUser = Review::with('user:user_id,username')->find($review->review_id);
+
         return response()->json([
             'message' => 'Đánh giá đã được lưu thành công!',
-            'data' => $review
+            'data' => $reviewWithUser
         ]);
     }
 
     //get review
     public function index($menuItemId)
     {
-        // Log để debug xem có nhận đúng tham số không
         Log::info("🟢 Fetching reviews for menu_item_id = $menuItemId");
 
-        $reviews = Review::where('menu_item_id', $menuItemId)->get();
+        // 🟢 Lấy danh sách review kèm username
+        $reviews = Review::where('menu_item_id', $menuItemId)
+            ->with('user:user_id,username') // chỉ lấy 2 cột cần thiết
+            ->get();
 
         Log::info("🟢 Found " . $reviews->count() . " reviews");
 
         return response()->json($reviews);
+    }
+
+    //get average rating
+    public function getAverageRating($menuItemId)
+    {
+        $averageRating = Review::where('menu_item_id', $menuItemId)
+            ->where('status', 'pending')
+            ->average('rating');
+
+        // Nếu chưa có đánh giá thì trả 0
+        $averageRating = round($averageRating ?? 0, 1);
+
+        $count = Review::where('menu_item_id', $menuItemId)
+            ->where('status', 'approved')
+            ->count();
+
+        return response()->json([
+            'average_rating' => $averageRating,
+            'total_reviews' => $count
+        ]);
     }
 }

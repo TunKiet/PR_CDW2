@@ -69,7 +69,7 @@ const BoxReview = ({ menuItemId }) => {
                             </div>
                             <div className="block-infor flex ms-2 mt-1">
                                 <div className="block-infor-name">
-                                    <span className='font-bold text-2xl'>{review.username}</span>
+                                    <span className='font-bold text-2xl'>{review.user.username}</span>
                                 </div>
                             </div>
                         </div>
