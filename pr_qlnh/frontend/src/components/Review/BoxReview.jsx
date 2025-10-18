@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BsChatRightText } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 import { AiOutlineLike } from "react-icons/ai";
@@ -9,6 +9,7 @@ import Star from './Star';
 import Feedback from './Feedback';
 import AdminFeedback from './AdminFeedback';
 import UserFeedback from './UserFeedback';
+import axios from "axios";
 
 
 const BoxReview = () => {
@@ -16,6 +17,10 @@ const BoxReview = () => {
     const [likes, setLikes] = useState(0);
     const [disLikes, setDisLikes] = useState(0);
     const [showReply, setShowReply] = useState(false);
+
+    //set review
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const handToggle = () => {
         setShowFeedback(!showFeedback);
@@ -31,6 +36,25 @@ const BoxReview = () => {
     const handleOpenReply = () => {
         setShowReply(!showReply);
     }
+
+    useEffect(() => {
+        const fetchReview = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8000/api/reviews/${menuItemId}`);
+                setReviews(res.data);
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+            }
+            finally {
+                setLoading(false);
+            }
+        };
+
+        fetchReview();
+    },[menuItemId]);
+
+    if(loading) return <p>Loading reviews...</p>
+    if(reviews.length === 0) return <p>Chua co danh gia nao</p>
     return (
         <>
             <div className="boxReview-comment flex mb-1 p-1">
@@ -49,7 +73,7 @@ const BoxReview = () => {
                         <Star />
                         <span className='ms-2'>Tuyệt vời</span>
                         <div className="comment-item-time flex items-center ms-2 text-gray-500">
-                            <MdAccessTime className='me-1'/>
+                            <MdAccessTime className='me-1' />
                             <span>2025-10-30 08:30</span>
                         </div>
                     </div>
@@ -100,14 +124,14 @@ const BoxReview = () => {
                         showFeedback &&
                         (
                             <div className="list-rep-comment my-4">
-                               
-                                <AdminFeedback/>
+
+                                <AdminFeedback />
                                 <hr />
 
-                                <AdminFeedback/>
+                                <AdminFeedback />
                                 <hr />
-                                <UserFeedback/>
-                                
+                                <UserFeedback />
+
                             </div>
                         )
                     }
