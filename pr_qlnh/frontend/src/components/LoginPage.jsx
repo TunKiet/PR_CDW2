@@ -6,26 +6,26 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEye,
   faEyeSlash,
-  faExclamationCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
+import axios from "axios";
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // ✅ Schema cho đăng nhập
+  // ✅ Validate schema cho đăng nhập
   const loginSchema = Yup.object({
     phone: Yup.string()
       .required("Vui lòng nhập số điện thoại")
-      .matches(/^[0-9]{10,11}$/, "Số điện thoại phải 10-11 chữ số"),
+      .matches(/^[0-9]{10,11}$/, "Số điện thoại phải có 10-11 chữ số"),
     password: Yup.string()
       .required("Vui lòng nhập mật khẩu")
       .min(6, "Mật khẩu ít nhất 6 ký tự"),
   });
 
-  // ✅ Schema cho đăng ký
+  // ✅ Validate schema cho đăng ký
   const registerSchema = Yup.object({
     fullName: Yup.string().required("Vui lòng nhập họ tên"),
     email: Yup.string()
@@ -33,23 +33,33 @@ export default function LoginPage() {
       .required("Vui lòng nhập email"),
     phone: Yup.string()
       .required("Vui lòng nhập số điện thoại")
-      .matches(/^[0-9]{10,11}$/, "Số điện thoại phải 10-11 chữ số"),
+      .matches(/^[0-9]{10,11}$/, "Số điện thoại phải có 10-11 chữ số"),
     password: Yup.string()
       .required("Vui lòng nhập mật khẩu")
-      .min(8, "Mật khẩu phải tối thiểu 8 ký tự"),
+      .min(8, "Mật khẩu tối thiểu 8 ký tự"),
     confirmPassword: Yup.string()
       .oneOf([Yup.ref("password")], "Mật khẩu xác nhận không khớp")
       .required("Vui lòng xác nhận mật khẩu"),
   });
 
+  // ✅ Đăng nhập
   const loginFormik = useFormik({
     initialValues: { phone: "", password: "", rememberMe: false },
     validationSchema: loginSchema,
-    onSubmit: (values) => {
-      alert(`Đăng nhập thành công: ${values.phone}`);
+    onSubmit: async (values) => {
+      try {
+        const res = await axios.post("http://localhost:8000/api/login", {
+          phone: values.phone,
+          password: values.password,
+        });
+        alert(res.data.message || "Đăng nhập thành công!");
+      } catch (err) {
+        alert(err.response?.data?.message || "Sai thông tin đăng nhập!");
+      }
     },
   });
 
+  // ✅ Đăng ký
   const registerFormik = useFormik({
     initialValues: {
       fullName: "",
@@ -59,14 +69,27 @@ export default function LoginPage() {
       confirmPassword: "",
     },
     validationSchema: registerSchema,
-    onSubmit: (values) => {
-      alert(`Đăng ký thành công: ${values.email}`);
+    onSubmit: async (values, { resetForm, setSubmitting }) => {
+      try {
+        setSubmitting(true);
+        const res = await axios.post("http://localhost:8000/api/register", {
+          full_name: values.fullName,
+          email: values.email,
+          phone: values.phone,
+          password: values.password,
+        });
+        alert(res.data.message || "Đăng ký thành công!");
+        resetForm();
+      } catch (err) {
+        alert(
+          err.response?.data?.message ||
+            "Có lỗi xảy ra khi đăng ký, vui lòng thử lại!"
+        );
+      } finally {
+        setSubmitting(false);
+      }
     },
   });
-
-  const handleGoogleLogin = () => {
-    alert("Chức năng đăng nhập bằng Google (chưa kích hoạt)");
-  };
 
   return (
     <div className="login-container">
@@ -94,6 +117,7 @@ export default function LoginPage() {
         {/* --- FORM LOGIN --- */}
         {activeTab === "login" && (
           <form onSubmit={loginFormik.handleSubmit} className="form">
+            {/* Phone */}
             <div className="form-group">
               <label className="label">Số điện thoại</label>
               <input
@@ -114,6 +138,7 @@ export default function LoginPage() {
               )}
             </div>
 
+            {/* Password */}
             <div className="form-group">
               <label className="label">Mật khẩu</label>
               <div className="password-wrapper">
@@ -135,7 +160,7 @@ export default function LoginPage() {
                   className="eye-btn"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                 </button>
               </div>
               {loginFormik.touched.password && loginFormik.errors.password && (
@@ -143,28 +168,12 @@ export default function LoginPage() {
               )}
             </div>
 
-            <div className="form-footer">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  onChange={loginFormik.handleChange}
-                  checked={loginFormik.values.rememberMe}
-                  className="checkbox"
-                />
-                <span>Ghi nhớ mật khẩu</span>
-              </label>
-              <button
-                type="button"
-                onClick={() => alert("Chức năng quên mật khẩu")}
-                className="link"
-              >
-                Quên mật khẩu?
-              </button>
-            </div>
-
-            <button type="submit" className="btn btn-primary">
-              Đăng nhập
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loginFormik.isSubmitting}
+            >
+              {loginFormik.isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
           </form>
         )}
@@ -172,6 +181,7 @@ export default function LoginPage() {
         {/* --- FORM REGISTER --- */}
         {activeTab === "register" && (
           <form onSubmit={registerFormik.handleSubmit} className="form">
+            {/* Full name */}
             <div className="form-group">
               <label className="label">Họ và tên</label>
               <input
@@ -180,7 +190,7 @@ export default function LoginPage() {
                 onChange={registerFormik.handleChange}
                 onBlur={registerFormik.handleBlur}
                 value={registerFormik.values.fullName}
-                placeholder="Nguyễn Văn A"
+                placeholder="Nhập họ và tên"
                 className={`input ${
                   registerFormik.touched.fullName &&
                   registerFormik.errors.fullName
@@ -194,6 +204,7 @@ export default function LoginPage() {
                 )}
             </div>
 
+            {/* Email */}
             <div className="form-group">
               <label className="label">Email</label>
               <input
@@ -214,6 +225,7 @@ export default function LoginPage() {
               )}
             </div>
 
+            {/* Phone */}
             <div className="form-group">
               <label className="label">Số điện thoại</label>
               <input
@@ -234,6 +246,7 @@ export default function LoginPage() {
               )}
             </div>
 
+            {/* Password */}
             <div className="form-group">
               <label className="label">Mật khẩu</label>
               <div className="password-wrapper">
@@ -256,7 +269,7 @@ export default function LoginPage() {
                   className="eye-btn"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+                  <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                 </button>
               </div>
               {registerFormik.touched.password &&
@@ -265,6 +278,7 @@ export default function LoginPage() {
                 )}
             </div>
 
+            {/* Confirm Password */}
             <div className="form-group">
               <label className="label">Xác nhận mật khẩu</label>
               <div className="password-wrapper">
@@ -285,9 +299,13 @@ export default function LoginPage() {
                 <button
                   type="button"
                   className="eye-btn"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
                 >
-                  <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+                  <FontAwesomeIcon
+                    icon={showConfirmPassword ? faEyeSlash : faEye}
+                  />
                 </button>
               </div>
               {registerFormik.touched.confirmPassword &&
@@ -297,23 +315,15 @@ export default function LoginPage() {
                   </p>
                 )}
             </div>
-
-            <button type="submit" className="btn btn-primary">
-              Đăng ký
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={registerFormik.isSubmitting}
+            >
+              {registerFormik.isSubmitting ? "Đang đăng ký..." : "Đăng ký"}
             </button>
           </form>
         )}
-
-        <div className="divider">
-          <span>Hoặc</span>
-        </div>
-
-        <button onClick={handleGoogleLogin} className="btn btn-google">
-          <FontAwesomeIcon icon={faGoogle} className="google-icon" />
-          {activeTab === "login"
-            ? " Đăng nhập bằng Google"
-            : " Đăng ký bằng Google"}
-        </button>
       </div>
     </div>
   );
