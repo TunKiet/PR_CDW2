@@ -119,7 +119,7 @@ const Review = () => {
                                         </div>
                                     </div>
                                     <div className="formReview-select-rating py-2">
-                                        <Rating value={rating} size='large' onChange={(e, newValue) => { setRating(newValue) }} />
+                                        <Rating value={rating} size='large' onChange={(e, newValue) => { setRating(newValue) }} readOnly/>
                                     </div>
                                     <div className="formReview-upload mb-2">
                                         <div className="formReview-upload-title">
