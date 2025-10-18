@@ -221,11 +221,7 @@ const Review = () => {
                     {/* <Feedback /> */}
 
                     <hr />
-                    <BoxReview />
-                    {/* <Feedback /> */}
-
-                    <hr />
-                    <BoxReview />
+                    
 
                     {/* <Feedback /> */}
 

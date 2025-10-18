@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log; 
 
 class ReviewController extends Controller
 {
@@ -39,11 +40,12 @@ class ReviewController extends Controller
     //get review
     public function index($menuItemId)
     {
-        $reviews = Review::where('menu_item_id', $menuItemId)
-            ->where('status', 'pendding')
-            ->with('user:id,name')
-            ->latest()
-            ->get();
+        // Log để debug xem có nhận đúng tham số không
+        Log::info("🟢 Fetching reviews for menu_item_id = $menuItemId");
+
+        $reviews = Review::where('menu_item_id', $menuItemId)->get();
+
+        Log::info("🟢 Found " . $reviews->count() . " reviews");
 
         return response()->json($reviews);
     }
