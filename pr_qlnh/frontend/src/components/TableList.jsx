@@ -85,7 +85,7 @@ export default function TableList({ tables, onEdit, onDelete }) {
                 Tên Bàn
               </th>
               <th className="px-6 py-3 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">
-                Sức Chứa 352352
+                Sức Chứa
               </th>
               <th className="px-6 py-3 text-left text-sm font-bold text-gray-600 uppercase tracking-wider">
                 Khu Vực
