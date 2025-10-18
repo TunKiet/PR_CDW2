@@ -102,7 +102,7 @@ const Review = () => {
                         <div className="boxReview-score">
                             <div className="rating text-4xl"><span className="average-rating text-6xl">4.8</span>/5</div>
                             <div className="item-star">
-                                <Star />
+                                <Rating value={5} readOnly/>
                             </div>
                             <div className="count-review py-1 ">100 lượt đánh giá</div>
                             <Button variant="contained" color='error' onClick={handleClickOpen}>Viết đánh giá</Button>

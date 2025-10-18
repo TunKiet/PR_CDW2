@@ -5,6 +5,7 @@ import Header from './components/Header/Header'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Review from './components/Review/Review'
 import ReviewModerator from './components/ReviewModerator/ReviewModerator'
+import { ReviewAll } from './components/ReviewAll/ReviewAll'
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path="/" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
+        <Route path="/all-review" element={<ReviewAll />} />
       </Routes>
     </BrowserRouter>
   )
