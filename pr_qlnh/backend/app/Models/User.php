@@ -10,7 +10,6 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-
     protected $table = 'users';
 
     // Nếu khóa chính khác "id", ví dụ "user_id"
@@ -33,4 +32,15 @@ class User extends Authenticatable
     ];
 
     public $timestamps = true;
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function hasPermission($permissionName)
+    {
+        return $this->role
+            ? $this->role->permissions->contains('name', $permissionName)
+            : false;
+    }
 }

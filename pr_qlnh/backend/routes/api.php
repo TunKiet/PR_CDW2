@@ -1,45 +1,34 @@
 <?php
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PermissionController;
 
-Route::post('/register', function (Request $request) {
-    $validated = $request->validate([
-        'full_name' => 'required|string|max:255',
-        'email' => 'required|string|email|unique:users,email',
-        'phone' => 'required|string|max:15|unique:users,phone',
-        'password' => 'required|string|min:8',
-    ]);
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+| Tất cả route API sẽ nằm ở đây, prefix là /api
+|--------------------------------------------------------------------------
+*/
 
-    $user = User::create([
-        'name' => $validated['full_name'],
-        'email' => $validated['email'],
-        'phone' => $validated['phone'],
-        'password' => Hash::make($validated['password']),
-    ]);
+// 🧩 AUTH ROUTES
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
-    return response()->json(['message' => 'Đăng ký thành công!', 'user' => $user]);
+// ✅ Nếu bạn dùng JWTAuth, nên bảo vệ route bằng middleware:
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-Route::post('/login', function (Request $request) {
-    $validated = $request->validate([
-        'phone' => 'required|string',
-        'password' => 'required|string',
-    ]);
-
-    // Tìm user theo số điện thoại
-    $user = User::where('phone', $validated['phone'])->first();
-
-    if (!$user || !Hash::check($validated['password'], $user->password)) {
-        return response()->json(['message' => 'Số điện thoại hoặc mật khẩu không đúng!'], 401);
-    }
-
-    // Lưu session
-    session(['id' => $user->id]);
-
-    return response()->json([
-        'message' => 'Đăng nhập thành công!',
-        'user' => $user
-    ]);
+// 🛡️ ROLE & PERMISSION
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::apiResource('/roles', RoleController::class);
+    Route::apiResource('/permissions', PermissionController::class);
 });
+

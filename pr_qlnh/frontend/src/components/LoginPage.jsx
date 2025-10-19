@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./LoginPage.css";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,7 +13,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // ✅ Validate schema cho đăng nhập
+  //Validate schema cho đăng nhập
   const loginSchema = Yup.object({
     phone: Yup.string()
       .required("Vui lòng nhập số điện thoại")
@@ -22,7 +23,7 @@ export default function LoginPage() {
       .min(6, "Mật khẩu ít nhất 6 ký tự"),
   });
 
-  // ✅ Validate schema cho đăng ký
+  // Validate schema cho đăng ký
   const registerSchema = Yup.object({
     fullName: Yup.string().required("Vui lòng nhập họ tên"),
     email: Yup.string()
@@ -38,8 +39,8 @@ export default function LoginPage() {
       .oneOf([Yup.ref("password")], "Mật khẩu xác nhận không khớp")
       .required("Vui lòng xác nhận mật khẩu"),
   });
-
-  // ✅ Đăng nhập
+  const navigate = useNavigate();
+  // Đăng nhập
   const loginFormik = useFormik({
     initialValues: { phone: "", password: "", rememberMe: false },
     validationSchema: loginSchema,
@@ -52,6 +53,13 @@ export default function LoginPage() {
 
         alert(res.data.message);
         console.log("User:", res.data.user);
+
+        //chuyen huong ve trang chu hoac dashboard
+        if (res.data.user.role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/user/home");
+        }
       } catch (err) {
         const msg = err.response?.data?.message || "Đăng nhập thất bại!";
         alert(msg);
@@ -59,7 +67,7 @@ export default function LoginPage() {
     },
   });
 
-  // ✅ Đăng ký
+  //Đăng ký
   const registerFormik = useFormik({
     initialValues: {
       fullName: "",
