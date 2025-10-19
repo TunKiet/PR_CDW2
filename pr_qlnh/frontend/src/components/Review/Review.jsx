@@ -214,6 +214,9 @@ const Review = () => {
                                 ))
                             }
                         </div>
+                        <div className="ms-auto">
+                            <div className="reply-rate">Tỉ lệ phản hồi <span>99%</span></div>
+                        </div>
                     </div>
 
                     {/* Info review */}

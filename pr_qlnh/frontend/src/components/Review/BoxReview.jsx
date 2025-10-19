@@ -77,7 +77,7 @@ const BoxReview = ({ menuItemId }) => {
                         <div className="boxReview-comment-item">
                             <div className="comment-item-rating flex items-center">
                                 <div className="star flex text-2xl py-1">
-                                    <Rating name="simple-controlled" value={review.rating} readOnly/>
+                                    <Rating name="simple-controlled" value={review.rating} readOnly />
                                 </div>
                                 <span className='ms-2'>Tuyệt vời</span>
                                 <div className="comment-item-time flex items-center ms-2 text-gray-500">
