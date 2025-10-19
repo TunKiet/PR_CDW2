@@ -28,6 +28,10 @@ COPY . /var/www
 # Install dependencies
 RUN composer install --no-interaction --optimize-autoloader
 
+# Install PHP extensions
+RUN pecl install redis && docker-php-ext-enable redis \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage

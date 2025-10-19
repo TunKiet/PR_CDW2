@@ -7,36 +7,47 @@
     --second: #717ff5;
     --bgColor: #f6f9ff;
 }
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+
 body {
     font-family: 'Open Sans', sans-serif;
     color: #444444;
     background: var(--bgColor);
 }
+
 a {
     color: var(--primary);
     text-decoration: none;
     cursor: pointer;
 }
+
 a:hover {
     color: var(--primary);
     text-decoration: none;
 }
-h1, h2, h3, h4, h5, h6 {
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: 'Nunito', sans-serif;
 }
 /*Start Review*/
-/* .container-review {
-    width: 80% !important;
-    height: auto !important;
-} */
-/* .boxReview {
-    width: 100%;
-    height: 40px;
-    background: blue !important;
-} */
+.custom-progress::-webkit-progress-bar {
+    background: rgb(222, 222, 222) !important;
+    border-radius: 10px !important;
+}
+
+.custom-progress::-webkit-progress-value {
+    background-color: red !important;
+    border-radius: 10px !important;
+}
+
 /*End Review*/

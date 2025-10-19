@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 services:
   # Laravel Backend
@@ -47,7 +47,7 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root 
       MYSQL_PASSWORD: password
       MYSQL_USER: laravel
     volumes:
