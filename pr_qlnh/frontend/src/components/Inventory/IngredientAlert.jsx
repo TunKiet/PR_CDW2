@@ -1,7 +1,9 @@
 import React from 'react'
 import Button from '@mui/material/Button';
 import { RiFileList2Line } from "react-icons/ri";
+import Dialog from '@mui/material/Dialog'; 
 const IngredientAlert = () => {
+
     return (
         <>
             <div className="boxIngredient-alert">
@@ -12,6 +14,10 @@ const IngredientAlert = () => {
                     <div className="boxIngredient-button ms-auto">
                         <div className="boxIngredient-button-name me-3">
                             <Button variant='contained' color='primary'><RiFileList2Line size={20} />Tạo đơn nhập hàng</Button>
+
+                            <Dialog>
+                                Don hang nhap nguyen lieu
+                            </Dialog>
                         </div>
                     </div>
                 </div>

@@ -11,7 +11,7 @@ import { FaPencil } from "react-icons/fa6";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Pagination from '@mui/material/Pagination';
-import Dialog from '@mui/material/Dialog';
+import Dialog from '@mui/material/Dialog'; 
 import Select from '@mui/material/Select';
 
 const Ingredient = () => {
