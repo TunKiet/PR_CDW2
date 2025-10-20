@@ -1,10 +1,19 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Sidebar from '../Sidebar/Sidebar'
 import Ingredient from './Ingredient'
+import IngredientAlert from './IngredientAlert'
+import IngredientInOut from './IngredientInOut'
 
 
 const Invertory = () => {
 
+    const [activeTab, setActiveTab] = useState(1);
+
+    const tabs = [
+        { id: 2, label: "Quản lý nguyên liệu" },
+        { id: 1, label: "Cảnh báo nguyên liệu" },
+        { id: 3, label: "Thống kê Nhập/Xuất" },
+    ];
     return (
         <>
             <div className="section">
@@ -21,21 +30,26 @@ const Invertory = () => {
                                 <hr />
                                 <div className="boxIngredient-menu my-2">
                                     <div className="boxIngredient-menu-item flex p-2 gap-4.5">
-                                        <div className="item-ingredient cursor-pointer">
-                                            <p className='mb-0'>Quản lý nguyên liệu</p>
-                                        </div>
-                                        <div className="item-inventory cursor-pointer">
-                                            <p className='mb-0'>Cảnh báo nguên liệu</p>
-
-                                        </div>
-                                        <div className="item-input-output cursor-pointer">
-                                            <p className='mb-0'>Thống kê Nhập/Xuất</p>
-
-                                        </div>
+                                        {tabs.map((tab) => (
+                                            <div
+                                                key={tab.id}
+                                                className={`relative cursor-pointer pb-1 transition-all duration-300 ${activeTab === tab.id
+                                                    ? "text-orange-500 font-bold after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-orange-500 after:transition-all after:duration-300"
+                                                    : "text-gray-600 hover:text-orange-400 after:content-[''] after:absolute after:left-1/2 after:bottom-0 after:w-0 after:h-[2px] after:bg-orange-400 after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full"
+                                                    }`}
+                                                onClick={() => setActiveTab(tab.id)}
+                                            >
+                                                <p className="mb-0">{tab.label}</p>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
-                            <Ingredient />
+                            <div className="boxIngredient-content mt-4">
+                                {activeTab === 2 && <Ingredient />}
+                                {activeTab === 1 && <IngredientAlert />}
+                                {activeTab === 3 && <IngredientInOut />}
+                            </div>
                         </div>
                     </div>
                 </div>

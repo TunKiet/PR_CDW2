@@ -152,20 +152,18 @@ const Ingredient = () => {
                                 <th className='px-4 py-2 text-center border-b'>Danh mục</th>
                                 <th className='px-4 py-2 text-center border-b'>Tồn kho</th>
                                 <th className='px-4 py-2 text-center border-b'>Đơn vị</th>
-                                <th className='px-4 py-2 text-center border-b'>Ngưỡng</th>
                                 <th className='px-4 py-2 text-center border-b'>Giá</th>
                                 <th className='px-4 py-2 text-center border-b'>Tổng tiền</th>
                                 <th className='px-4 py-2 text-center border-b'>Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr className='border border-b-2'>
                                 <td className='px-4 py-2 text-center border-b'>1</td>
                                 <td className='px-4 py-2 text-center border-b'>Gà</td>
                                 <td className='px-4 py-2 text-center border-b'>Thịt</td>
                                 <td className='px-4 py-2 text-center border-b'>10</td>
                                 <td className='px-4 py-2 text-center border-b'>con</td>
-                                <td className='px-4 py-2 text-center border-b'>5</td>
                                 <td className='px-4 py-2 text-center border-b'>120.000 đ</td>
                                 <td className='px-4 py-2 text-center border-b'>1.200.000 đ</td>
                                 <td className='text-center border-b'>
@@ -242,11 +240,178 @@ const Ingredient = () => {
                                     </Tooltip>
                                 </td>
                             </tr>
+
+                            <tr className='border border-b-2'>
+                                <td className='px-4 py-2 text-center border-b'>1</td>
+                                <td className='px-4 py-2 text-center border-b'>Gà</td>
+                                <td className='px-4 py-2 text-center border-b'>Thịt</td>
+                                <td className='px-4 py-2 text-center border-b'>10</td>
+                                <td className='px-4 py-2 text-center border-b'>con</td>
+                                <td className='px-4 py-2 text-center border-b'>120.000 đ</td>
+                                <td className='px-4 py-2 text-center border-b'>1.200.000 đ</td>
+                                <td className='text-center border-b'>
+                                    {/* <Tooltip title="View">
+                                                        <IconButton onClick={() => setOpenIngDetail(true)}>
+                                                            <IoEyeOutline size={22} />
+                                                        </IconButton>
+                                                    </Tooltip> */}
+
+                                    <Tooltip title="Update">
+                                        <IconButton onClick={() => setOpenUpdate(true)}>
+                                            <FaPencil size={20} />
+                                        </IconButton>
+                                    </Tooltip>
+                                    {/* Dialog update ingredient */}
+                                    <Dialog open={openUpdate} onClose={() => setOpenUpdate(false)} maxWidth="sm" fullWidth>
+                                        <h3 className='text-center mt-3 border-b border-b-[#e8e8e8]'>Cập nhật nguyên liệu</h3>
+                                        <div className="formUpdate-ingredient">
+                                            <div className="fromUpdate-info p-3">
+                                                <div>
+                                                    <label htmlFor="">Mã NL</label>
+                                                    <input className='form-control' type="text" name="" id="" value={1} readOnly />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Tên nguyên liệu</label>
+                                                    <input className='form-control' type="text" name="" id="" value={`Ga`} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Danh mục</label>
+                                                    <Select value={category} onChange={handleChange} className='w-full' sx={{
+                                                        '& .MuiSelect-select': {
+                                                            padding: '8px',
+                                                        },
+                                                    }}>
+                                                        <MenuItem value={1}>Thịt</MenuItem>
+                                                        <MenuItem value={2}>Rau</MenuItem>
+                                                        <MenuItem value={3}>Cá</MenuItem>
+                                                        <MenuItem value={4}>Nước</MenuItem>
+                                                    </Select>
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Tồn kho</label>
+                                                    <input className='form-control' type="text" name="" id="" value={10} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Đơn vị</label>
+                                                    <input className='form-control' type="text" name="" id="" value={`Con`} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Ngưỡng cảnh báo</label>
+                                                    <input className='form-control' type="text" name="" id="" value={2} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Giá</label>
+                                                    <input className='form-control' type="text" name="" id="" value={120.000} />
+                                                </div>
+                                                <div className="fromUpdate-button flex">
+                                                    <div className='flex ms-auto py-3 gap-1.5'>
+                                                        <div className="fromUpdate-button-left">
+                                                            <Button variant='contained' color='error'>Hủy</Button>
+                                                        </div>
+                                                        <div className="fromUpdate-button-right">
+                                                            <Button variant='contained' color='primary'>Cập nhật</Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Dialog>
+                                    <Tooltip title="Delete">
+                                        <IconButton>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </td>
+                            </tr>
+
+                            <tr className='border border-b-2'>
+                                <td className='px-4 py-2 text-center border-b'>1</td>
+                                <td className='px-4 py-2 text-center border-b'>Gà</td>
+                                <td className='px-4 py-2 text-center border-b'>Thịt</td>
+                                <td className='px-4 py-2 text-center border-b'>10</td>
+                                <td className='px-4 py-2 text-center border-b'>con</td>
+                                <td className='px-4 py-2 text-center border-b'>120.000 đ</td>
+                                <td className='px-4 py-2 text-center border-b'>1.200.000 đ</td>
+                                <td className='text-center border-b'>
+                                    {/* <Tooltip title="View">
+                                                        <IconButton onClick={() => setOpenIngDetail(true)}>
+                                                            <IoEyeOutline size={22} />
+                                                        </IconButton>
+                                                    </Tooltip> */}
+
+                                    <Tooltip title="Update">
+                                        <IconButton onClick={() => setOpenUpdate(true)}>
+                                            <FaPencil size={20} />
+                                        </IconButton>
+                                    </Tooltip>
+                                    {/* Dialog update ingredient */}
+                                    <Dialog open={openUpdate} onClose={() => setOpenUpdate(false)} maxWidth="sm" fullWidth>
+                                        <h3 className='text-center mt-3 border-b border-b-[#e8e8e8]'>Cập nhật nguyên liệu</h3>
+                                        <div className="formUpdate-ingredient">
+                                            <div className="fromUpdate-info p-3">
+                                                <div>
+                                                    <label htmlFor="">Mã NL</label>
+                                                    <input className='form-control' type="text" name="" id="" value={1} readOnly />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Tên nguyên liệu</label>
+                                                    <input className='form-control' type="text" name="" id="" value={`Ga`} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Danh mục</label>
+                                                    <Select value={category} onChange={handleChange} className='w-full' sx={{
+                                                        '& .MuiSelect-select': {
+                                                            padding: '8px',
+                                                        },
+                                                    }}>
+                                                        <MenuItem value={1}>Thịt</MenuItem>
+                                                        <MenuItem value={2}>Rau</MenuItem>
+                                                        <MenuItem value={3}>Cá</MenuItem>
+                                                        <MenuItem value={4}>Nước</MenuItem>
+                                                    </Select>
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Tồn kho</label>
+                                                    <input className='form-control' type="text" name="" id="" value={10} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Đơn vị</label>
+                                                    <input className='form-control' type="text" name="" id="" value={`Con`} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Ngưỡng cảnh báo</label>
+                                                    <input className='form-control' type="text" name="" id="" value={2} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Giá</label>
+                                                    <input className='form-control' type="text" name="" id="" value={120.000} />
+                                                </div>
+                                                <div className="fromUpdate-button flex">
+                                                    <div className='flex ms-auto py-3 gap-1.5'>
+                                                        <div className="fromUpdate-button-left">
+                                                            <Button variant='contained' color='error'>Hủy</Button>
+                                                        </div>
+                                                        <div className="fromUpdate-button-right">
+                                                            <Button variant='contained' color='primary'>Cập nhật</Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Dialog>
+                                    <Tooltip title="Delete">
+                                        <IconButton>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </td>
+                            </tr>
+
                         </tbody>
                     </table>
                 </div>
                 {/* Paginaition ingredient */}
-                <div className="reviewModerator-pagination flex justify-center">
+                <div className="reviewModerator-pagination flex justify-center pt-2">
                     <Pagination count={5} variant="outlined" color='primary' />
                 </div>
             </div>
