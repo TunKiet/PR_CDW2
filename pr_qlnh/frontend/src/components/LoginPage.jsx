@@ -42,19 +42,25 @@ export default function LoginPage() {
   const navigate = useNavigate();
   // Đăng nhập
   const loginFormik = useFormik({
-    initialValues: { phone: "", password: "", rememberMe: false },
-    validationSchema: loginSchema,
+    initialValues: { identifier: "", password: "", rememberMe: false },
+    validationSchema: Yup.object({
+      identifier: Yup.string().required(
+        "Vui lòng nhập email hoặc số điện thoại"
+      ),
+      password: Yup.string()
+        .required("Vui lòng nhập mật khẩu")
+        .min(6, "Mật khẩu ít nhất 6 ký tự"),
+    }),
     onSubmit: async (values) => {
       try {
         const res = await axios.post("http://localhost:8000/api/login", {
-          phone: values.phone,
+          identifier: values.identifier, // ✅ gửi identifier
           password: values.password,
         });
 
         alert(res.data.message);
         console.log("User:", res.data.user);
 
-        //chuyen huong ve trang chu hoac dashboard
         if (res.data.user.role === "admin") {
           navigate("/admin/dashboard");
         } else {
@@ -127,23 +133,25 @@ export default function LoginPage() {
           <form onSubmit={loginFormik.handleSubmit} className="form">
             {/* Phone */}
             <div className="form-group">
-              <label className="label">Số điện thoại</label>
+              <label className="label">Email hoặc Số điện thoại</label>
               <input
                 type="text"
-                name="phone"
+                name="identifier"
                 onChange={loginFormik.handleChange}
                 onBlur={loginFormik.handleBlur}
-                value={loginFormik.values.phone}
-                placeholder="Nhập số điện thoại"
+                value={loginFormik.values.identifier}
+                placeholder="Nhập email hoặc số điện thoại"
                 className={`input ${
-                  loginFormik.touched.phone && loginFormik.errors.phone
+                  loginFormik.touched.identifier &&
+                  loginFormik.errors.identifier
                     ? "input-error"
                     : ""
                 }`}
               />
-              {loginFormik.touched.phone && loginFormik.errors.phone && (
-                <p className="error">{loginFormik.errors.phone}</p>
-              )}
+              {loginFormik.touched.identifier &&
+                loginFormik.errors.identifier && (
+                  <p className="error">{loginFormik.errors.identifier}</p>
+                )}
             </div>
 
             {/* Password */}

@@ -53,29 +53,34 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'phone' => 'required',
-            'password' => 'required',
+            'identifier' => 'required|string',
+            'password' => 'required|string',
         ]);
 
-        $user = User::where('phone', $request->phone)->first();
+        $identifier = $request->identifier;
 
-        if (!$user || !Hash::check(value: $request->password, hashedValue: $user->password)) {
-            return response()->json(['message' => 'Số điện thoại hoặc mật khẩu không đúng!'], 401);
+        // Kiểm tra xem người dùng nhập email hay số điện thoại
+        $user = User::where('email', $identifier)
+            ->orWhere('phone', $identifier)
+            ->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'Sai thông tin đăng nhập.'
+            ], 401);
         }
 
-        try {
-            $token = JWTAuth::fromUser($user);
-        } catch (JWTException $e) {
-            return response()->json(['message' => 'Không thể tạo token!'], 500);
-        }
+        // Nếu bạn dùng JWT
+        $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'message' => 'Đăng nhập thành công!',
             'user' => $user,
-            'role' => $user->role ?? 'user',
-            'token' => $token
-        ], 200);
+            'role' => $user->role ?? 'user', // vì chưa có quan hệ role model
+            'token' => $token,
+        ]);
     }
+
 
     /**
      * Lấy thông tin người dùng hiện tại (dành cho Frontend)
