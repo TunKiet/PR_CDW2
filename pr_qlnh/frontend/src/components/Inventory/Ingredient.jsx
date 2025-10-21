@@ -79,7 +79,7 @@ const Ingredient = () => {
                                 </Button>
                             </div>
                             <div className="boxIngredient-button-right mx-2">
-                                <Button variant='contained' color='primary' onClick={() => setOpenAdd(true)}>
+                                <Button variant='contained' color='primary' onClick={() => setOpenAdd(true)}> 
                                     <IoIosAdd color='white' size={20} />
                                     <p className="mb-0">Thêm nguyên liệu</p>
                                 </Button>
