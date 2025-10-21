@@ -11,7 +11,7 @@ import { FaPencil } from "react-icons/fa6";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Pagination from '@mui/material/Pagination';
-import Dialog from '@mui/material/Dialog'; 
+import Dialog from '@mui/material/Dialog';
 import Select from '@mui/material/Select';
 
 const Ingredient = () => {
@@ -79,7 +79,7 @@ const Ingredient = () => {
                                 </Button>
                             </div>
                             <div className="boxIngredient-button-right mx-2">
-                                <Button variant='contained' color='primary' onClick={() => setOpenAdd(true)}> 
+                                <Button variant='contained' color='primary' onClick={() => setOpenAdd(true)}>
                                     <IoIosAdd color='white' size={20} />
                                     <p className="mb-0">Thêm nguyên liệu</p>
                                 </Button>
