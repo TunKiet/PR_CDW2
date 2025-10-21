@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -38,5 +39,11 @@ class DatabaseSeeder extends Seeder
             ReviewReplySeeder::class,
             SessionSeeder::class,
         ]);
+        // Dang ky them cac seeder khac o day
+        // lenh: php artisan db:seed (chay toan bo cac seeder)
+        // lenh: php artisan db:seed --class=RolePermissionsSeeder (chay tung seeder)
+        $this->call(
+            [RolePermissionsSeeder::class]
+        );
     }
 }

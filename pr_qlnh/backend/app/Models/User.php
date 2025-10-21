@@ -18,36 +18,36 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $table = 'users';
-    protected $primaryKey = 'user_id';
+
+    // Nếu khóa chính khác "id", ví dụ "user_id"
+    protected $primaryKey = 'id';
+
+    //Các cột có thể gán hàng loạt (mass assignment)
     protected $fillable = [
         'username',
         'email',
         'password',
+        'full_name',
         'phone',
-        'role',
-        'is_active'
+        'status',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    // Ẩn password khi trả về JSON
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public $timestamps = true;
+    public function role()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->belongsTo(Role::class);
+    }
+
+    public function hasPermission($permissionName)
+    {
+        return $this->role
+            ? $this->role->permissions->contains('name', $permissionName)
+            : false;
     }
 }

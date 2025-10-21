@@ -19,9 +19,12 @@ function App() {
         <Route path="/review" element={<Review />} />
         <Route path="/inventory" element={<Invertory/>} />
         <Route path="/export" element={<IngredientInOut/>} />
+        {/* Định tuyến cho các trang khác nhau */}
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path='/user/dashboard' element={<UserDashboard />} />
       </Routes>
     </BrowserRouter>
   )
 }
-
 export default App
