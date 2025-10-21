@@ -1,8 +1,22 @@
 {
+<<<<<<< HEAD
   "hash": "c8d2f8a1",
   "configHash": "1c0bb37b",
   "lockfileHash": "777c88f5",
   "browserHash": "bda57fff",
+=======
+<<<<<<< HEAD
+  "hash": "fcc5255b",
+  "configHash": "ab472541",
+  "lockfileHash": "777c88f5",
+  "browserHash": "f54fee06",
+=======
+  "hash": "c251a65c",
+  "configHash": "ab472541",
+  "lockfileHash": "fdf4c863",
+  "browserHash": "2772d837",
+>>>>>>> 21-loc
+>>>>>>> Loc/f1/Customer_Points
   "optimized": {},
   "chunks": {}
 }
