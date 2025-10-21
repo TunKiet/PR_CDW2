@@ -260,3 +260,29 @@
   cursor: pointer;
   font-size: 18px;
 }
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0 16px;
+}
+
+.remember-me {
+  font-size: 14px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.forgot-password {
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}

@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class AuthController extends Controller
 {
@@ -97,5 +101,86 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             return response()->json(['message' => 'Không thể đăng xuất!'], 500);
         }
+    }
+    /**
+     * Summary of forgotPassword
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        // Tạo mã OTP 6 số
+        $otp = rand(100000, 999999);
+
+        // Lưu OTP vào DB (xóa OTP cũ nếu có)
+        DB::table('password_resets')->where('email', $request->email)->delete();
+        DB::table('password_resets')->insert([
+            'email' => $request->email,
+            'otp' => $otp,
+            'created_at' => Carbon::now(),
+        ]);
+
+        // Gửi mail
+        Mail::raw("Mã OTP của bạn là: $otp. Mã này có hiệu lực trong 5 phút.", function ($message) use ($request) {
+            $message->to($request->email)
+                ->subject('Xác nhận đặt lại mật khẩu');
+        });
+
+        return response()->json(['message' => 'OTP đã được gửi đến email của bạn!']);
+    }
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:6',
+        ]);
+
+        $record = DB::table('password_resets')
+            ->where('email', $request->email)
+            ->where('otp', $request->otp)
+            ->first();
+
+        if (!$record) {
+            return response()->json(['message' => 'OTP không hợp lệ!'], 400);
+        }
+
+        // Kiểm tra thời gian hết hạn (5 phút)
+        if (Carbon::parse($record->created_at)->addMinutes(5)->isPast()) {
+            return response()->json(['message' => 'OTP đã hết hạn!'], 400);
+        }
+
+        return response()->json(['message' => 'Xác thực OTP thành công!']);
+    }
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required|digits:6',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $record = DB::table('password_resets')
+            ->where('email', $request->email)
+            ->where('otp', $request->otp)
+            ->first();
+
+        if (!$record) {
+            return response()->json(['message' => 'OTP không hợp lệ!'], 400);
+        }
+
+        // Cập nhật mật khẩu
+        $user = User::where('email', $request->email)->first();
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        // Xóa OTP sau khi đặt lại
+        DB::table('password_resets')->where('email', $request->email)->delete();
+
+        return response()->json(['message' => 'Đặt lại mật khẩu thành công!']);
     }
 }

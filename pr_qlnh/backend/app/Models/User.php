@@ -5,17 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
     protected $table = 'users';
-
-    // Nếu khóa chính khác "id", ví dụ "user_id"
     protected $primaryKey = 'id';
 
-    //Các cột có thể gán hàng loạt (mass assignment)
     protected $fillable = [
         'username',
         'email',
@@ -25,13 +23,13 @@ class User extends Authenticatable
         'status',
     ];
 
-    // Ẩn password khi trả về JSON
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
     public $timestamps = true;
+
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -42,5 +40,16 @@ class User extends Authenticatable
         return $this->role
             ? $this->role->permissions->contains('name', $permissionName)
             : false;
+    }
+
+    // 👇 Thêm 2 hàm bắt buộc cho JWT
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }

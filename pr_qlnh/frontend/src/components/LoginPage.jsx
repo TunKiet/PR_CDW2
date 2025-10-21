@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./LoginPage.css";
+import "./css/LoginPage.css";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -58,7 +58,7 @@ export default function LoginPage() {
         if (res.data.user.role === "admin") {
           navigate("/admin/dashboard");
         } else {
-          navigate("/user/home");
+          navigate("/user/dashboard");
         }
       } catch (err) {
         const msg = err.response?.data?.message || "Đăng nhập thất bại!";
@@ -174,6 +174,22 @@ export default function LoginPage() {
               {loginFormik.touched.password && loginFormik.errors.password && (
                 <p className="error">{loginFormik.errors.password}</p>
               )}
+            </div>
+
+            {/* Remember me + Forgot password */}
+            <div className="login-options">
+              <label className="remember-me">
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  onChange={loginFormik.handleChange}
+                  checked={loginFormik.values.rememberMe}
+                />
+                Nhớ tài khoản
+              </label>
+              <a href="/forgot-password" className="forgot-password">
+                Quên mật khẩu?
+              </a>
             </div>
 
             <button

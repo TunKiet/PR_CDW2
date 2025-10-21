@@ -2,33 +2,33 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-| Tất cả route API sẽ nằm ở đây, prefix là /api
-|--------------------------------------------------------------------------
-*/
-
+// php artisan route:list | de check cac route
+// -------------------------------
 // 🧩 AUTH ROUTES
+// -------------------------------
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// ✅ Nếu bạn dùng JWTAuth, nên bảo vệ route bằng middleware:
+// ✅ Quên mật khẩu & đặt lại mật khẩu
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
+// -------------------------------
+// 🧱 JWT PROTECTED ROUTES
+// -------------------------------
 Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
+// -------------------------------
 // 🛡️ ROLE & PERMISSION
+// -------------------------------
 Route::middleware(['jwt.auth'])->group(function () {
     Route::apiResource('/roles', RoleController::class);
     Route::apiResource('/permissions', PermissionController::class);
 });
-
