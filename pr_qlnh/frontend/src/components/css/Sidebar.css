@@ -1,0 +1,95 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background-color: #1e1e2f;
+  color: #fff;
+  width: 70px;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar.expanded {
+  width: 230px;
+}
+
+/* Header */
+.sidebar-header {
+  text-align: center;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.logo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+/* Menu */
+.menu {
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+  flex-grow: 1;
+}
+.menu li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  font-size: 15px;
+  color: #b0b3c2;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.menu li:hover {
+  background-color: #2b2b3d;
+  color: #fff;
+}
+.menu li.active {
+  background-color: #4b5cff;
+  color: #fff;
+  border-left: 4px solid #ffffff;
+}
+.icon {
+  font-size: 20px;
+  min-width: 25px;
+  display: flex;
+  justify-content: center;
+}
+.label {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+.sidebar.expanded .label {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Logout Section */
+.logout-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 0;
+}
+.logout-section li {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  color: #ff6666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.logout-section li:hover {
+  background-color: #2b2b3d;
+  color: #ff7b7b;
+}

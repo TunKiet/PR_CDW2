@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import axios from "axios";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState("login");
@@ -40,6 +41,21 @@ export default function LoginPage() {
       .required("Vui lòng xác nhận mật khẩu"),
   });
   const navigate = useNavigate();
+  useEffect(() => {
+  // Kiểm tra session trong localStorage hoặc sessionStorage
+  const savedSession =
+    JSON.parse(localStorage.getItem("session")) ||
+    JSON.parse(sessionStorage.getItem("session"));
+
+  if (savedSession && savedSession.user) {
+    // Nếu đã đăng nhập rồi → tự động điều hướng
+    if (savedSession.user.role === "admin") {
+      navigate("/admin/dashboard");
+    } else {
+      navigate("/user/dashboard");
+    }
+  }
+}, [navigate]);
   // Đăng nhập
   const loginFormik = useFormik({
     initialValues: { identifier: "", password: "", rememberMe: false },
@@ -54,12 +70,24 @@ export default function LoginPage() {
     onSubmit: async (values) => {
       try {
         const res = await axios.post("http://localhost:8000/api/login", {
-          identifier: values.identifier, // ✅ gửi identifier
+          identifier: values.identifier,
           password: values.password,
         });
 
         alert(res.data.message);
         console.log("User:", res.data.user);
+
+        const userData = {
+          token: res.data.token,
+          user: res.data.user,
+        };
+
+       
+        if (values.rememberMe) {
+          localStorage.setItem("session", JSON.stringify(userData));
+        } else {
+          sessionStorage.setItem("session", JSON.stringify(userData));
+        }
 
         if (res.data.user.role === "admin") {
           navigate("/admin/dashboard");
