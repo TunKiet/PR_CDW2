@@ -8,7 +8,7 @@ import {
   FaBoxOpen,
   FaClipboardList,
 } from "react-icons/fa";
-import "./Sidebar.css";
+import "./css/Sidebar.css";
 
 export default function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);

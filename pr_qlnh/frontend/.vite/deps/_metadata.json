@@ -1,59 +1,80 @@
 {
-  "hash": "7027acf9",
+  "hash": "75b1dbfe",
   "configHash": "16a1459d",
-  "lockfileHash": "6387c4b5",
-  "browserHash": "9df3ac96",
+  "lockfileHash": "951c5100",
+  "browserHash": "25a634ca",
   "optimized": {
     "react": {
       "src": "../../node_modules/react/index.js",
       "file": "react.js",
-      "fileHash": "8e07713c",
+      "fileHash": "58c4467f",
       "needsInterop": true
     },
     "react-dom/client": {
       "src": "../../node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
-      "fileHash": "18a652cb",
+      "fileHash": "228e05fa",
       "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "b5fc65a5",
+      "needsInterop": false
     },
     "formik": {
       "src": "../../node_modules/formik/dist/formik.esm.js",
       "file": "formik.js",
-      "fileHash": "7f3add58",
+      "fileHash": "09a8024f",
       "needsInterop": false
     },
     "yup": {
       "src": "../../node_modules/yup/index.esm.js",
       "file": "yup.js",
-      "fileHash": "eab74768",
+      "fileHash": "05a8af0f",
       "needsInterop": false
     },
     "@fortawesome/react-fontawesome": {
       "src": "../../node_modules/@fortawesome/react-fontawesome/dist/index.js",
       "file": "@fortawesome_react-fontawesome.js",
-      "fileHash": "b59e5072",
+      "fileHash": "1ab40044",
       "needsInterop": false
     },
     "@fortawesome/free-solid-svg-icons": {
       "src": "../../node_modules/@fortawesome/free-solid-svg-icons/index.mjs",
       "file": "@fortawesome_free-solid-svg-icons.js",
-      "fileHash": "8d8294f8",
+      "fileHash": "fe854587",
       "needsInterop": false
     },
     "@fortawesome/free-brands-svg-icons": {
       "src": "../../node_modules/@fortawesome/free-brands-svg-icons/index.mjs",
       "file": "@fortawesome_free-brands-svg-icons.js",
-      "fileHash": "eb30ab6b",
+      "fileHash": "dddbd40c",
       "needsInterop": false
     },
     "axios": {
       "src": "../../node_modules/axios/index.js",
       "file": "axios.js",
-      "fileHash": "275e502c",
+      "fileHash": "bf5a7e67",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "ef01706a",
+      "needsInterop": false
+    },
+    "react-icons/fa": {
+      "src": "../../node_modules/react-icons/fa/index.mjs",
+      "file": "react-icons_fa.js",
+      "fileHash": "b06583c2",
       "needsInterop": false
     }
   },
   "chunks": {
+    "chunk-V2X5ZORR": {
+      "file": "chunk-V2X5ZORR.js"
+    },
     "chunk-32E4H3EV": {
       "file": "chunk-32E4H3EV.js"
     },
