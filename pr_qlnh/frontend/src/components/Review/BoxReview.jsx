@@ -5,7 +5,6 @@ import { AiOutlineLike } from "react-icons/ai";
 import { AiOutlineDislike } from "react-icons/ai";
 import Tooltip from '@mui/material/Tooltip';
 import { MdAccessTime } from "react-icons/md";
-import Star from './Star';
 import Feedback from './Feedback';
 import AdminFeedback from './AdminFeedback';
 import UserFeedback from './UserFeedback';
@@ -14,7 +13,9 @@ import axios from "axios";
 
 
 
-const BoxReview = ({ menuItemId }) => {
+const BoxReview = () => {
+    const menuItemId = 1;
+
     const [showFeedback, setShowFeedback] = useState(false); //close or hide feedback
     const [likes, setLikes] = useState(0);
     const [disLikes, setDisLikes] = useState(0);

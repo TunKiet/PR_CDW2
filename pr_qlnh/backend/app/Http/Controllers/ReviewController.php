@@ -39,38 +39,25 @@ class ReviewController extends Controller
         ]);
     }
 
-    //get review
-    public function index($menuItemId)
+    /**
+     * Summary of getAllReviews
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllReviews($menuItemId)
     {
-        Log::info("Fetching reviews for menu_item_id = $menuItemId");
-
-        //Lấy danh sách review kèm username
-        $reviews = Review::where('menu_item_id', $menuItemId)
-            ->with('user:user_id,username') // chỉ lấy 2 cột cần thiết
-            ->get();
-
-        Log::info("Found " . $reviews->count() . " reviews");
-
-        return response()->json($reviews);
+        $reviews = Review::getAllReviews($menuItemId);
+        return response()->json($reviews, 200);
     }
 
     //get average rating
-    public function getAverageRating($menuItemId)
+    public function getRatingStats($menuItemId)
     {
-        $averageRating = Review::where('menu_item_id', $menuItemId)
-            ->where('status', 'pending')
-            ->average('rating');
-
-        // Nếu chưa có đánh giá thì trả 0
-        $averageRating = round($averageRating ?? 0, 1);
-
-        $count = Review::where('menu_item_id', $menuItemId)
-            ->where('status', 'active')
-            ->count();
+        $data = Review::getAverageRating($menuItemId);
 
         return response()->json([
-            'average_rating' => $averageRating,
-            'total_reviews' => $count
+            'status' => 'pending',
+            'message' => 'Lấy dữ liệu đánh giá thành công',
+            'data' => $data,
         ]);
     }
 }

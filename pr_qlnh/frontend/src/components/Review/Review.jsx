@@ -10,7 +10,9 @@ import BoxReview from './BoxReview';
 import { CiCamera } from "react-icons/ci";
 import axios from "axios";
 
-const Review = ({ menuItemId }) => {
+const Review = () => {
+
+    const menuItemId = 1;
 
     const [activeFilter, setActiveFilter] = useState(1);
     const [openFormReview, setOpenFormReview] = useState(false);
@@ -24,9 +26,10 @@ const Review = ({ menuItemId }) => {
     const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
 
-    //get average rating, count rating
-    const [avgRating, setAvgRating] = useState(0);
-    const [countRating, setCountRating] = useState(0);
+    //get average, count, breakdown review
+    const [ratingData, setRatingData] = useState(null);
+
+
 
     const filters = [
         { id: 1, label: "Tất cả" },
@@ -92,20 +95,23 @@ const Review = ({ menuItemId }) => {
         }
     }
 
-    //get api avg rating
+    //fetch api average, count, breakdown review
     useEffect(() => {
-        const fetchAverage = async () => {
-            if (!menuItemId) return; // tránh undefined
+        if (!menuItemId) return; // tránh fetch khi chưa có id
+        const fetchRating = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/reviews/${menuItemId}/average`);
-                setAvgRating(res.data.average_rating);
-                setCountRating(res.data.total_reviews);
+                const res = await axios.get(`http://localhost:8000/api/menu/${menuItemId}/ratings`);
+                setRatingData(res.data.data);
             } catch (error) {
-                console.error("Error fetching average rating:", error);
+                console.error("Lỗi khi lấy dữ liệu đánh giá:", error);
             }
         };
-        fetchAverage();
+        fetchRating();
     }, [menuItemId]);
+
+    const count = ratingData?.count || 0;
+    const breakdown = ratingData?.breakdown || {};
+
 
     return (
         <>
@@ -116,11 +122,11 @@ const Review = ({ menuItemId }) => {
                 <div className="boxReview w-full h-[200px] bg-white p-3 flex rounded-[8px]">
                     <div className="boxReview-overview w-[250px]">
                         <div className="boxReview-score">
-                            <div className="rating text-4xl"><span className="average-rating text-6xl">{avgRating}</span>/5</div>
+                            <div className="rating text-4xl"><span className="average-rating text-6xl">{ratingData?.average ?? 0}</span>/5</div>
                             <div className="item-star">
                                 <Rating value={5} readOnly />
                             </div>
-                            <div className="count-review py-1 ">{countRating} lượt đánh giá</div>
+                            <div className="count-review py-1 ">{ratingData?.count ?? 0} lượt đánh giá</div>
                             <Button variant="contained" color='error' onClick={handleClickOpen}>Viết đánh giá</Button>
                             <Dialog open={openFormReview} onClose={handleClose}>
                                 <div className="container p-3 m-3 max-w-xl w-full mx-auto">
@@ -172,48 +178,23 @@ const Review = ({ menuItemId }) => {
                         </div>
                     </div>
                     <div className="boxReview-star w-[500px] space-y-2 mt-3">
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>5</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={85} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
-                            <span className="text-sm text-gray-600 ml-2">85 đánh giá</span>
-                        </div>
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>4</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={10} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
-                            <span className="text-sm text-gray-600 ml-2">10 đánh giá</span>
-                        </div>
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>3</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={0} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
-                            <span className="text-sm text-gray-600 ml-2">0 đánh giá</span>
-                        </div>
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>2</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={0} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
-                            <span className="text-sm text-gray-600 ml-2">0 đánh giá</span>
-                        </div>
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>1</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={5} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
-                            <span className="text-sm text-gray-600 ml-2">5 đánh giá</span>
-                        </div>
-                    </div>
 
+                        {[5, 4, 3, 2, 1].map((star) => {
+                            const starCount = breakdown[star] ?? 0;
+                            const percent = count > 0 ? ((starCount / count) * 100).toFixed(1) : 0;
+
+                            return (
+                                <div key={star} className="rating-level flex items-center gap-2">
+                                    <div className="number-star flex items-center w-8">
+                                        <span>{star}</span>
+                                        <FaStar className="text-yellow-400 ml-1" />
+                                    </div>
+                                    <progress max={100} value={percent} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
+                                    <span className="text-sm text-gray-600 ml-2">{starCount} đánh giá</span>
+                                </div>
+                            )
+                        })}
+                    </div>
                 </div>
 
                 <div className='w-full h-auto bg-white p-3 my-2 rounded-[8px]' >
