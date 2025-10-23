@@ -11,6 +11,9 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+    
+    // Khai báo khóa chính là 'user_id' thay vì 'id'
+    protected $primaryKey = 'user_id';
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +21,12 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'username', // Đã thay thế 'name' bằng 'username'
         'email',
         'password',
+        'phone',     // Thêm cột tùy chỉnh
+        'role',      // Thêm cột tùy chỉnh
+        'is_active', // Thêm cột tùy chỉnh
     ];
 
     /**
@@ -43,6 +49,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean', // Cast cột is_active thành boolean
         ];
     }
 }
