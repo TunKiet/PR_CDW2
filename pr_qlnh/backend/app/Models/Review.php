@@ -36,7 +36,7 @@ class Review extends Model
      */
     public static function getAllReviews($menuItemId)
     {
-        return self::with(['user:id,username', 'menu_item:id,menu_item_name'])
+        return self::with(['user:user_id,username', 'menu_item:menu_item_id,menu_item_name'])
             ->where('menu_item_id', $menuItemId)
             ->get();
     }

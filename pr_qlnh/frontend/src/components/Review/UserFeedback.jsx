@@ -12,7 +12,7 @@ const UserFeedback = () => {
                             </div>
                         </div>
 
-                        <span className="box-info-name flex items-center mx-2 text-2xl font-bold">Trieu</span>
+                        <span className="box-info-name flex items-center mx-2 text-2xl font-bold">Tr</span>
                     </div>
                     <div className="box-time flex items-center text-gray-400 mx-2">
                         <MdAccessTime />
