@@ -13,7 +13,7 @@ import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter> 
       <Routes>
         <Route path="/" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
