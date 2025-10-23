@@ -42,14 +42,14 @@ class ReviewController extends Controller
     //get review
     public function index($menuItemId)
     {
-        Log::info("🟢 Fetching reviews for menu_item_id = $menuItemId");
+        Log::info("Fetching reviews for menu_item_id = $menuItemId");
 
-        // 🟢 Lấy danh sách review kèm username
+        //Lấy danh sách review kèm username
         $reviews = Review::where('menu_item_id', $menuItemId)
             ->with('user:user_id,username') // chỉ lấy 2 cột cần thiết
             ->get();
 
-        Log::info("🟢 Found " . $reviews->count() . " reviews");
+        Log::info("Found " . $reviews->count() . " reviews");
 
         return response()->json($reviews);
     }
@@ -65,7 +65,7 @@ class ReviewController extends Controller
         $averageRating = round($averageRating ?? 0, 1);
 
         $count = Review::where('menu_item_id', $menuItemId)
-            ->where('status', 'approved')
+            ->where('status', 'active')
             ->count();
 
         return response()->json([

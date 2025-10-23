@@ -1,18 +1,16 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Avatar from '@mui/material/Avatar';
 import Rating from '@mui/material/Rating';
 import { IoClose } from "react-icons/io5";
-import Star from './Star';
 import { FaStar } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import BoxReview from './BoxReview';
 import { CiCamera } from "react-icons/ci";
-import Feedback from './Feedback';
 import axios from "axios";
 
-const Review = () => {
+const Review = ({ menuItemId }) => {
 
     const [activeFilter, setActiveFilter] = useState(1);
     const [openFormReview, setOpenFormReview] = useState(false);
@@ -26,6 +24,9 @@ const Review = () => {
     const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
 
+    //get average rating, count rating
+    const [avgRating, setAvgRating] = useState(0);
+    const [countRating, setCountRating] = useState(0);
 
     const filters = [
         { id: 1, label: "Tất cả" },
@@ -61,7 +62,7 @@ const Review = () => {
         setLoading(true);
 
         const formData = new FormData();
-        formData.append("menu_item_id", 1);
+        formData.append("menu_item_id", menuItemId);
         formData.append("rating", rating);
         formData.append("comment", comment);
 
@@ -91,6 +92,21 @@ const Review = () => {
         }
     }
 
+    //get api avg rating
+    useEffect(() => {
+        const fetchAverage = async () => {
+            if (!menuItemId) return; // tránh undefined
+            try {
+                const res = await axios.get(`http://localhost:8000/api/reviews/${menuItemId}/average`);
+                setAvgRating(res.data.average_rating);
+                setCountRating(res.data.total_reviews);
+            } catch (error) {
+                console.error("Error fetching average rating:", error);
+            }
+        };
+        fetchAverage();
+    }, [menuItemId]);
+
     return (
         <>
             <div className="container-review w-[80%] h-auto m-auto border border-[#333] p-2 bg-gray-100 rounded-[10px]">
@@ -100,11 +116,11 @@ const Review = () => {
                 <div className="boxReview w-full h-[200px] bg-white p-3 flex rounded-[8px]">
                     <div className="boxReview-overview w-[250px]">
                         <div className="boxReview-score">
-                            <div className="rating text-4xl"><span className="average-rating text-6xl">4.8</span>/5</div>
+                            <div className="rating text-4xl"><span className="average-rating text-6xl">{avgRating}</span>/5</div>
                             <div className="item-star">
-                                <Rating value={5} readOnly/>
+                                <Rating value={5} readOnly />
                             </div>
-                            <div className="count-review py-1 ">100 lượt đánh giá</div>
+                            <div className="count-review py-1 ">{countRating} lượt đánh giá</div>
                             <Button variant="contained" color='error' onClick={handleClickOpen}>Viết đánh giá</Button>
                             <Dialog open={openFormReview} onClose={handleClose}>
                                 <div className="container p-3 m-3 max-w-xl w-full mx-auto">
@@ -119,7 +135,7 @@ const Review = () => {
                                         </div>
                                     </div>
                                     <div className="formReview-select-rating py-2">
-                                        <Rating value={rating} size='large' onChange={(e, newValue) => { setRating(newValue) }} readOnly />
+                                        <Rating value={rating} size='large' onChange={(e, newValue) => { setRating(newValue) }} />
                                     </div>
                                     <div className="formReview-upload mb-2">
                                         <div className="formReview-upload-title">
@@ -218,13 +234,7 @@ const Review = () => {
 
                     {/* Info review */}
                     <BoxReview menuItemId={1} />
-                    {/* <Feedback /> */}
-
                     <hr />
-
-
-                    {/* <Feedback /> */}
-
                     <div className="flex justify-center">
                         <Button variant='contained'>Xem tất cả đánh giá <FaChevronRight /> </Button>
                     </div>
