@@ -1,7 +1,7 @@
-import LoginPage from './components/LoginPage'
+import React from "react";
+import OrderPage from "./pages/OrderPage";
 
-function App() {
-  return <LoginPage />
-}
+// export default function App() {
+//   return <OrderPage />;
 
-export default App
+// }
