@@ -21,7 +21,6 @@ const BoxReview = () => {
     // const [showReply, setShowReply] = useState(false);
     // const [showFeedback, setShowFeedback] = useState(false); //close or hide feedback
 
-
     //set review
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -41,9 +40,6 @@ const BoxReview = () => {
         setActiveFeedbackId((prev) => (prev === reviewId ? null : reviewId));
     };
 
-    // const handToggle = () => {
-    //     setShowFeedback(!showFeedback);
-    // }
     const handleLike = () => {
         setLikes(likes + 1)
     }
@@ -147,15 +143,15 @@ const BoxReview = () => {
 
                                                 <AdminFeedback />
                                                 <hr />
-                                                
+
                                                 <UserFeedback />
 
                                             </div>
                                         )
                                     }
                                 </div>
-                            {/* <ReplyReview/> */}
                             </div>
+                            {/* <ReplyReview/> */}
                             {activeReplyId === review.review_id && (
                                 <div className="mt-2">
                                     <Feedback />

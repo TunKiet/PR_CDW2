@@ -29,6 +29,7 @@ class Review extends Model
     {
         return $this->belongsTo(MenuItem::class, 'menu_item_id', 'menu_item_id');
     }
+
     /**
      * Summary of getAllReviews
      * @param mixed $menuItemId
@@ -36,8 +37,24 @@ class Review extends Model
      */
     public static function getAllReviews($menuItemId)
     {
+        return self::with(['user:user_id,username', 'menu_item:menu_item_id,menu_item_name,price,image_url'])
+            ->where('menu_item_id', $menuItemId)
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            
+            ->get();
+    }
+    /**
+     * Summary of getLatestThreeReviews
+     * @param mixed $menuItemId
+     * @return \Illuminate\Database\Eloquent\Collection<int, Review>
+     */
+    public static function getLatestThreeReview($menuItemId)
+    {
         return self::with(['user:user_id,username', 'menu_item:menu_item_id,menu_item_name'])
             ->where('menu_item_id', $menuItemId)
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
             ->get();
     }
 

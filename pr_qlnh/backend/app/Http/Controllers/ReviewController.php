@@ -38,14 +38,25 @@ class ReviewController extends Controller
             'data' => $reviewWithUser
         ]);
     }
+    
+    /**
+     * Summary of getAllReviews
+     * @param mixed $menuItemId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllReviews($menuItemId)
+    {
+        $reviewAll = Review::getAllReviews($menuItemId);
+        return response()->json($reviewAll);
+    }
 
     /**
      * Summary of getAllReviews
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getAllReviews($menuItemId)
+    public function getThreeReview($menuItemId)
     {
-        $reviews = Review::getAllReviews($menuItemId);
+        $reviews = Review::getLatestThreeReview($menuItemId);
         return response()->json($reviews, 200);
     }
 
