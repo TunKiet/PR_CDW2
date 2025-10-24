@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { initializeApp } from "firebase/app";
 import { LayoutDashboard, Users, Package, ShoppingCart, Settings, LogOut, Menu, X, ArrowUpRight, Edit, Trash2, Plus } from 'lucide-react';
-import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, onSnapshot, query, setDoc, doc, deleteDoc, getDocs } from 'firebase/firestore';
+// import { getFirestore, collection, onSnapshot, query, setDoc, doc, deleteDoc, getDocs } from 'firebase/firestore';
 
 // --- FIREBASE SETUP ---
 // Global variables provided by the Canvas environment
+
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -83,7 +84,7 @@ const Sidebar = ({ active, setActive, isMenuOpen, setIsMenuOpen, userId }) => {
             User ID: <span className="text-gray-600 font-mono">{userId || 'Loading...'}</span>
         </p>
 
-        <nav className="flex-grow">
+        <nav className="grow">
           <ul className="space-y-2">
             {navItems.map((item) => (
               <li key={item.name}>

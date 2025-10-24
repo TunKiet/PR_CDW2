@@ -72,11 +72,10 @@ const Sidebar = ({ active, setActive, isMenuOpen, setIsMenuOpen }) => {
                     setActive(item.name);
                     setIsMenuOpen(false); // Đóng menu sau khi chọn trên mobile
                   }}
-                  className={`w-full flex items-center p-3 rounded-lg transition duration-200 ${
-                    active === item.name
+                  className={`w-full flex items-center p-3 rounded-lg transition duration-200 ${active === item.name
                       ? "bg-indigo-600 text-white shadow-md"
                       : "text-gray-600 hover:bg-gray-100 hover:text-indigo-600"
-                  }`}
+                    }`}
                 >
                   <item.icon size={20} className="mr-3" />
                   <span className="font-medium">{item.name}</span>
@@ -152,29 +151,29 @@ const RecentOrders = () => {
 
 // Component: Nội Dung Tùy Chỉnh (Dựa trên tab được chọn)
 const DashboardContent = ({ activeTab }) => {
-    if (activeTab !== 'Dashboard') {
-        return (
-            <div className="p-8 bg-white rounded-xl shadow-lg min-h-[400px] flex items-center justify-center">
-                <p className="text-2xl font-bold text-gray-600">
-                    Nội dung cho mục "{activeTab}" đang được phát triển...
-                </p>
-            </div>
-        );
-    }
-
+  if (activeTab !== 'Dashboard') {
     return (
-        <div className="space-y-8">
-            {/* Hàng 1: Metric Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {mockMetrics.map((metric, index) => (
-                    <MetricCard key={index} {...metric} />
-                ))}
-            </div>
-
-            {/* Hàng 2: Recent Orders */}
-            <RecentOrders />
-        </div>
+      <div className="p-8 bg-white rounded-xl shadow-lg min-h-[400px] flex items-center justify-center">
+        <p className="text-2xl font-bold text-gray-600">
+          Nội dung cho mục "{activeTab}" đang được phát triển...
+        </p>
+      </div>
     );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Hàng 1: Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {mockMetrics.map((metric, index) => (
+          <MetricCard key={index} {...metric} />
+        ))}
+      </div>
+
+      {/* Hàng 2: Recent Orders */}
+      <RecentOrders />
+    </div>
+  );
 };
 
 
@@ -190,23 +189,23 @@ const App = () => {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col transition-all duration-300 lg:ml-64">
-        
+
         {/* Header/Navbar (Mobile) */}
         <header className="sticky top-0 bg-white shadow-sm p-4 flex items-center justify-between lg:hidden z-20">
-            <button className="text-gray-600 hover:text-indigo-600" onClick={() => setIsMenuOpen(true)}>
-                <Menu size={24} />
-            </button>
-            <h1 className="text-xl font-bold text-gray-900">
-                {activeTab}
-            </h1>
-            <div className="w-8"></div> {/* Placeholder */}
+          <button className="text-gray-600 hover:text-indigo-600" onClick={() => setIsMenuOpen(true)}>
+            <Menu size={24} />
+          </button>
+          <h1 className="text-xl font-bold text-gray-900">
+            {activeTab}
+          </h1>
+          <div className="w-8"></div> {/* Placeholder */}
         </header>
 
         {/* Content Area */}
         <main className="p-4 sm:p-8 lg:p-10 w-full">
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-2 hidden lg:block">{activeTab}</h1>
-            <p className="text-gray-500 mb-8 hidden lg:block">Tổng quan dữ liệu và quản lý hệ thống</p>
-            <DashboardContent activeTab={activeTab} />
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-2 hidden lg:block">{activeTab}</h1>
+          <p className="text-gray-500 mb-8 hidden lg:block">Tổng quan dữ liệu và quản lý hệ thống</p>
+          <DashboardContent activeTab={activeTab} />
         </main>
       </div>
     </div>
