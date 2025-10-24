@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 
 class ReservationSeeder extends Seeder
 {
-    const MAX_RECORDS = 20;
+    const MAX_RECORDS = 1000;
 
     /**
      * Run the database seeds.
@@ -17,8 +17,8 @@ class ReservationSeeder extends Seeder
     {
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             DB::table('reservations')->insert([
-                'user_id' => rand(1, 10),
-                'table_id' => rand(1, 15),
+                'user_id' => rand(1, 1000),
+                'table_id' => rand(1, 1000),
                 'reservation_date' => '2025-12-12',   // ngày cố định
                 'reservation_time' => '12:00:00',
                 'num_guests' => rand(2, 8),

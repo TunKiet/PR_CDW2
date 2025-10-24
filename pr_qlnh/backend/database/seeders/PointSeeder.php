@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class PointSeeder extends Seeder
 {
-    const MAX_RECORDS = 20; // số lượng bản ghi muốn tạo
+    const MAX_RECORDS = 1000; // số lượng bản ghi muốn tạo
 
     /**
      * Run the database seeds.
@@ -16,10 +16,10 @@ class PointSeeder extends Seeder
     {
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             // Random user_id giả sử từ 1 đến 10
-            $userId = rand(1, 10);
+            $userId = rand(1, 1000);
 
             // Random order_id giả sử từ 1 đến 20
-            $orderId = rand(1, 20);
+            $orderId = rand(1, 1000);
 
             // Số điểm thưởng từ 10 đến 100
             $points = rand(10, 100);

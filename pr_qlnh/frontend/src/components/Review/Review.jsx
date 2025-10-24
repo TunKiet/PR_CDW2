@@ -12,7 +12,6 @@ const Review = () => {
     const [activeFilter, setActiveFilter] = useState(1);
     const navigateAllReview = useNavigate();
 
-
     const filters = [
         { id: 1, label: "Tất cả" },
         { id: 2, label: "5 sao" },

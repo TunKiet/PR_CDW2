@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 
 class OrderSeeder extends Seeder
 {
-    const MAX_RECORDS = 20;
+    const MAX_RECORDS = 1000;
 
     /**
      * Run the database seeds.
@@ -20,11 +20,11 @@ class OrderSeeder extends Seeder
 
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             // Random user_id giả sử từ 1 đến 10
-            $userId = rand(1, 10);
+            $userId = rand(1, 1000);
 
             // Random table_id và reservation_id (nullable)
-            $tableId = rand(1, 15);
-            $reservationId = rand(1, 20);
+            $tableId = rand(1,  1000);
+            $reservationId = rand(1, 1000);
 
             // Tổng tiền random từ 100.000 đến 5.000.000
             $totalPrice = rand(100, 5000) * 1000;

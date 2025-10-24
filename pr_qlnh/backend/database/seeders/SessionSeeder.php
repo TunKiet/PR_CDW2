@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class SessionSeeder extends Seeder
 {
-    const MAX_SESSIONS = 20;
+    const MAX_SESSIONS = 1000;
 
     /**
      * Run the database seeds.
@@ -18,7 +18,7 @@ class SessionSeeder extends Seeder
         for ($i = 1; $i <= self::MAX_SESSIONS; $i++) {
             DB::table('sessions')->insert([
                 'id' => Str::uuid()->toString(), // id session ngẫu nhiên
-                'user_id' => rand(1, 10), // giả sử user_id từ 1 đến 10, nullable
+                'user_id' => rand(1, 1000), // giả sử user_id từ 1 đến 10, nullable
                 'ip_address' => '192.168.1.' . rand(1, 255),
                 'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                 'payload' => serialize(['_token' => Str::random(40), 'data' => 'sample']), // payload thử

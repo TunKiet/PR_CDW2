@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    const MAX_RECORDS = 100;
+    const MAX_RECORDS = 1000;
 
     /**
      * Run the database seeds.

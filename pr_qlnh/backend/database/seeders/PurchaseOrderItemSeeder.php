@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderItemSeeder extends Seeder
 {
-    const MAX_RECORDS = 50; // số lượng bản ghi muốn tạo
+    const MAX_RECORDS = 1000; // số lượng bản ghi muốn tạo
 
     /**
      * Run the database seeds.
@@ -16,10 +16,10 @@ class PurchaseOrderItemSeeder extends Seeder
     {
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             // Random purchase_order_id giả sử từ 1 đến 15 (tương ứng PurchaseOrderSeeder)
-            $purchaseOrderId = rand(1, 15);
+            $purchaseOrderId = rand(1, 1000);
 
             // Random ingredient_id giả sử từ 1 đến 20 (tương ứng IngredientSeeder)
-            $ingredientId = rand(1, 20);
+            $ingredientId = rand(1,  1000);
 
             // Số lượng nguyên liệu mua
             $quantity = rand(1, 50); // có thể là kg, pcs,…

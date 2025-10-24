@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class TableSeeder extends Seeder
 {
-    const MAX_RECORDS = 15; // số lượng bàn muốn tạo
+    const MAX_RECORDS = 1000; // số lượng bàn muốn tạo
 
     /**
      * Run the database seeds.

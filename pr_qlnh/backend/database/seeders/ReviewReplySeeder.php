@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class ReviewReplySeeder extends Seeder
 {
-    const MAX_REPLIES = 50; // số lượng phản hồi muốn tạo
+    const MAX_REPLIES = 1000; // số lượng phản hồi muốn tạo
 
     /**
      * Run the database seeds.
@@ -24,10 +24,10 @@ class ReviewReplySeeder extends Seeder
 
         for ($i = 1; $i <= self::MAX_REPLIES; $i++) {
             // Random review_id giả sử từ 1 đến 40 (tương ứng ReviewSeeder)
-            $reviewId = rand(1, 40);
+            $reviewId = rand(1, 1000);
 
             // Random user_id giả sử từ 1 đến 10
-            $userId = rand(1, 10);
+            $userId = rand(1, 1000);
 
             $replyText = $sampleReplies[array_rand($sampleReplies)];
 

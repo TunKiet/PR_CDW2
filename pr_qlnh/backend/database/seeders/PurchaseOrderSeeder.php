@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class PurchaseOrderSeeder extends Seeder
 {
-    const MAX_RECORDS = 15; // số đơn hàng mua muốn tạo
+    const MAX_RECORDS = 1000; // số đơn hàng mua muốn tạo
 
     /**
      * Run the database seeds.

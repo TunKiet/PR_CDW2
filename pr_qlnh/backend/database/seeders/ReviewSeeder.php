@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class ReviewSeeder extends Seeder
 {
-    const MAX_RECORDS = 40; // số lượng review muốn tạo
+    const MAX_RECORDS = 1000; // số lượng review muốn tạo
 
     /**
      * Run the database seeds.
@@ -31,8 +31,8 @@ class ReviewSeeder extends Seeder
         ];
 
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
-            $userId = rand(1, 10);        // giả sử user_id từ 1 đến 10
-            $menuItemId = rand(1, 20);    // giả sử menu_item_id từ 1 đến 20
+            $userId = rand(1, 1000);        // giả sử user_id từ 1 đến 10
+            $menuItemId = rand(1, 1000);    // giả sử menu_item_id từ 1 đến 20
 
             $rating = rand(1, 5);
             $comment = $sampleComments[array_rand($sampleComments)];

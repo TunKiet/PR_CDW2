@@ -18,8 +18,6 @@ const BoxReview = () => {
 
     const [likes, setLikes] = useState(0);
     const [disLikes, setDisLikes] = useState(0);
-    // const [showReply, setShowReply] = useState(false);
-    // const [showFeedback, setShowFeedback] = useState(false); //close or hide feedback
 
     //set review
     const [reviews, setReviews] = useState([]);
@@ -47,10 +45,6 @@ const BoxReview = () => {
     const handleDisLike = () => {
         setDisLikes(disLikes + 1)
     }
-
-    // const handleOpenReply = () => {
-    //     setShowReply(!showReply);
-    // }
 
     useEffect(() => {
         const fetchReview = async () => {

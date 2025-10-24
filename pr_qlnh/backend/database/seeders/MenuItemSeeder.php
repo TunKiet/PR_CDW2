@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class MenuItemSeeder extends Seeder
 {
-    const MAX_RECORDS = 20; // số lượng món ăn muốn tạo
+    const MAX_RECORDS = 1000; // số lượng món ăn muốn tạo
 
     /**
      * Run the database seeds.
@@ -16,7 +16,7 @@ class MenuItemSeeder extends Seeder
     {
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             DB::table('menu_items')->insert([
-                'category_id' => rand(1, 10), // giả sử có 10 category
+                'category_id' => rand(1, 100), // giả sử có 10 category
                 'menu_item_name' => 'Menu Item ' . $i,
                 'price' => rand(20000, 100000), // giá ngẫu nhiên 20k–100k
                 'image_url' => null,

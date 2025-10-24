@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class CategorySeeder extends Seeder
 {
-    const MAX_RECORDS = 10; // số lượng bản ghi muốn tạo
+    const MAX_RECORDS = 100; // số lượng bản ghi muốn tạo
 
     /**
      * Run the database seeds.

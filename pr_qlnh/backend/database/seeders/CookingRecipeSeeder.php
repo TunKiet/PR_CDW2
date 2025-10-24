@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class CookingRecipeSeeder extends Seeder
 {
-    const MAX_RECORDS = 50; // số lượng bản ghi muốn tạo
+    const MAX_RECORDS = 1000; // số lượng bản ghi muốn tạo
 
     /**
      * Run the database seeds.
@@ -31,10 +31,10 @@ class CookingRecipeSeeder extends Seeder
 
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             // Random menu_item_id giả sử từ 1 đến 20
-            $menuItemId = rand(1, 20);
+            $menuItemId = rand(1, 1000);
 
             // Random ingredient_id giả sử từ 1 đến 20
-            $ingredientId = rand(1, 20);
+            $ingredientId = rand(1, 1000);
 
             // Lượng nguyên liệu cần dùng
             $quantityNeeded = rand(50, 500) / 10; // 5.0 -> 50.0

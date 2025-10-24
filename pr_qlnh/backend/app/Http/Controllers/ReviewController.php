@@ -38,7 +38,7 @@ class ReviewController extends Controller
             'data' => $reviewWithUser
         ]);
     }
-    
+
     /**
      * Summary of getAllReviews
      * @param mixed $menuItemId

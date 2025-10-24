@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class IngredientSeeder extends Seeder
 {
-    const MAX_RECORDS = 20; // Số lượng nguyên liệu muốn tạo
+    const MAX_RECORDS = 1000; // Số lượng nguyên liệu muốn tạo
 
     /**
      * Run the database seeds.

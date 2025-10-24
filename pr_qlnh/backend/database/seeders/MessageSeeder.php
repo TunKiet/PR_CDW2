@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class MessageSeeder extends Seeder
 {
-    const MAX_RECORDS = 30; // số lượng bản ghi muốn tạo
+    const MAX_RECORDS = 1000; // số lượng bản ghi muốn tạo
 
     /**
      * Run the database seeds.
@@ -26,7 +26,7 @@ class MessageSeeder extends Seeder
 
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             // Random user_id giả sử từ 1 đến 10
-            $userId = rand(1, 10);
+            $userId = rand(1, 1000);
 
             // Chọn loại người gửi ngẫu nhiên
             $senderType = $senderTypes[array_rand($senderTypes)];
