@@ -1,5 +1,17 @@
 // src/components/Sidebar.jsx
-import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, User, Users, Settings, Building } from "lucide-react";
+import {
+  ClipboardList,
+  BarChart2,
+  FileText,
+  Calendar,
+  ShoppingCart,
+  Menu,
+  Zap,
+  User,
+  Users,
+  Settings,
+  Building,
+} from "lucide-react";
 const Sidebar = () => {
   const menuItems = [
     { title: "Đơn hàng mới", icon: <ClipboardList size={20} />, active: true },

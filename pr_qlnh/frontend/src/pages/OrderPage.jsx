@@ -4,7 +4,7 @@ import OrderList from "../components/OrderList";
 import CartPanel from "../components/CartPanel";
 
 const menuItems = [
-  { name: "Phở Bò cái con c", price: 55000 },
+  { name: "Phở Bò", price: 55000 },
   { name: "Bún Chả", price: 45000 },
   { name: "Nem Cua Bể", price: 60000 },
   { name: "Chả Cá Lã Vọng", price: 120000 },
