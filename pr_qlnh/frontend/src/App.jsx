@@ -15,7 +15,7 @@ function App() {
         <Route path="/" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
-        <Route path="/all-review" element={<ReviewAll />} />
+        <Route path="/all-review/:menuItemId" element={<ReviewAll />} />
       </Routes>
     </BrowserRouter>
   )
