@@ -61,7 +61,7 @@ const ManagerReply = () => {
                                                 </div>
                                             </div>
                                             <div className="reply-body">
-                                                <div className="border border-[#000] rounded-[8px] p-3">
+                                                <div className="border border-black rounded-lg p-3">
                                                     <div className="reply-title flex gap-1 text-[13px]">
                                                         <div className="dish-name"><span>Bun bo</span></div>|
                                                         <div className="time-rieview"><span>20/10/2025 09:00</span></div>
@@ -89,7 +89,7 @@ const ManagerReply = () => {
                                                     </div>
                                                     <div className="reply-textarea">
                                                         <div className="write-reply">
-                                                            <textarea name="" id="" className="w-full h-24 p-2 border border-[#000] rounded-lg !resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200" placeholder="Nhập phản hồi..." ></textarea>
+                                                            <textarea name="" id="" className="w-full h-24 p-2 border border-black rounded-lg resize-none! focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200" placeholder="Nhập phản hồi..." ></textarea>
                                                         </div>
                                                     </div>
                                                     <div className="reply-button flex gap-1 justify-end my-2">

@@ -5,7 +5,6 @@ import PrintIcon from '@mui/icons-material/Print';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import SearchIcon from '@mui/icons-material/Search';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const IngredientInOut = () => {
   const rows = Array.from({ length: 100 }, (_, i) => i + 1);
@@ -65,21 +64,7 @@ const IngredientInOut = () => {
                 </IconButton>
               </Tooltip>
 
-              <AnimatePresence>
-                {clickSearch && (
-                  <motion.input
-                    ref={inputRef}
-                    type="text"
-                    key="search-input"
-                    initial={{ width: 0, opacity: 0, scale: 0.9 }}
-                    animate={{ width: 180, opacity: 1, scale: 1 }}
-                    exit={{ width: 0, opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3 }}
-                    placeholder="Tìm kiếm..."
-                    className="form-control border border-gray-400 rounded px-2 py-1 ml-2 focus:outline-none"
-                  />
-                )}
-              </AnimatePresence>
+
             </div>
           </div>
         </div>

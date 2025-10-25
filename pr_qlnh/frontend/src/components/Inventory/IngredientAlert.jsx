@@ -89,7 +89,7 @@ const IngredientAlert = () => {
                                     <td className="px-4 py-2 text-center border-b">15</td>
 
                                     <td className="px-4 py-2 border-b">
-                                        <div className="relative w-full max-w-[200px] mx-auto h-[20px]">
+                                        <div className="relative w-full max-w-[200px] mx-auto h-5">
                                             <progress
                                                 max={100}
                                                 value={90}

@@ -8,14 +8,14 @@ const AdminFeedback = () => {
                 <div className="box-rep-info flex items-center">
                     <div className="box-info flex items-center">
                         <div className="box-info-avatar">
-                            <div className='flex justify-center items-center w-[40px] h-[40px] bg-red-600 rounded-full'>
+                            <div className='flex justify-center items-center w-10 h-10 bg-red-600 rounded-full'>
                                 <p className='flex justify-center items-center text-white font-bold text-2xl m-0 p-0'>AD</p>
                             </div>
                         </div>
 
                         <span className="box-info-name flex items-center mx-2 text-2xl font-bold">Quản Trị Viên</span>
 
-                        <div className="box-info-tag w-[40px] h-[20px] flex justify-center items-center bg-red-600 rounded-[5px]">
+                        <div className="box-info-tag w-10 h-5 flex justify-center items-center bg-red-600 rounded-[5px]">
                             <p className='text-white font-bold m-0'>QTV</p>
                         </div>
                     </div>
