@@ -1,5 +1,6 @@
 import React from 'react';
-import { menuStructure } from '../constants/menuStructure';
+import { menuStructure } from "../../constants/menuStructure";
+
 
 export default function Sidebar() {
   return (
