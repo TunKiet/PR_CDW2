@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Review from './components/Review/Review'
 import ReviewModerator from './components/ReviewModerator/ReviewModerator'
 import Invertory from './components/Inventory/Inventory'
-import AdminTable from './pages/TableManagementAdmin'
+import TableManageAdmin from './pages/TableManagementAdmin'
 
 
 
@@ -18,7 +18,7 @@ function App() {
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
         <Route path="/inventory" element={<Invertory/>} />
-        <Route path="/quanlyban" element={<AdminTable/>} />
+        <Route path="/quanlyban" element={<TableManageAdmin/>} />
       </Routes>
     </BrowserRouter>
   )

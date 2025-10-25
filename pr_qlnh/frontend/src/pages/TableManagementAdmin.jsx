@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/Sidebar';
-import TableList from '../components/TableList';
-import TableModal from '../components/TableModal';
-import DeleteModal from '../components/DeleteModal';
+import Sidebar from '../components/Table/Sidebar';
+import TableList from '../components/Table/TableList';
+import TableModal from '../components/Table/TableModal';
+import DeleteModal from '../components/Table/DeleteModal';
 import { loadTablesFromStorage, saveTablesToStorage } from '../utils/storage';
 
 const initialFallback = [
