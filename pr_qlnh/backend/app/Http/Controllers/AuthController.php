@@ -3,15 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
-use App\Models\Role;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -24,7 +21,7 @@ class AuthController extends Controller
             'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|unique:users,phone',
-            'password' => 'required|min:6',
+            'password' => 'required|min:6|confirmed', // nhớ thêm field password_confirmation
         ]);
 
         $user = User::create([
@@ -33,23 +30,22 @@ class AuthController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Mặc định user thường
+            'role' => 'user',
             'status' => 1,
         ]);
 
-        // Sinh token JWT cho user sau khi đăng ký
-        $token = JWTAuth::fromUser($user);
+        // Đăng nhập luôn sau khi đăng ký
+        Auth::login($user);
 
         return response()->json([
             'message' => 'Đăng ký thành công!',
             'user' => $user,
-            'role' => $user->role ?? 'user', // vì chưa có quan hệ role model
-            'token' => $token
+            'role' => $user->role ?? 'user'
         ], 201);
     }
 
     /**
-     * Đăng nhập người dùng
+     * Đăng nhập người dùng (session-based)
      */
     public function login(Request $request)
     {
@@ -58,60 +54,52 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $identifier = $request->identifier;
-
-        // Kiểm tra xem người dùng nhập email hay số điện thoại
-        $user = User::where('email', $identifier)
-            ->orWhere('phone', $identifier)
+        // Kiểm tra identifier là email hay phone
+        $user = User::where('email', $request->identifier)
+            ->orWhere('phone', $request->identifier)
             ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'message' => 'Sai thông tin đăng nhập.'
-            ], 401);
+            return response()->json(['message' => 'Sai thông tin đăng nhập.'], 401);
         }
 
-        // Nếu bạn dùng JWT
-        $token = JWTAuth::fromUser($user);
+        Auth::login($user);
 
         return response()->json([
             'message' => 'Đăng nhập thành công!',
             'user' => $user,
-            'role' => $user->role ?? 'user', // vì chưa có quan hệ role model
-            'token' => $token,
+            'role' => $user->role ?? 'user',
         ]);
     }
 
-
     /**
-     * Lấy thông tin người dùng hiện tại (dành cho Frontend)
+     * Lấy thông tin người dùng hiện tại
      */
     public function me()
     {
-        try {
-            $user = JWTAuth::parseToken()->authenticate();
-            return response()->json($user);
-        } catch (JWTException $e) {
-            return response()->json(['message' => 'Token không hợp lệ hoặc đã hết hạn!'], 401);
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Chưa đăng nhập!'], 401);
         }
+
+        return response()->json($user);
     }
 
     /**
-     * Đăng xuất (hủy token)
+     * Đăng xuất người dùng
      */
     public function logout(Request $request)
     {
-        try {
-            JWTAuth::invalidate(JWTAuth::getToken());
-            return response()->json(['message' => 'Đăng xuất thành công!']);
-        } catch (JWTException $e) {
-            return response()->json(['message' => 'Không thể đăng xuất!'], 500);
-        }
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json(['message' => 'Đăng xuất thành công!']);
     }
+
     /**
-     * Summary of forgotPassword
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * Gửi OTP qua email để reset password
      */
     public function forgotPassword(Request $request)
     {
@@ -119,10 +107,8 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users,email',
         ]);
 
-        // Tạo mã OTP 6 số
         $otp = rand(100000, 999999);
 
-        // Lưu OTP vào DB (xóa OTP cũ nếu có)
         DB::table('password_resets')->where('email', $request->email)->delete();
         DB::table('password_resets')->insert([
             'email' => $request->email,
@@ -130,7 +116,6 @@ class AuthController extends Controller
             'created_at' => Carbon::now(),
         ]);
 
-        // Gửi mail
         Mail::raw("Mã OTP của bạn là: $otp. Mã này có hiệu lực trong 5 phút.", function ($message) use ($request) {
             $message->to($request->email)
                 ->subject('Xác nhận đặt lại mật khẩu');
@@ -138,6 +123,10 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'OTP đã được gửi đến email của bạn!']);
     }
+
+    /**
+     * Xác thực OTP
+     */
     public function verifyOtp(Request $request)
     {
         $request->validate([
@@ -154,13 +143,16 @@ class AuthController extends Controller
             return response()->json(['message' => 'OTP không hợp lệ!'], 400);
         }
 
-        // Kiểm tra thời gian hết hạn (5 phút)
         if (Carbon::parse($record->created_at)->addMinutes(5)->isPast()) {
             return response()->json(['message' => 'OTP đã hết hạn!'], 400);
         }
 
         return response()->json(['message' => 'Xác thực OTP thành công!']);
     }
+
+    /**
+     * Đặt lại mật khẩu mới
+     */
     public function resetPassword(Request $request)
     {
         $request->validate([
@@ -178,13 +170,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'OTP không hợp lệ!'], 400);
         }
 
-        // Cập nhật mật khẩu
         $user = User::where('email', $request->email)->first();
         $user->update([
             'password' => Hash::make($request->password),
         ]);
 
-        // Xóa OTP sau khi đặt lại
         DB::table('password_resets')->where('email', $request->email)->delete();
 
         return response()->json(['message' => 'Đặt lại mật khẩu thành công!']);
