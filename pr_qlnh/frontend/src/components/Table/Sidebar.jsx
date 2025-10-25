@@ -7,7 +7,7 @@ export default function Sidebar() {
     <aside id="sidebar" className="hidden lg:flex lg:flex-col lg:w-64 bg-white border-r border-gray-200 p-4">
       <div className="flex items-center p-3 mb-6 mt-2">
         <div className="bg-brand-indigo w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg">Ad</div>
-        <h1 className="text-2xl font-bold text-gray-900 ml-3">Administration</h1>
+        <h1 className="text-2xl font-bold text-gray-900 ml-3">admin</h1>
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto">
@@ -37,7 +37,7 @@ export default function Sidebar() {
         <div className="flex items-center p-2 rounded-xl bg-gray-50">
           <div className="bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm">NV</div>
           <div className="ml-3">
-            <p className="font-semibold text-gray-800">Trần Tuấn Kiệt</p>
+            <p className="font-semibold text-gray-800">Nguyễn Tiến Thành</p>
             <p className="text-xs text-gray-500">Quản lý hệ thống</p>
           </div>
         </div>
