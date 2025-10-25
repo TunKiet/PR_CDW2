@@ -1,6 +1,8 @@
 FROM php:8.2-fpm
 
-# Install system dependencies
+# ---------------------------
+# 1️⃣ Cài system dependencies
+# ---------------------------
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -8,37 +10,55 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Install PHP extensions
+# ---------------------------
+# 2️⃣ Cài PHP extensions
+# ---------------------------
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Get latest Composer
+# ---------------------------
+# 3️⃣ Cài Composer
+# ---------------------------
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
+# ---------------------------
+# 4️⃣ Set working directory
+# ---------------------------
 WORKDIR /var/www
 
-# Copy application files
+# ---------------------------
+# 5️⃣ Copy source code
+# ---------------------------
 COPY . /var/www
 
-# Install dependencies
-RUN composer install --no-interaction --optimize-autoloader
+# ---------------------------
+# 6️⃣ Dọn cache Laravel để tránh lỗi "Target class [auth]"
+# ---------------------------
+RUN rm -rf bootstrap/cache/*.php
 
-# Install PHP extensions
-RUN pecl install redis && docker-php-ext-enable redis \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# ---------------------------
+# 7️⃣ Cài dependencies PHP (composer)
+# ---------------------------
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
+    && composer dump-autoload --optimize
 
-# Set permissions
+# ---------------------------
+# 8️⃣ Cài Redis (nếu cần)
+# ---------------------------
+RUN pecl install redis && docker-php-ext-enable redis
+
+# ---------------------------
+# 9️⃣ Phân quyền storage & bootstrap/cache
+# ---------------------------
 RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage
+    && chmod -R 755 /var/www/storage \
+    && chmod -R 755 /var/www/bootstrap/cache
 
+# ---------------------------
+# 🔟 Expose port & khởi động app
+# ---------------------------
 EXPOSE 8000
 
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
-
-
-#docker compose exec backend bash
