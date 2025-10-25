@@ -63,7 +63,7 @@ const Sidebar = ({ active, setActive, isMenuOpen, setIsMenuOpen }) => {
           </button>
         </div>
 
-        <nav className="flex-grow">
+        <nav className="grow">
           <ul className="space-y-2">
             {navItems.map((item) => (
               <li key={item.name}>

@@ -41,4 +41,3 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::apiResource('/permissions', PermissionController::class);
 });
 
->>>>>>> origin/18-kiet/Pemission
