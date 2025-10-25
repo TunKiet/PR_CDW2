@@ -1,7 +1,7 @@
 // src/pages/CustomerManagementPage.jsx
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import Sidebar from '../components/Sidebar'; 
+import Sidebar from '../components/Sidebar/Sidebar'; 
 import CustomerTable from '../components/CustomerTable';
 import CustomerDetailsModal from '../components/CustomerDetailsModal';
 import { initialCustomersData } from '../data/customerData'; // Giả định import từ data

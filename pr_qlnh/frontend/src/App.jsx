@@ -12,8 +12,10 @@ import IngredientInOut from './components/Inventory/IngredientInOut'
 import OrderPage from './pages/OrderPage';
 import OrderManagementPage from './pages/OrderManagementPage';
 import CustomerManagementPage from './pages/CustomerManagementPage';
+import UserDashboard from './pages/Dashboard/UserDashboard'
+import AdminDashboard from './pages/AdminDashboard'
 
-import LoginPage from './components/LoginPage';
+// import LoginPage from './components/LoginPage';
 
 function App() {
   return (
@@ -25,9 +27,9 @@ function App() {
         <Route path="/inventory" element={<Invertory />} />
         <Route path="/export" element={<IngredientInOut />} />
         {/* Định tuyến cho các trang khác nhau */}
-        <Route path="/loginpage" element={<LoginPage />} />
-        {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
-        {/* <Route path='/user/dashboard' element={<UserDashboard />} />   */}
+        {/* <Route path="/loginpage" element={<LoginPage />} /> */}
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path='/analytics' element={<UserDashboard />} />  
         {/* Route mặc định (Trang OrderPage) */}
         <Route path="/" element={<Navigate to="/order-page" replace />} />
 
