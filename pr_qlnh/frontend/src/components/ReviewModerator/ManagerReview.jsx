@@ -1,13 +1,33 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import Pagination from '@mui/material/Pagination';
-
+import axios from "axios";
 import { CiImageOff } from "react-icons/ci";
 const ManagerReview = () => {
+    const [adminReview, setAdminReview] = useState([]);
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchAdminReview = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8000/api/reviews/${menuItemId}`);
+                setAdminReview(res.data);
+                
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+            }
+            finally {
+                setLoading(false);
+            }
+        }
+    })
+        if (loading) return <p>Loading reviews...</p>
+    if (adminReview.length === 0) return <p>Chua co danh gia nao</p>
     
     return (
         <>

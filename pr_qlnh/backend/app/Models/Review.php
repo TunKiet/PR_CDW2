@@ -57,7 +57,6 @@ class Review extends Model
             ->limit(3)
             ->get();
     }
-
     /**
      * Summary of getAverageRating
      * @param mixed $menuItemId

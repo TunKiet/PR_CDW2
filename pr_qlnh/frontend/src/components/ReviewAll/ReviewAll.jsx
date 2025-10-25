@@ -17,7 +17,7 @@ import Pagination from '@mui/material/Pagination';
 export const ReviewAll = () => {
     const { menuItemId } = useParams();
     // const menuItemId = 1;
-
+    
     const [menuItem, setMenuItem] = useState(null);
 
     const [likes, setLikes] = useState(0);
@@ -77,7 +77,7 @@ export const ReviewAll = () => {
     if (reviews.length === 0) return <p>Chua co danh gia nao</p>
 
     return (
-        <div className="container w-[80%] h-auto bg-gray-100 border border-[#333] rounded-[8px] p-3">
+        <div className="container w-[80%] h-auto bg-gray-100 border border-[#333] rounded-lg p-3">
             <div className="allReview">
                 <div className="allReview-head">
                     <h2 className="font-bold">Đánh giá về món {menuItem.menu_item_name}</h2>
@@ -85,7 +85,7 @@ export const ReviewAll = () => {
 
                 <div>
                     <div className="block-dish">
-                        <div className="block-dish-item flex p-3 bg-white rounded-[8px]">
+                        <div className="block-dish-item flex p-3 bg-white rounded-lg">
                             <div className="dish-image w-[200px] h-[120px]">
                                 <img
                                     src={`http://localhost:8000/storage/${menuItem.image_url}`}
@@ -105,7 +105,7 @@ export const ReviewAll = () => {
                         <RatingInfo />
                     </div>
 
-                    <div className="allReview-list rounded-[8px] bg-white">
+                    <div className="allReview-list rounded-lg bg-white">
                         <div className="allReview-list-item p-3">
                             {reviews.map((review) => {
                                 const isOpenFeedback = activeFeedbackId === review.review_id;
@@ -115,7 +115,7 @@ export const ReviewAll = () => {
                                         <div className="boxReview-comment flex mb-1 p-1">
                                             <div className="boxReview-comment-titel w-[200px] flex items-start mb-2">
                                                 <div className="flex">
-                                                    <p className="w-[40px] h-[40px] flex items-center justify-center text-white text-2xl font-bold bg-blue-700 rounded-full m-0">
+                                                    <p className="w-10 h-10 flex items-center justify-center text-white text-2xl font-bold bg-blue-700 rounded-full m-0">
                                                         A
                                                     </p>
                                                 </div>
