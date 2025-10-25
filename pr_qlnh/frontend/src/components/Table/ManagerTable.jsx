@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../Sidebar/Sidebar";
 import TableList from "../components/TableList";
 import TableModal from "../components/TableModal";
 import DeleteModal from "../components/DeleteModal";
 
-const TableManagement = () => {
+const ManagerTable = () => {
   const [tables, setTables] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -90,4 +90,4 @@ const TableManagement = () => {
   );
 };
 
-export default TableManagement;
+export default ManagerTable;
