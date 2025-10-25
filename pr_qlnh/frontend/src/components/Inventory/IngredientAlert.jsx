@@ -4,6 +4,7 @@ import { RiFileList2Line } from "react-icons/ri";
 import Dialog from '@mui/material/Dialog';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Box from '@mui/material/Box';
 const IngredientAlert = () => {
     const [checked, setChecked] = useState([true, false]);
 

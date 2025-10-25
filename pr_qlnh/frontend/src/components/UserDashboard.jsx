@@ -83,7 +83,7 @@ const Sidebar = ({ active, setActive, isMenuOpen, setIsMenuOpen, userId }) => {
             User ID: <span className="text-gray-600 font-mono">{userId || 'Loading...'}</span>
         </p>
 
-        <nav className="flex-grow">
+        <nav className="grow">
           <ul className="space-y-2">
             {navItems.map((item) => (
               <li key={item.name}>
