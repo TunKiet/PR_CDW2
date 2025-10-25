@@ -17,7 +17,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      - mysql
       - redis
     command: php artisan serve --host=0.0.0.0 --port=8000
 
@@ -41,7 +41,7 @@ services:
     tty: true
 
   # MySQL Database
-  db:
+  mysql:
     image: mysql:8.0
     container_name: mysql_db
     restart: unless-stopped
@@ -50,7 +50,7 @@ services:
       MYSQL_ROOT_PASSWORD: root 
       MYSQL_PASSWORD: password
       MYSQL_USER: laravel
-      MYSQL_PASSWORD: laravel
+      # MYSQL_PASSWORD: laravel
     ports:
       - "3306:3306"
     volumes:
@@ -59,17 +59,17 @@ services:
       - app-network
 
   # ✅ phpMyAdmin
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: phpmyadmin
-    restart: unless-stopped
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: YourStrongPassword@123
-    ports:
-      - "3306:3306"
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin:latest
+  #   container_name: phpmyadmin
+  #   restart: unless-stopped
+  #   environment:
+  #     PMA_HOST: mysql
+  #     PMA_PORT: 3306
+  #     PMA_USER: root
+  #     PMA_PASSWORD: YourStrongPassword@123
+  #   ports:
+  #     - "3306:3306"
 
   # Redis
   redis:
@@ -87,7 +87,7 @@ services:
     container_name: phpmyadmin
     restart: unless-stopped
     environment:
-      PMA_HOST: db
+      PMA_HOST: mysql
       PMA_PORT: 3306
       MYSQL_ROOT_PASSWORD: root
     networks:
@@ -95,7 +95,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - db
+      - mysql
 
   # Nginx (Optional - nếu muốn dùng Nginx thay vì php artisan serve)
   nginx:
