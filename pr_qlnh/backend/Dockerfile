@@ -28,6 +28,10 @@ COPY . /var/www
 # Install dependencies
 RUN composer install --no-interaction --optimize-autoloader
 
+# Install PHP extensions
+RUN pecl install redis && docker-php-ext-enable redis \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage
@@ -35,3 +39,6 @@ RUN chown -R www-data:www-data /var/www \
 EXPOSE 8000
 
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+
+
+#docker compose exec backend bash

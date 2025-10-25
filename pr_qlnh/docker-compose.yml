@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3'
 
 services:
   # Laravel Backend
@@ -17,7 +17,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - mysql
+      - db
       - redis
     command: php artisan serve --host=0.0.0.0 --port=8000
 
@@ -41,19 +41,20 @@ services:
     tty: true
 
   # MySQL Database
-  mysql:
+  db:
     image: mysql:8.0
-    container_name: mysql
+    container_name: mysql_db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: YourStrongPassword@123
+      MYSQL_ROOT_PASSWORD: root 
+      MYSQL_PASSWORD: password
       MYSQL_USER: laravel
       MYSQL_PASSWORD: laravel
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - dbdata:/var/lib/mysql
     networks:
       - app-network
 
@@ -68,11 +69,7 @@ services:
       PMA_USER: root
       PMA_PASSWORD: YourStrongPassword@123
     ports:
-      - "8080:80"
-    depends_on:
-      - mysql
-    networks:
-      - app-network
+      - "3306:3306"
 
   # Redis
   redis:
@@ -84,7 +81,23 @@ services:
     ports:
       - "6379:6379"
 
-  # Nginx (Optional)
+  # phpMyAdmin (Optional)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - app-network
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+  # Nginx (Optional - nếu muốn dùng Nginx thay vì php artisan serve)
   nginx:
     image: nginx:alpine
     container_name: nginx
@@ -104,5 +117,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
+  dbdata:
     driver: local

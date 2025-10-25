@@ -1,42 +1,62 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import "tailwindcss";
+
+:root {
+    scroll-behavior: smooth;
+    --primary: #4154f1;
+    --second: #717ff5;
+    --bgColor: #f6f9ff;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+body {
+    font-family: 'Open Sans', sans-serif;
+    color: #444444;
+    background: var(--bgColor);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+a {
+    color: var(--primary);
+    text-decoration: none;
+    cursor: pointer;
 }
 
-.card {
-  padding: 2em;
+a:hover {
+    color: var(--primary);
+    text-decoration: none;
 }
 
-.read-the-docs {
-  color: #888;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Nunito', sans-serif;
 }
+/*Start Review*/
+.custom-progress::-webkit-progress-bar {
+    background: rgb(222, 222, 222) !important;
+    border-radius: 10px !important;
+}
+
+.custom-progress::-webkit-progress-value {
+    background-color: red !important;
+    border-radius: 10px !important;
+}
+
+.alert-progress::-webkit-progress-bar {
+    background: rgb(222, 222, 222) !important;
+    border-radius: 10px !important;
+}
+
+.alert-progress::-webkit-progress-value {
+    background-color: green !important;
+    border-radius: 10px !important;
+}
+/*End Review*/
