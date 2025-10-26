@@ -6,9 +6,12 @@ import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Box from '@mui/material/Box';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import { BarChart } from '@mui/x-charts/BarChart';
+
+function valueFormatter(v) {
+  if (v === null) return 'NaN';
+  return `${v.toLocaleString()}t CO2eq/pers`;
+}
 
 const InventoryOverview = () => {
   // --- Dữ liệu cho PieChart ---
@@ -19,32 +22,26 @@ const InventoryOverview = () => {
   ];
 
   // --- Dữ liệu cho RadarChart ---
-  const radar = {
-    metrics: ['Thịt', 'Hải sản', 'Rau củ', 'Gia vị', 'Gạo - Bột', 'Đồ uống',]
-  };
-
-  const series = [
-    {
-      id: 'import',
-      label: 'Nhập kho',
-      data: [150, 120, 180, 90, 220, 110],
-    },
-    {
-      id: 'export',
-      label: 'Xuất kho',
-      data: [130, 100, 160, 70, 200, 95],
-    },
-    {
-      id: 'stock',
-      label: 'Tồn cuối kỳ',
-      data: [20, 20, 20, 20, 20, 15],
-    },
-  ];
-
+  // const series = [
+  //   {
+  //     id: 'import',
+  //     label: 'Nhập kho',
+  //     data: [150, 120, 180, 90, 220, 110],
+  //   },
+  //   {
+  //     id: 'export',
+  //     label: 'Xuất kho',
+  //     data: [130, 100, 160, 70, 200, 95],
+  //   },
+  //   {
+  //     id: 'stock',
+  //     label: 'Tồn cuối kỳ',
+  //     data: [20, 20, 20, 20, 20, 15],
+  //   },
+  // ];
 
   // --- State ---
   const [highlightedItem, setHighlightedItem] = useState(null);
-  const [fillArea, setFillArea] = useState(false);
 
   const handleHighLightedSeries = (event, newSeriesId) => {
     if (newSeriesId !== null) {
@@ -52,37 +49,20 @@ const InventoryOverview = () => {
     }
   };
 
-  const withOptions = (series) =>
-    series.map((item) => ({
-      ...item,
-      fillArea,
-      type: 'radar',
-    }));
-
+  // --- Dữ liệu cho BarChart ---
   const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490, 10000, 5678, 4400, 6733, 1000];
   const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300, 4000, 7890, 1234, 1000, 4000];
-  const xLabels = [
-    'T1',
-    'T2',
-    'T3',
-    'T4',
-    'T5',
-    'T6',
-    'T7',
-    'T8',
-    'T9',
-    'T10',
-    'T11',
-    'T12',
-  ];
+  const xLabels = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
 
   return (
     <div className="section">
       <div className="flex min-h-screen">
+        {/* Sidebar */}
         <div className="w-[20%]">
           <Sidebar />
         </div>
 
+        {/* Nội dung chính */}
         <div className="w-[80%] h-screen bg-gray-100 p-6 mx-auto overflow-hidden">
           <h4 className="text-lg font-bold mb-4 p-3 border-b border-gray-300">
             📦 Thống kê kho hàng
@@ -132,38 +112,41 @@ const InventoryOverview = () => {
                   fullWidth
                   size="small"
                 >
-                  {series.map((item) => (
-                    <ToggleButton key={item.id} value={item.id}>
-                      {item.label}
-                    </ToggleButton>
-                  ))}
+                  
                 </ToggleButtonGroup>
 
                 <Box sx={{ width: '100%' }}>
                   <RadarChart
-                    height={160}
-                    highlight="series"
-                    highlightedItem={highlightedItem}
-                    onHighlightChange={setHighlightedItem}
-                    series={withOptions(series)}
-                    radar={radar}
+                    height={300}
+                    series={[
+                      {
+                        label: 'USA',
+                        data: [6.65, 2.76, 5.15, 0.19, 0.07, 0.12],
+                        fill: true, // 🔹 luôn tô vùng phủ
+                        valueFormatter,
+                      },
+                      {
+                        label: 'Australia',
+                        data: [5.52, 5.5, 3.19, 0.51, 0.15, 0.11],
+                        fill: true,
+                        valueFormatter,
+                      },
+                      {
+                        label: 'United Kingdom',
+                        data: [2.26, 0.29, 2.03, 0.05, 0.04, 0.06],
+                        fill: true,
+                        valueFormatter,
+                      },
+                    ]}
+                    radar={{
+                      metrics: ['Oil', 'Coal', 'Gas', 'Flaring', 'Other\nindustry', 'Cement'],
+                    }}
                   />
                 </Box>
-
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={fillArea}
-                      onChange={(e) => setFillArea(e.target.checked)}
-                    />
-                  }
-                  label="Tô vùng phủ (fill area)"
-                />
               </Stack>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
