@@ -24,6 +24,7 @@ class IngredientSeeder extends Seeder
 
             DB::table('ingredients')->insert([
                 'ingredient_name' => 'Nguyên liệu ' . $i,
+                'category_ingredient_id' => rand(1, 10),
                 'price' => $price,
                 'unit' => $units[array_rand($units)],
                 'total_price' => $totalPrice,

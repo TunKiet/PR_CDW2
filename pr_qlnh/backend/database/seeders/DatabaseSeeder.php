@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             CategorySeeder::class,       
+            CategoryIngredientSeeder::class,       
             MenuItemSeeder::class,
             IngredientSeeder::class,
             TableSeeder::class,  
