@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as BrowserRouter, Routes, Route , Navigate } from "react-router-dom";
-import React from 'react'
+// import React from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar/Sidebar'
 import Header from './components/Header/Header'
@@ -17,6 +17,9 @@ import UserDashboard from './pages/Dashboard/UserDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 
 // import LoginPage from './components/LoginPage';
+
+//import  chức năng 08_hao
+import DishTable from './components/08_hao-QLMonAn/DishTable';
 
 function App() {
   return (
