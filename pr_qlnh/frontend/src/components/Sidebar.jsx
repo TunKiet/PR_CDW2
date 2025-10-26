@@ -17,7 +17,7 @@ const Sidebar = () => {
     { title: "Hóa đơn", icon: <FileText size={20} />, path: '/order-management' }, // Trỏ đến trang quản lý
     { title: "Đặt bàn", icon: <Calendar size={20} />, path: '/tables' },
     { title: "Quản lý giỏ hàng", icon: <ShoppingCart size={20} />, path: 'cart-management' }, // Trỏ đến trang quản lý
-    { title: "Thực đơn", icon: <Menu size={20} />, path: '/menu' },
+    { title: "Thực đơn", icon: <Menu size={20} />, path: '/dishtable' },
     { title: "Mặt hàng", icon: <Zap size={20} />, path: '/products' },
     { title: "Nhân viên", icon: <User size={20} />, path: '/staff' },
     { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },

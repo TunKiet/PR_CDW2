@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   # Laravel Backend
@@ -37,8 +37,12 @@ services:
       - "3000:3000"
     environment:
       - VITE_API_URL=http://localhost:8000/api
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    command: npm run dev -- --host 0.0.0.0 --port 3000
     stdin_open: true
     tty: true
+
 
   # MySQL Database
   mysql:

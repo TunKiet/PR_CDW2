@@ -1,8 +1,9 @@
-import React from 'react'
+import React from "react";
+import { BrowserRouter as BrowserRouter, Routes, Route , Navigate } from "react-router-dom";
+// import React from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar/Sidebar'
 import Header from './components/Header/Header'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Review from './components/Review/Review'
 import ReviewModerator from './components/ReviewModerator/ReviewModerator'
 import Invertory from './components/Inventory/Inventory'
@@ -17,10 +18,14 @@ import AdminDashboard from './pages/AdminDashboard'
 
 // import LoginPage from './components/LoginPage';
 
+//import  chức năng 08_hao
+import DishTable from './components/08_hao-QLMonAn/DishTable';
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />

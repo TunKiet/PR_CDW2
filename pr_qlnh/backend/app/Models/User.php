@@ -11,6 +11,9 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+    
+    // Khai báo khóa chính là 'user_id' thay vì 'id'
+    protected $primaryKey = 'user_id';
 
     /**
      * The attributes that are mass assignable.
@@ -20,11 +23,11 @@ class User extends Authenticatable
     protected $table = 'users';
 
     // Nếu khóa chính khác "id", ví dụ "user_id"
-    protected $primaryKey = 'id';
+    // protected $primaryKey = 'id';
 
     //Các cột có thể gán hàng loạt (mass assignment)
     protected $fillable = [
-        'username',
+        'username', // Đã thay thế 'name' bằng 'username'
         'email',
         'password',
         'full_name',
