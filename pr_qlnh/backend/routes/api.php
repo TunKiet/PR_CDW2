@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ForgotPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,3 +44,6 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::apiResource('/permissions', PermissionController::class);
 });
 
+Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
+Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);

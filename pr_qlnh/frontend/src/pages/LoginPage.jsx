@@ -12,8 +12,9 @@ export default function LoginPage() {
   const [activeTab, setActiveTab] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
 
-  //Validate schema cho đăng nhập
+  // Validate login
   const loginSchema = Yup.object({
     phone: Yup.string()
       .required("Vui lòng nhập số điện thoại")
@@ -23,12 +24,10 @@ export default function LoginPage() {
       .min(6, "Mật khẩu ít nhất 6 ký tự"),
   });
 
-  // Validate schema cho đăng ký
+  // Validate register
   const registerSchema = Yup.object({
     fullName: Yup.string().required("Vui lòng nhập họ tên"),
-    email: Yup.string()
-      .email("Email không hợp lệ")
-      .required("Vui lòng nhập email"),
+    email: Yup.string().email("Email không hợp lệ").required("Vui lòng nhập email"),
     phone: Yup.string()
       .required("Vui lòng nhập số điện thoại")
       .matches(/^[0-9]{10,11}$/, "Số điện thoại phải có 10-11 chữ số"),
@@ -39,7 +38,7 @@ export default function LoginPage() {
       .oneOf([Yup.ref("password")], "Mật khẩu xác nhận không khớp")
       .required("Vui lòng xác nhận mật khẩu"),
   });
-  const navigate = useNavigate();
+
   // Đăng nhập
   const loginFormik = useFormik({
     initialValues: { phone: "", password: "", rememberMe: false },
@@ -49,17 +48,12 @@ export default function LoginPage() {
         const res = await axios.post("http://localhost:8000/api/login", {
           phone: values.phone,
           password: values.password,
+          remember: values.rememberMe,
         });
 
         alert(res.data.message);
-        console.log("User:", res.data.user);
-
-        //chuyen huong ve trang chu hoac dashboard
-        if (res.data.user.role === "admin") {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/user/home");
-        }
+        if (res.data.user.role === "admin") navigate("/admin/dashboard");
+        else navigate("/user/home");
       } catch (err) {
         const msg = err.response?.data?.message || "Đăng nhập thất bại!";
         alert(msg);
@@ -67,7 +61,7 @@ export default function LoginPage() {
     },
   });
 
-  //Đăng ký
+  // Đăng ký
   const registerFormik = useFormik({
     initialValues: {
       fullName: "",
@@ -174,6 +168,26 @@ export default function LoginPage() {
               {loginFormik.touched.password && loginFormik.errors.password && (
                 <p className="error">{loginFormik.errors.password}</p>
               )}
+            </div>
+
+            {/* Remember & Forgot Password */}
+            <div className="extra-options">
+              <label className="remember">
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  onChange={loginFormik.handleChange}
+                  checked={loginFormik.values.rememberMe}
+                />
+                Ghi nhớ mật khẩu
+              </label>
+              <button
+                type="button"
+                className="forgot-btn"
+                onClick={() => navigate("/forgot-password")}
+              >
+                Quên mật khẩu?
+              </button>
             </div>
 
             <button
@@ -307,7 +321,9 @@ export default function LoginPage() {
                 <button
                   type="button"
                   className="eye-btn"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
                 >
                   <FontAwesomeIcon
                     icon={showConfirmPassword ? faEyeSlash : faEye}
@@ -321,6 +337,7 @@ export default function LoginPage() {
                   </p>
                 )}
             </div>
+
             <button
               type="submit"
               className="btn btn-primary"
