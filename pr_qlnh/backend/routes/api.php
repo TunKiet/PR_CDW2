@@ -1,10 +1,9 @@
 <?php
-
-
+use App\Http\Controllers\Api\DishController;
+Route::get('/test', function () {
+    return response()->json(['message' => 'API file is loaded']);
+});
 use App\Http\Controllers\ReviewController;
-
-
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +20,9 @@ use App\Http\Controllers\PermissionController;
 | Tất cả route API sẽ nằm ở đây, prefix là /api
 |--------------------------------------------------------------------------
 */
+// ✅ Đây là route chính cho DishController
+Route::apiResource('dishes', DishController::class);
+
 Route::post('/reviews', [ReviewController::class, 'store']);
 Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
 
@@ -40,3 +42,4 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::apiResource('/roles', RoleController::class);
     Route::apiResource('/permissions', PermissionController::class);
 });
+

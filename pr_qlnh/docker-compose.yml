@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   # Laravel Backend
@@ -17,7 +17,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      - mysql
       - redis
     command: php artisan serve --host=0.0.0.0 --port=8000
 
@@ -37,11 +37,15 @@ services:
       - "3000:3000"
     environment:
       - VITE_API_URL=http://localhost:8000/api
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    command: npm run dev -- --host 0.0.0.0 --port 3000
     stdin_open: true
     tty: true
 
+
   # MySQL Database
-  db:
+  mysql:
     image: mysql:8.0
     container_name: mysql_db
     restart: unless-stopped
@@ -50,6 +54,7 @@ services:
       MYSQL_ROOT_PASSWORD: root 
       MYSQL_PASSWORD: password
       MYSQL_USER: laravel
+      # MYSQL_PASSWORD: laravel
     ports:
       - "3306:3306"
     volumes:
@@ -58,17 +63,17 @@ services:
       - app-network
 
   # ✅ phpMyAdmin
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
-    container_name: phpmyadmin
-    restart: unless-stopped
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: YourStrongPassword@123
-    ports:
-      - "3306:3306"
+  # phpmyadmin:
+  #   image: phpmyadmin/phpmyadmin:latest
+  #   container_name: phpmyadmin
+  #   restart: unless-stopped
+  #   environment:
+  #     PMA_HOST: mysql
+  #     PMA_PORT: 3306
+  #     PMA_USER: root
+  #     PMA_PASSWORD: YourStrongPassword@123
+  #   ports:
+  #     - "3306:3306"
 
   # Redis
   redis:
@@ -79,6 +84,22 @@ services:
       - app-network
     ports:
       - "6379:6379"
+
+  # phpMyAdmin (Optional)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - app-network
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
 
   # Nginx (Optional - nếu muốn dùng Nginx thay vì php artisan serve)
   nginx:

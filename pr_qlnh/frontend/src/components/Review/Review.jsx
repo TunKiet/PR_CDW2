@@ -97,7 +97,7 @@ const Review = () => {
                 <div className="headReview">
                     <h2>Đánh giá món ăn</h2>
                 </div>
-                <div className="boxReview w-full h-[200px] bg-white p-3 flex rounded-[8px]">
+                <div className="boxReview w-full h-[200px] bg-white p-3 flex rounded-lg">
                     <div className="boxReview-overview w-[250px]">
                         <div className="boxReview-score">
                             <div className="rating text-4xl"><span className="average-rating text-6xl">4.8</span>/5</div>
@@ -109,7 +109,7 @@ const Review = () => {
                             {/* Form write review for user */}
                             <Dialog open={openFormReview} onClose={handleClose}>
                                 <div className="container p-3 m-3 max-w-xl w-full mx-auto">
-                                    <div className="absolute top-1 right-1 !p-3 !rounded-full !me-auto hover:bg-gray-300 !w-[40px] cursor-pointer" onClick={handleClose}><IoClose /></div>
+                                    <div className="absolute top-1 right-1 p-3! rounded-full! me-auto! hover:bg-gray-300 w-10! cursor-pointer" onClick={handleClose}><IoClose /></div>
                                     <h2 className='text-5xl font-bold pt-3'>Đánh giá về chúng tôi</h2>
                                     <div className="formReview-info flex items-center">
                                         <div className="formReview-info-avatar">
@@ -141,7 +141,7 @@ const Review = () => {
                                         </div>
                                         <div className="formReview-comment-content">
                                             <textarea
-                                                className='w-[500px] h-[200px] border border-[#333] focus:ring-0 focus:outline-none !resize-none p-2'
+                                                className='w-[500px] h-[200px] border border-[#333] focus:ring-0 focus:outline-none resize-none! p-2'
                                                 placeholder='Nhập đánh giá của bạn về chúng tôi...'
                                                 value={comment}
                                                 onChange={(e) => setComment(e.target.value)}></textarea>
@@ -162,7 +162,7 @@ const Review = () => {
                                 <span>5</span>
                                 <FaStar className="text-yellow-400 ml-1" />
                             </div>
-                            <progress max={100} value={85} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
+                            <progress max={100} value={85} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
                             <span className="text-sm text-gray-600 ml-2">85 đánh giá</span>
                         </div>
                         <div className="rating-level flex items-center gap-2">
@@ -170,7 +170,7 @@ const Review = () => {
                                 <span>4</span>
                                 <FaStar className="text-yellow-400 ml-1" />
                             </div>
-                            <progress max={100} value={10} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
+                            <progress max={100} value={10} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
                             <span className="text-sm text-gray-600 ml-2">10 đánh giá</span>
                         </div>
                         <div className="rating-level flex items-center gap-2">
@@ -178,7 +178,7 @@ const Review = () => {
                                 <span>3</span>
                                 <FaStar className="text-yellow-400 ml-1" />
                             </div>
-                            <progress max={100} value={0} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
+                            <progress max={100} value={0} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
                             <span className="text-sm text-gray-600 ml-2">0 đánh giá</span>
                         </div>
                         <div className="rating-level flex items-center gap-2">
@@ -186,7 +186,7 @@ const Review = () => {
                                 <span>2</span>
                                 <FaStar className="text-yellow-400 ml-1" />
                             </div>
-                            <progress max={100} value={0} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
+                            <progress max={100} value={0} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
                             <span className="text-sm text-gray-600 ml-2">0 đánh giá</span>
                         </div>
                         <div className="rating-level flex items-center gap-2">
@@ -194,14 +194,14 @@ const Review = () => {
                                 <span>1</span>
                                 <FaStar className="text-yellow-400 ml-1" />
                             </div>
-                            <progress max={100} value={5} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
+                            <progress max={100} value={5} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
                             <span className="text-sm text-gray-600 ml-2">5 đánh giá</span>
                         </div>
                     </div>
 
                 </div>
 
-                <div className='w-full h-auto bg-white p-3 my-2 rounded-[8px]' >
+                <div className='w-full h-auto bg-white p-3 my-2 rounded-lg' >
                     <div className="boxReview-filter flex items-center mb-3">
                         <div className="title">Lọc đánh giá</div>
                         <div className="container-filter flex items-center">
