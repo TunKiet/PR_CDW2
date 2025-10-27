@@ -28,6 +28,7 @@ function App() {
       <Routes>
         <Route path ="/" element={<LoginPage/>}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/user/homepage" element={<HomePage />} />
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
