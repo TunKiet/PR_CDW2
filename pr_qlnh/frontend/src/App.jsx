@@ -16,6 +16,7 @@ import CustomerManagementPage from './pages/CustomerManagementPage';
 import UserDashboard from './pages/Dashboard/UserDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 import LoginPage from './pages/LoginPage';
+import ForgotPassword from "./pages/ForgotPasswordPage";
 
 //import  chức năng 08_hao
 import DishTable from './components/08_hao-QLMonAn/DishTable';
@@ -25,6 +26,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path ="/" element={<LoginPage/>}/>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
@@ -32,7 +34,6 @@ function App() {
         <Route path="/inventory" element={<Invertory />} />
         <Route path="/export" element={<IngredientInOut />} />
         {/* Định tuyến cho các trang khác nhau */}
-        {/* <Route path="/loginpage" element={<LoginPage />} /> */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path='/analytics' element={<UserDashboard />} />  
         {/* Route mặc định (Trang OrderPage) */}
