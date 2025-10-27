@@ -24,10 +24,9 @@ class AuthController extends Controller
 
         $user = User::create([
             'username' => explode('@', $request->email)[0],
-            'full_name' => $request->full_name,
             'email' => $request->email,
-            'phone' => $request->phone,
             'password' => Hash::make($request->password),
+            'phone' => $request->phone,
             'role' => 'user', // Mặc định user thường
             'status' => 1,
         ]);

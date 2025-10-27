@@ -15,8 +15,7 @@ import OrderManagementPage from './pages/OrderManagementPage';
 import CustomerManagementPage from './pages/CustomerManagementPage';
 import UserDashboard from './pages/Dashboard/UserDashboard'
 import AdminDashboard from './pages/AdminDashboard'
-
-// import LoginPage from './components/LoginPage';
+import LoginPage from './pages/LoginPage';
 
 //import  chức năng 08_hao
 import DishTable from './components/08_hao-QLMonAn/DishTable';
@@ -25,6 +24,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path ="/" element={<LoginPage/>}/>
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
