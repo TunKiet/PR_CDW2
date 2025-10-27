@@ -34,8 +34,8 @@ const Invertory = () => {
                                             <div
                                                 key={tab.id}
                                                 className={`relative cursor-pointer pb-1 transition-all duration-300 ${activeTab === tab.id
-                                                    ? "text-orange-500 font-bold after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-orange-500 after:transition-all after:duration-300"
-                                                    : "text-gray-600 hover:text-orange-400 after:content-[''] after:absolute after:left-1/2 after:bottom-0 after:w-0 after:h-[2px] after:bg-orange-400 after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full"
+                                                    ? "text-orange-500 font-bold after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-0.5 after:bg-orange-500 after:transition-all after:duration-300"
+                                                    : "text-gray-600 hover:text-orange-400 after:content-[''] after:absolute after:left-1/2 after:bottom-0 after:w-0 after:h-0.5 after:bg-orange-400 after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full"
                                                     }`}
                                                 onClick={() => setActiveTab(tab.id)}
                                             >

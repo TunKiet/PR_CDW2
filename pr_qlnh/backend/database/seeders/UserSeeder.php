@@ -12,7 +12,9 @@ class UserSeeder extends Seeder
     const MAX_RECORDS = 100;
 
     /**
-     * Run the database seeds.
+     * Chạy quá trình seed database.
+     *
+     * @return void
      */
     public function run(): void
     {
