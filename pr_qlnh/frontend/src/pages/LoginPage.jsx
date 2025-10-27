@@ -15,19 +15,28 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   // Validate login
-  const loginSchema = Yup.object({
-    phone: Yup.string()
-      .required("Vui lòng nhập số điện thoại")
-      .matches(/^[0-9]{10,11}$/, "Số điện thoại phải có 10-11 chữ số"),
-    password: Yup.string()
-      .required("Vui lòng nhập mật khẩu")
-      .min(6, "Mật khẩu ít nhất 6 ký tự"),
-  });
+ const loginSchema = Yup.object({
+  phone: Yup.string()
+    .required("Vui lòng nhập email hoặc số điện thoại")
+    .test(
+      "is-valid-phone-or-email",
+      "Phải là số điện thoại (10–11 số) hoặc email hợp lệ",
+      (value) =>
+        /^[0-9]{10,11}$/.test(value) ||
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+    ),
+  password: Yup.string()
+    .required("Vui lòng nhập mật khẩu")
+    .min(6, "Mật khẩu ít nhất 6 ký tự"),
+});
+
 
   // Validate register
   const registerSchema = Yup.object({
     fullName: Yup.string().required("Vui lòng nhập họ tên"),
-    email: Yup.string().email("Email không hợp lệ").required("Vui lòng nhập email"),
+    email: Yup.string()
+      .email("Email không hợp lệ")
+      .required("Vui lòng nhập email"),
     phone: Yup.string()
       .required("Vui lòng nhập số điện thoại")
       .matches(/^[0-9]{10,11}$/, "Số điện thoại phải có 10-11 chữ số"),
@@ -45,11 +54,25 @@ export default function LoginPage() {
     validationSchema: loginSchema,
     onSubmit: async (values) => {
       try {
-        const res = await axios.post("http://localhost:8000/api/login", {
-          phone: values.phone,
+        // Kiểm tra người dùng nhập email hay số điện thoại
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.phone);
+
+        const payload = {
           password: values.password,
           remember: values.rememberMe,
-        });
+        };
+
+        // Nếu là email thì gửi key là "email", ngược lại là "phone"
+        if (isEmail) {
+          payload.email = values.phone;
+        } else {
+          payload.phone = values.phone;
+        }
+
+        const res = await axios.post(
+          "http://localhost:8000/api/login",
+          payload
+        );
 
         alert(res.data.message);
         if (res.data.user.role === "admin") navigate("/admin/dashboard");
@@ -121,14 +144,14 @@ export default function LoginPage() {
           <form onSubmit={loginFormik.handleSubmit} className="form">
             {/* Phone */}
             <div className="form-group">
-              <label className="label">Số điện thoại</label>
+              <label className="label">Số điện thoại hoặc Email</label>
               <input
                 type="text"
                 name="phone"
                 onChange={loginFormik.handleChange}
                 onBlur={loginFormik.handleBlur}
                 value={loginFormik.values.phone}
-                placeholder="Nhập số điện thoại"
+                placeholder="Nhập số điện thoại hoặc email của bạn"
                 className={`input ${
                   loginFormik.touched.phone && loginFormik.errors.phone
                     ? "input-error"
@@ -321,9 +344,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   className="eye-btn"
-                  onClick={() =>
-                    setShowConfirmPassword(!showConfirmPassword)
-                  }
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   <FontAwesomeIcon
                     icon={showConfirmPassword ? faEyeSlash : faEye}

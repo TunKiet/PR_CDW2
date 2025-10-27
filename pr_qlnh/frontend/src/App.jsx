@@ -20,6 +20,7 @@ import ForgotPassword from "./pages/ForgotPasswordPage";
 
 //import  chức năng 08_hao
 import DishTable from './components/08_hao-QLMonAn/DishTable';
+import HomePage from "./components/08_hao-QLMonAn/HomePage";
 
 function App() {
   return (
@@ -35,9 +36,7 @@ function App() {
         <Route path="/export" element={<IngredientInOut />} />
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path='/analytics' element={<UserDashboard />} />  
-        {/* Route mặc định (Trang OrderPage) */}
-        <Route path="/" element={<Navigate to="/order-page" replace />} />
+        <Route path='/user/home' element={<UserDashboard />} />  
 
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}
         <Route path="/order-page" element={<OrderPage />} />
