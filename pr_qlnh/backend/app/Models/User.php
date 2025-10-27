@@ -53,4 +53,9 @@ class User extends Authenticatable
             ? $this->role->permissions->contains('name', $permissionName)
             : false;
     }
+    public function getAuthIdentifierName()
+    {
+        return 'user_id';
+    }
+
 }
