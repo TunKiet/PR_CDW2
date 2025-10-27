@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 
 export default function ForgotPassword() {
@@ -10,6 +11,7 @@ export default function ForgotPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
   const handleSendOtp = async (e) => {
     e.preventDefault();
@@ -75,6 +77,13 @@ export default function ForgotPassword() {
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? "Đang gửi..." : "Gửi mã OTP"}
             </button>
+             <button
+                type="button"
+                className="forgot-btn"
+                onClick={() => navigate("/")}
+              >
+                Quay lại đăng nhập
+              </button>
           </form>
         )}
 
