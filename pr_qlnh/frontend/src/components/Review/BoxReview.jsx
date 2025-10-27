@@ -9,6 +9,10 @@ import Feedback from './Feedback';
 import AdminFeedback from './AdminFeedback';
 import UserFeedback from './UserFeedback';
 import Rating from '@mui/material/Rating';
+import Stack from '@mui/material/Stack';
+import Skeleton from '@mui/material/Skeleton';
+import Box from '@mui/material/Box';
+import NoReview from '../../assets/icon/no-review.svg';
 import axios from "axios";
 
 
@@ -68,8 +72,34 @@ const BoxReview = () => {
         fetchReview();
     }, [menuItemId]);
 
-    if (loading) return <p>Loading reviews...</p>
-    if (reviews.length === 0) return <p>Chua co danh gia nao</p>
+    if (loading) return (
+
+        <Box sx={{ p: 2, bgcolor: 'none', width: '100%', height: 'auto' }}>
+            <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={1} sx={{ flex: '0 0 auto', alignItems: 'flex-start', minWidth: '150px' }}>
+                    <Skeleton variant="circular" width={50} height={50} sx={{ flexShrink: 0 }} />
+                    <Box sx={{ mt: 2 }}>
+                        <Skeleton variant="text" width={80} sx={{ fontSize: "1rem", transform: 'none' }} />
+                    </Box>
+                </Stack>
+
+                <Stack spacing={2} sx={{ flexGrow: 1, minWidth: '0' }}>
+                    <Skeleton variant="text" width="40%" sx={{ fontSize: "0.7rem", transform: 'none' }} />
+                    <Skeleton variant="rectangular" width="20%" height={80} />
+                    <Skeleton variant="text" width="50%" sx={{ fontSize: "0.7rem", transform: 'none' }} />
+                    <Skeleton variant="text" width="80%" sx={{ fontSize: "0.7rem", transform: 'none' }} />
+                    <Skeleton variant="text" width="70%" sx={{ fontSize: "0.7rem", transform: 'none' }} />
+                </Stack>
+            </Stack>
+        </Box>
+
+    )
+    if (reviews.length === 0) return (
+        <div className="flex flex-col items-center justify-center text-center min-h-[200px]">
+            <img src={NoReview} alt="No Review" className="w-32" />
+            <p className="mt-2 text-gray-600">Hiện chưa có đánh giá nào.</p>
+        </div>
+    )
     return (
         <>
             {
