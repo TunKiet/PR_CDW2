@@ -2983,3 +2983,601 @@ Did you mean one of these?
 #8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #9 {main}
 "} 
+[2025-10-27 18:15:30] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:15:31] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:15:37] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:15:37] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:15:43] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:15:43] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:15:49] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:15:49] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:15:55] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:15:55] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:16:02] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:16:02] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:16:10] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:16:10] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:16:21] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:16:21] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:16:38] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:16:38] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:17:09] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:17:09] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:18:05] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:18:05] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:19:11] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:19:11] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:20:16] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:20:16] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:21:21] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:21:21] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:22:27] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:22:27] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:23:32] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:23:32] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:24:38] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:24:38] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:25:43] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:25:43] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:26:48] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:26:48] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:27:53] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:27:53] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:28:58] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:28:58] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:30:03] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:30:03] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:31:08] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(403): Illuminate\\Log\\LogManager->error('Class \"Tymon\\\\JW...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(366): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(Error))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(620): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(Error))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(199): Illuminate\\Foundation\\Console\\Kernel->reportException(Object(Error))
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
+[2025-10-27 18:31:08] laravel.ERROR: Class "Tymon\JWTAuth\Providers\JWT\Provider" not found {"exception":"[object] (Error(code: 0): Class \"Tymon\\JWTAuth\\Providers\\JWT\\Provider\" not found at /var/www/config/jwt.php:134)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): require()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'jwt', '/var/www/config...', Array)
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(473): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(195): Illuminate\\Foundation\\Console\\Kernel->bootstrap()
+#7 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#8 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#9 {main}
+"} 
