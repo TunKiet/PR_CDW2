@@ -51,15 +51,7 @@ function App() {
 
         {/* ROUTE MỚI: Trang Quản Lý Khách Hàng */}
         <Route path="/customers" element={<CustomerManagementPage />} />
-
-        {/* Thêm các route khác nếu có: /invoices, /menu, ... */}
-        {/* <Route path="/invoices" element={<InvoicePage />} /> */}
-
-        {/* Route xử lý trường hợp không tìm thấy trang (404) */}
-        <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} />
-        <div className="min-h-screen lg:flex">
-      		<TableManagementAdmin />
-    	</div>
+        <Route path="*" element={<TableManagementAdmin />} />
       </Routes>
     </BrowserRouter>
   )
