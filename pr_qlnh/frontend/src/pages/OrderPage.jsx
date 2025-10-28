@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/Sidebar/Sidebar";
 import MenuList from "../components/MenuList";
 import OrderSummary from "../components/OrderSummary";
 import TableModal from "../components/TableModal";
