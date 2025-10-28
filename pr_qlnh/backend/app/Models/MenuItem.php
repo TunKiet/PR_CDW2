@@ -1,21 +1,27 @@
 <?php
 
-namespace App\Models;
+namespace App\Models; // ⚠️ Thêm dòng này
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MenuItem extends Model 
+class MenuItem extends Model
 {
-    protected $table = 'menu_items';
+    use HasFactory;
+
     protected $primaryKey = 'menu_item_id';
-    public $timestamps = true;
 
     protected $fillable = [
         'category_id',
         'menu_item_name',
-        'description',
         'price',
         'image_url',
-        'status'
+        'description',
+        'status',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id', 'category_id');
+    }
 }

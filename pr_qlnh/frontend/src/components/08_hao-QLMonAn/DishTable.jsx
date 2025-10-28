@@ -159,6 +159,17 @@ export default function DishTable() {
                           {statusMap[dish.statusKey]}
                         </span>
                       </td>
+                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end items-center space-x-2">
+                            <button onClick={() => handleDetailView(dish)} className="text-indigo-600 hover:text-indigo-900" title="Xem Chi Tiết">
+                                {/* ... Icon Con mắt ... */}
+                            </button>
+                            <button className="text-blue-600 hover:text-blue-900" title="Sửa">
+                                {/* ... Icon Sửa ... */}
+                            </button>
+                            <button className="text-red-600 hover:text-red-900" title="Xóa">
+                                {/* ... Icon Xóa ... */}
+                            </button>
+                        </td>
                     </tr>
                   ))
                 ) : (
@@ -171,8 +182,54 @@ export default function DishTable() {
               </tbody>
             </table>
           </div>
+          
+          {/* PHÂN TRANG (PAGINATION) MỚI */}
+          <div className="mt-6 flex justify-between items-center text-sm text-gray-600">
+                <span id="pagination-info">{paginationInfo}</span>
+                <div className="flex space-x-2">
+                    {/* Nút TRƯỚC */}
+                    <button 
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
+                        className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 transition duration-150" 
+                        disabled={currentPage === 1}
+                    >
+                        Trước
+                    </button>
+                    
+                    {/* Các Nút SỐ TRANG */}
+                    {pageNumbers.map(page => (
+                        <button 
+                            key={page} 
+                            onClick={() => setCurrentPage(page)} 
+                            className={`px-3 py-1 border border-gray-300 rounded-lg ${
+                                page === currentPage ? 'bg-emerald-500 text-white' : 'hover:bg-gray-100'
+                            }`}
+                        >
+                            {page}
+                        </button>
+                    ))}
+                    
+                    {/* Nút SAU */}
+                    <button 
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
+                        className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 transition duration-150"
+                        disabled={currentPage === totalPages || totalPages === 0}
+                    >
+                        Sau
+                    </button>
+                </div>
+            </div>
+            {/* KẾT THÚC PHÂN TRANG */}
+
         </div>
       </main>
+      
+      {/* Modal Xem Chi Tiết */}
+      <DetailModal 
+        isVisible={isDetailModalOpen} 
+        onClose={() => setIsDetailModalOpen(false)} 
+        dish={selectedDish} 
+      />
     </div>
   );
 }

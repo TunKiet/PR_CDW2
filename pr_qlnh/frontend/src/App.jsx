@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter as BrowserRouter, Routes, Route , Navigate } from "react-router-dom";
 // import React from 'react'
 import './App.css'
+import MenuList from "./components/MenuList";
+
 import Sidebar from './components/Sidebar/Sidebar'
 import Header from './components/Header/Header'
 import Review from './components/Review/Review'
@@ -21,6 +23,7 @@ import ForgotPassword from "./pages/ForgotPasswordPage";
 //import  chức năng 08_hao
 import DishTable from './components/08_hao-QLMonAn/DishTable';
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
+import TableManagementAdmin from './pages/TableManagementAdmin';
 
 function App() {
   return (
@@ -28,6 +31,7 @@ function App() {
       <Routes>
         <Route path ="/" element={<LoginPage/>}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/user/homepage" element={<HomePage />} />
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
@@ -53,8 +57,12 @@ function App() {
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
         <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} />
+        <div className="min-h-screen lg:flex">
+      		<TableManagementAdmin />
+    	</div>
       </Routes>
     </BrowserRouter>
   )
 }
 export default App
+
