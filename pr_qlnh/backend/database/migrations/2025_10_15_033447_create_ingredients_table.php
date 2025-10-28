@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ingredients', function (Blueprint $table) {
-            $table->id('ingredient_id');
-            $table->string('ingredient_name', 100);
-            $table->decimal('price', 10, 2);
-            $table->string('unit', 20);
-            $table->decimal('total_price', 12, 2);
-            $table->integer('stock_quantity');
-            $table->integer('min_stock_level');
-            $table->timestamps();
-        });
+    $table->id('ingredient_id');
+    $table->string('ingredient_name', 150);
+    $table->string('unit', 50);
+    $table->decimal('price', 10, 2)->default(0);
+    // ❌ Xoá dòng này nếu có:
+    // $table->decimal('total_price', 10, 2);
+    $table->timestamps();
+});
+
     }
 
     /**

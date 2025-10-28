@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter as BrowserRouter, Routes, Route , Navigate } from "react-router-dom";
 // import React from 'react'
 import './App.css'
+import MenuList from "./components/MenuList";
+
 import Sidebar from './components/Sidebar/Sidebar'
 import Header from './components/Header/Header'
 import Review from './components/Review/Review'

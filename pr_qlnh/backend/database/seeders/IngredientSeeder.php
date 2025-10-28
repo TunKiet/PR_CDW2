@@ -7,31 +7,45 @@ use Illuminate\Support\Facades\DB;
 
 class IngredientSeeder extends Seeder
 {
-    const MAX_RECORDS = 20; // Số lượng nguyên liệu muốn tạo
-
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $units = ['kg', 'g', 'l', 'ml', 'pcs'];
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('ingredients')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
-            $price = rand(10, 200) * 1000; // Giá mua 10.000 -> 200.000
-            $stockQuantity = rand(10, 100); // Số lượng trong kho
-            $totalPrice = $price * $stockQuantity; // Tổng giá trị nguyên liệu
-            $minStockLevel = rand(5, 20); // Mức tồn tối thiểu
-
-            DB::table('ingredients')->insert([
-                'ingredient_name' => 'Nguyên liệu ' . $i,
-                'price' => $price,
-                'unit' => $units[array_rand($units)],
-                'total_price' => $totalPrice,
-                'stock_quantity' => $stockQuantity,
-                'min_stock_level' => $minStockLevel,
+        DB::table('ingredients')->insert([
+            [
+                'ingredient_id' => 1,
+                'ingredient_name' => 'Thịt bò',
+                'unit' => 'kg',
+                'price' => 250000,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
-        }
+            ],
+            [
+                'ingredient_id' => 2,
+                'ingredient_name' => 'Rau xà lách',
+                'unit' => 'bó',
+                'price' => 10000,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'ingredient_id' => 3,
+                'ingredient_name' => 'Nước mắm',
+                'unit' => 'chai',
+                'price' => 15000,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'ingredient_id' => 4,
+                'ingredient_name' => 'Trứng gà',
+                'unit' => 'quả',
+                'price' => 4000,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
     }
 }
