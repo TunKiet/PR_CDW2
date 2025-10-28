@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('review_id')->constrained('reviews', 'review_id')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade');
             $table->text('reply_text')->nullable();
+            $table->string('status', 50)->default('approved');
             $table->timestamps();
         });
     }

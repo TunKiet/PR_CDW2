@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './restaurant_infor_manage.css'; // Import CSS riêng
+import Sidebar from "../../components/Sidebar";
 
 // === HÀM HỖ TRỢ VÀ DỮ LIỆU MẪU BAN ĐẦU ===
 
@@ -296,49 +297,16 @@ export default function QuanLyTrangThongTin() {
     
     const featuredDishes = dishList.filter(dish => dish.isFeatured);
 
-    // Dữ liệu Sidebar (được định nghĩa trực tiếp trong JSX)
-    const sidebarItems = [
-        { id: 'new-orders', label: 'Đơn hàng mới', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>)},
-        { id: 'reviews', label: 'Thống kê', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>)},
-        { id: 'invoices', label: 'Hóa đơn', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>)},
-        { id: 'reservations', label: 'Đặt bàn', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h.01M16 17h.01M16 13h.01M10 17h.01M10 13h.01M14 17h.01M14 13h.01M8 17h.01M8 13h.01M3 21h18a2 2 0 002-2V7a2 2 0 00-2-2H3a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>)},
-        { id: 'carts', label: 'Quản lý Giỏ hàng', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>)},
-        { id: 'menu', label: 'Thực đơn', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>)},
-        { id: 'inventory', label: 'Mặt hàng', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>)},
-        { id: 'staff', label: 'Nhân viên', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2h2m-4-7a4 4 0 100-8 4 4 0 000 8zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>)},
-        { id: 'customers', label: 'Khách hàng', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 000 8zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>)},
-        { id: 'system', label: 'Hệ thống', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37a1.724 1.724 0 002.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>)},
-        { id: 'settings', label: 'Thiết lập nhà hàng', icon: (<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>)},
-    ];
 
     return (
         // body class 'overflow-hidden' + 'display: flex' + 'height: 100vh' được thay bằng .app-layout
-        <div className="app-layout"> 
-
-            {/* Cột Menu (Sidebar) */}
-            <aside id="sidebar" className="w-64 bg-white text-gray-800 flex-shrink-0 shadow-lg transition-all duration-300 overflow-y-auto">
-                <div className="p-6 flex items-center border-b border-gray-100">
-                    <div className="w-10 h-10 bg-indigo-600 text-white flex items-center justify-center rounded-full font-bold text-xl mr-3">Ad</div>
-                    <h1 className="text-2xl font-extrabold text-gray-900">Admin</h1>
-                </div>
-                <nav className="p-4 space-y-1">
-                    {sidebarItems.map(item => (
-                        <a 
-                            key={item.id}
-                            href="#" 
-                            onClick={(e) => { e.preventDefault(); setActiveView(item.id); }} 
-                            className={`sidebar-menu-item ${activeView === item.id ? 'sidebar-active-item' : ''}`}
-                        >
-                            {item.icon}
-                            <span>{item.label}</span>
-                        </a>
-                    ))}
-                </nav>
-            </aside>
-
+        <div className="dish-layout"> 
+      
+      {/* Sidebar giả lập (Cần import component thực tế) */}
+            <Sidebar />
             {/* Main content container */}
             {/* Sử dụng .main-content-area thay thế cho .flex-grow.h-full.main-container */}
-            <div className="main-content-area">
+            <div className="dish-main">
                 
                 {/* Khu vực Quản lý Nội dung (Settings View) */}
                 {activeView === 'settings' && (
