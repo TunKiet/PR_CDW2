@@ -1,15 +1,7 @@
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-
+// Không cần import tailwindcss ở đây, chỉ cần cấu hình trong postcss.config.js
 export default defineConfig({
-plugins: [tailwindcss()],
   plugins: [react()],
-  server: {
-    host: '0.0.0.0',
-    port: 3000,
-    watch: {
-      usePolling: true
-    }
-  }
 })
-
