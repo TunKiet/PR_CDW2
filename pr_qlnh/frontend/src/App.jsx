@@ -37,7 +37,6 @@ function App() {
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
-<<<<<<< HEAD
         <Route path="/inventory" element={<Invertory/>} />
         <Route path="/export" element={<IngredientInOut/>} />
         <Route path="/inventory-overview" element={<InventoryOverview/>} />
