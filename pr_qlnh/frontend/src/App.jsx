@@ -10,6 +10,7 @@ import Review from './components/Review/Review'
 import ReviewModerator from './components/ReviewModerator/ReviewModerator'
 import Invertory from './components/Inventory/Inventory'
 import IngredientInOut from './components/Inventory/IngredientInOut'
+import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 
 // Import các component trang của bạn
 import OrderPage from './pages/OrderPage';
@@ -27,7 +28,7 @@ import TableManagementAdmin from './pages/TableManagementAdmin';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter> 
       <Routes>
         <Route path ="/" element={<LoginPage/>}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -36,8 +37,12 @@ function App() {
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
-        <Route path="/inventory" element={<Invertory />} />
-        <Route path="/export" element={<IngredientInOut />} />
+        <Route path="/inventory" element={<Invertory/>} />
+        <Route path="/export" element={<IngredientInOut/>} />
+        <Route path="/inventory-overview" element={<InventoryOverview/>} />
+     
+
+        
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path='/user/home' element={<UserDashboard />} />  
@@ -56,7 +61,9 @@ function App() {
         {/* <Route path="/invoices" element={<InvoicePage />} /> */}
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
-        <Route path="*" element={<h1>404 - Trang không tồn tại</h1>}/> </Routes>
+        <Route path="*" element={<h1>404 - Trang không tồn tại</h1>}/>
+      </Routes>
+
     </BrowserRouter>
   )
 }

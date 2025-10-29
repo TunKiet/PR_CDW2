@@ -5,42 +5,58 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MenuItem extends Model
+class Ingredient extends Model
 {
-    use HasFactory;
-
-    protected $table = 'menu_items';
-
-    // ⚠️ Đây là điểm quan trọng
-    protected $primaryKey = 'menu_item_id';
-
-    // Nếu khóa chính tự động tăng (AUTO_INCREMENT)
-    public $incrementing = true;
-
-    // Nếu là integer
-    protected $keyType = 'int';
+    protected $table = 'ingredients';
+    protected $primaryKey = 'ingredient_id';
+    public $timestamps = true;
 
     protected $fillable = [
-        'menu_item_id',
-        'name',
+        'category_ingredient_id',
+        'ingredient_name',
         'price',
-        'description',
-        'category_id',
-        'status'
+        'unit',
+        'total_price',
+        'stock_quantity',
+        'min_stock_level'
     ];
-    public function run(): void
-{
-    DB::statement('SET FOREIGN_KEY_CHECKS=0;'); // 🔧 tắt kiểm tra khóa ngoại
-    DB::table('ingredients')->truncate();
 
-    DB::table('ingredients')->insert([
-        ['ingredient_id' => 1, 'ingredient_name' => 'Thịt bò', 'unit' => 'kg', 'created_at' => now(), 'updated_at' => now()],
-        ['ingredient_id' => 2, 'ingredient_name' => 'Bún tươi', 'unit' => 'kg', 'created_at' => now(), 'updated_at' => now()],
-        ['ingredient_id' => 3, 'ingredient_name' => 'Hành lá', 'unit' => 'g', 'created_at' => now(), 'updated_at' => now()],
-        ['ingredient_id' => 4, 'ingredient_name' => 'Nước mắm', 'unit' => 'ml', 'created_at' => now(), 'updated_at' => now()],
-        ['ingredient_id' => 5, 'ingredient_name' => 'Đường', 'unit' => 'g', 'created_at' => now(), 'updated_at' => now()],
-    ]);
-    DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // 🔒 bật lại
-}
+    protected $casts = [
+        'created_at' => 'datetime:Y/m/d H:i:s',
+        'updated_at' => 'datetime:Y/m/d H:i:s',
+    ];
 
+    public function category_ingredient()
+    {
+        return $this->belongsTo(CategoryIngredient::class, 'category_ingredient_id', 'category_ingredient_id');
+    }
+    /**
+     * get list ingredient
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public static function allIngedient()
+    {
+        return self::with('category_ingredient:category_ingredient_id,category_ingredient_name')
+            ->orderBy('ingredient_id', 'desc')
+            ->paginate(10);
+    }
+
+    public static function updateIngredient($id, $data)
+    {
+        $ingredient = self::find($id);
+        if ($ingredient) {
+            return null;
+        }
+
+        $ingredient->update([
+            'ingredient_name'        => $data['ingredient_name'],
+            'category_ingredient_id' => $data['category_ingredient_id'],
+            'price'                  => $data['price'],
+            'unit'                   => $data['unit'],
+            'stock_quantity'         => $data['stock_quantity'],
+            'min_stock_level'        => $data['min_stock_level'],
+            'total_price'            => $data['price'] * $data['stock_quantity']
+        ]);
+        return $ingredient->load('category_ingredient');
+    }
 }

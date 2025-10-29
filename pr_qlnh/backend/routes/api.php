@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\IngredientController;
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
 
@@ -52,6 +54,8 @@ Route::apiResource('dishes', DishController::class);
 Route::post('/reviews', [ReviewController::class, 'store']);
 Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
 Route::get('/reviews/{menuItemId}/average', [ReviewController::class, 'averageRating']);
+Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
+Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
 
 /*
 |--------------------------------------------------------------------------
