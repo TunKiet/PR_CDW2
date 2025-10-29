@@ -7,13 +7,12 @@ use Illuminate\Support\Facades\DB;
 
 class IngredientSeeder extends Seeder
 {
-    const MAX_RECORDS = 20; // Số lượng nguyên liệu muốn tạo
-
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        DB::table('ingredients')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
         $units = ['kg', 'g', 'l', 'ml', 'pcs'];
 
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
