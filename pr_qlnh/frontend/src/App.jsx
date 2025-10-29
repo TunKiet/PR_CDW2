@@ -22,11 +22,13 @@ import AdminDashboard from './pages/AdminDashboard'
 import DishTable from './components/08_hao-QLMonAn/DishTable';
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
 import RestaurantInfoManage from "./components/08_hao-QLMonAn/restaurant_infor_manage";
+import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/category-manager" element={<CategoryManager />} />
         <Route path="/user/homepage" element={<HomePage />} />
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
