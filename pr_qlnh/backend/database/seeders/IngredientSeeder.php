@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class IngredientSeeder extends Seeder
 {
+    const MAX_RECORDS = 20;
     public function run(): void
     {
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');

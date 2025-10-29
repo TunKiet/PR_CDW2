@@ -41,7 +41,6 @@
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
     ),
   ),
-
   'php-open-source-saver/jwt-auth' => 
   array (
     'aliases' => 
