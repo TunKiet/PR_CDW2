@@ -19,7 +19,7 @@ const Invertory = () => {
             <div className="section">
                 <div className="flex min-h-screen">
                     <Sidebar />
-                    <div className="w-[80%] bg-gray-100 p-6">
+                    <div className="w-[85%] bg-gray-100 p-6">
                         <div className="boxIngredient">
                             <div className="boxIngredient-head">
                                 <div className="boxIngredient-head-title">

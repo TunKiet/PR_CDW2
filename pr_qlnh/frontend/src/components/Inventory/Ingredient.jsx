@@ -13,6 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Pagination from '@mui/material/Pagination';
 import Dialog from '@mui/material/Dialog';
 import Select from '@mui/material/Select';
+import { notify, confirmAction } from '../../utils/notify'
 import axios from "axios";
 
 const Ingredient = () => {
@@ -110,33 +111,54 @@ const Ingredient = () => {
         setPage(value);
     };
 
-    const handleSubmit = e => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        axios.post("http://localhost:8000/api/add", formData)
-            .then(res => {
-                alert("Thêm nguyên liệu thành công!");
-                console.log(res.data);
-                fetchIngredients();
+
+        try {
+            notify.info('Đang thêm...');
+
+            await axios.post("http://localhost:8000/api/add", formData);
+
+            notify.dismiss();
+            notify.success('Thêm thành công!');
+
+            //reset form data
+            setFormData({
+                ingredient_name: "",
+                category_ingredient_id: "",
+                price: "",
+                unit: "",
+                total_price: "",
+                stock_quantity: "",
+                min_stock_level: "",
             })
-            .catch(err => {
-                console.log(err.response.data);
-                alert("Có lỗi xảy ra khi thêm nguyên liệu!");
-            });
+            //Load api
+            fetchIngredients();
+        } catch (error) {
+            notify.dismiss();
+            console.log(error);
+            notify.error('Thêm thất bại');
+        }
     };
 
     const handleDelete = async (id) => {
-        const confirmDelete = window.confirm("Bạn có chắc muốn xóa nguyên liệu này không?");
-        if (!confirmDelete) return;
+        const isConfirmed = await confirmAction('Xóa nguyên liệu?');
+        if (!isConfirmed) return;
 
         try {
-            const res = await axios.delete(`http://localhost:8000/api/ingredients/delete/${id}`);
-            alert(res.data.message);
+            notify.info('Đang xóa...')
+            await axios.delete(`http://localhost:8000/api/ingredients/delete/${id}`);
+
+            notify.dismiss();
+            notify.success('Xóa thành công!');
 
             fetchIngredients();
         } catch (error) {
+            notify.dismiss();
+            // In ra lỗi để dễ debug
             console.error("Lỗi khi xóa nguyên liệu:", error);
-            alert("Xóa nguyên liệu thất bại!");
+            notify.error('Xóa thất bại! Vui lòng tải lại trang');
         }
     }
 
@@ -275,9 +297,6 @@ const Ingredient = () => {
                                                 </div>
                                                 <div className="formAdd-button flex">
                                                     <div className='flex ms-auto py-3 gap-1.5'>
-                                                        <div className="formAdd-button-left">
-                                                            <Button variant='contained' color='error'>Hủy</Button>
-                                                        </div>
                                                         <div className="formAdd-button-right">
                                                             <Button type='submit' variant='contained' color='primary'>Thêm</Button>
                                                         </div>

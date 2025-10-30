@@ -21,15 +21,14 @@ const menuItems = [
   { title: "Thống kê", icon: <BarChart2 size={20} />, path: '/analytics' },
   { title: "Hóa đơn", icon: <FileText size={20} />, path: '/order-management' },
   { title: "Đặt bàn", icon: <Calendar size={20} />, path: '/tables' },
-  { 
-    title: "Thực đơn", 
-    icon: <Menu size={20} />, 
-    path: '/menu-management-placeholder', 
+  {
+    title: "Thực đơn",
+    icon: <Menu size={20} />,
     isParent: true,
     subItems: [
       { title: "Quản lý món ăn", path: '/dishtable' },
       { title: "Quản lý danh mục", path: '/category-manager' },
-    ] 
+    ]
   },
   { title: "Quản lý giỏ hàng", icon: <ShoppingCart size={20} />, path: '/cart-management' },
   { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
@@ -88,13 +87,13 @@ const Sidebar = () => {
             <div key={index}>
               {item.isParent ? (
                 <>
-                  {/* Mục cha */}
-                  <button
+                  {/* Nút cha “Thực đơn” đồng bộ giao diện */}
+                  <div
                     onClick={() => toggleSubMenu(item.title)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition
+                    className={`cursor-pointer w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition
                       ${isParentActiveState || isMenuOpen
                         ? "bg-indigo-100 text-indigo-700"
-                        : "text-gray-700 hover:bg-gray-100"
+                        : "text-blue-600 hover:bg-gray-100"
                       }`}
                   >
                     <div className="flex items-center gap-3">
@@ -102,9 +101,9 @@ const Sidebar = () => {
                       <span>{item.title}</span>
                     </div>
                     {isMenuOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                  </button>
+                  </div>
 
-                  {/* Menu con */}
+                  {/* Submenu */}
                   <div
                     ref={submenuRef}
                     style={{ maxHeight: isMenuOpen || isParentActiveState ? `${submenuHeight}px` : '0px' }}
@@ -114,13 +113,13 @@ const Sidebar = () => {
                       <Link
                         key={subIndex}
                         to={sub.path}
-                        className={`w-full flex items-center px-3 py-2 rounded-xl text-sm transition
+                        className={`block w-full no-underline! px-3 py-2 rounded-lg text-sm transition 
                           ${isActive(sub.path)
                             ? "bg-indigo-50 text-indigo-600 font-semibold"
                             : "text-gray-600 hover:bg-gray-100"
                           }`}
                       >
-                        <span className="ml-1">{sub.title}</span>
+                        {sub.title}
                       </Link>
                     ))}
                   </div>
@@ -128,7 +127,7 @@ const Sidebar = () => {
               ) : (
                 <Link
                   to={item.path || '#'}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition
+                  className={`block w-full flex no-underline! items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition
                     ${currentItemActive
                       ? "bg-indigo-100 text-indigo-700"
                       : "text-gray-700 hover:bg-gray-100"
