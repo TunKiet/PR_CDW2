@@ -18,4 +18,9 @@ class CategoryIngredient extends Model
     {
         return $this->hasMany(Ingredient::class, 'category_ingredient_id', 'category_ingredient_id');
     }
+    public static function index()
+    {
+        return self::all();
+    }
+
 }

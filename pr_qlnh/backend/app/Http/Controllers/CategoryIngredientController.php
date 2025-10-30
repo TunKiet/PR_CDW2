@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CategoryIngredient;
 use App\Models\Ingredient;
 use Illuminate\Http\Request;
 
 class CategoryIngredientController extends Controller
 {
-    public function index()
+    public function getAllCategoryIngredient()
     {
-        $categories = Ingredient::all(); // chỉ lấy danh mục
+        $category = CategoryIngredient::index();
 
         return response()->json([
-            'success' => true,
-            'data' => $categories
+            'data' => $category
         ]);
     }
 
