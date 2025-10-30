@@ -7,7 +7,7 @@ import Review from './components/Review/Review'
 import ReviewModerator from './components/ReviewModerator/ReviewModerator'
 import Invertory from './components/Inventory/Inventory'
 import IngredientInOut from './components/Inventory/IngredientInOut'
-
+import TableManagementAdmin from './pages/TableManagementAdmin'
 
 
 function App() {
@@ -19,6 +19,7 @@ function App() {
         <Route path="/review" element={<Review />} />
         <Route path="/inventory" element={<Invertory/>} />
         <Route path="/export" element={<IngredientInOut/>} />
+        <Route path="/table" element={<TableManagementAdmin/>} />
       </Routes>
     </BrowserRouter>
   )

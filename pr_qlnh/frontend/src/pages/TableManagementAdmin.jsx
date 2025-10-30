@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/Table/Sidebar';
+import Sidebar from '../components/Sidebar';
 import TableList from '../components/Table/TableList';
 import TableModal from '../components/Table/TableModal';
 import DeleteModal from '../components/Table/DeleteModal';
