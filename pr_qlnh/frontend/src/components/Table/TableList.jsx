@@ -4,27 +4,26 @@ import { Edit2, Trash2, Users, MapPin, Info } from "lucide-react";
 const getStatusClass = (status) => {
   switch (status) {
     case "Trống":
-      // Màu xanh lá cây (Emerald) cho Trống
-      return "bg-emerald-100 text-emerald-700 border border-emerald-200";
+      return "bg-emerald-50 text-emerald-700 border border-emerald-200";
     case "Đang sử dụng":
-      // Màu đỏ (Rose) cho Đang sử dụng
-      return "bg-rose-100 text-rose-700 border border-rose-200";
+      return "bg-rose-50 text-rose-700 border border-rose-200";
     case "Đã đặt":
-      // Màu vàng hổ phách (Amber) cho Đã đặt
-      return "bg-amber-100 text-amber-700 border border-amber-200";
+      return "bg-amber-50 text-amber-700 border border-amber-200";
     default:
-      // Mặc định (Gray)
-      return "bg-gray-100 text-gray-700 border border-gray-200";
+      return "bg-gray-50 text-gray-700 border border-gray-200";
   }
 };
 
 export default function TableList({ tables = [], onEdit, onDelete }) {
   return (
-    <div className="w-full bg-white rounded-xl shadow-lg border border-gray-200">
-      {/* Header - Sử dụng nền xám nhạt thay vì gradient để có cái nhìn phẳng và sạch hơn */}
-      <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50 rounded-t-xl">
-        <span className="text-xl font-bold text-gray-600">
-          Tổng số bàn: <strong className="text-indigo-600">{tables.length}</strong>
+    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-200">
+      {/* Header */}
+      <div className="flex items-center justify-between px-1 py-1 border-b bg-gradient-to-r from-indigo-50 to-purple-50 rounded-t-xl">
+        <h2 className="text-lg font-semibold text-gray-100">
+          Danh sách bàn
+        </h2>
+        <span className="text-sm font-medium text-gray-600 bg-white px-4 py-1.5 rounded-full border border-gray-200">
+          Tổng: <strong className="text-indigo-600">{tables.length}</strong> bàn
         </span>
       </div>
 
@@ -33,33 +32,33 @@ export default function TableList({ tables = [], onEdit, onDelete }) {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {/* Cột Tên Bàn - Căn Trái */}
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/5">
-                <div className="flex items-center gap-1">
-                  <Info size={14} />
+              {/* Tên Bàn - 25% */}
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <div className="flex items-center gap-2 ps-3">
+                  <Info size={16} className="text-gray-400" />
                   Tên Bàn
                 </div>
               </th>
-              {/* Cột Sức Chứa - CĂN GIỮA để cân bằng dữ liệu số */}
-              <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider w-[15%]">
-                <div className="flex items-center justify-center gap-1">
-                  <Users size={14} />
+              {/* Sức Chứa - 15% */}
+              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <div className="flex items-center justify-center gap-2">
+                  <Users size={16} className="text-gray-400" />
                   Sức Chứa
                 </div>
               </th>
-              {/* Cột Khu Vực - Căn Trái */}
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-1/4">
-                <div className="flex items-center gap-1">
-                  <MapPin size={14} />
+              {/* Khu Vực - 25% */}
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <div className="flex items-center gap-2">
+                  <MapPin size={16} className="text-gray-400" />
                   Khu Vực
                 </div>
               </th>
-              {/* Cột Trạng Thái - Căn Trái */}
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-[20%]">
+              {/* Trạng Thái - 20% */}
+              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Trạng Thái
               </th>
-              {/* Cột Thao Tác - Căn Phải */}
-              <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider w-[15%]">
+              {/* Thao Tác - 15% */}
+              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Thao Tác
               </th>
             </tr>
@@ -70,10 +69,17 @@ export default function TableList({ tables = [], onEdit, onDelete }) {
               <tr>
                 <td
                   colSpan="5"
-                  className="px-6 py-10 text-center text-lg text-gray-500 italic"
+                  className="px-6 py-16 text-center"
                 >
-                  <p className="mb-2">🍽️</p>
-                  Chưa có bàn nào được thêm. Vui lòng thêm bàn mới để quản lý.
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="text-5xl mb-3">🍽️</div>
+                    <p className="text-gray-500 text-base">
+                      Chưa có bàn nào được thêm
+                    </p>
+                    <p className="text-gray-400 text-sm mt-1">
+                      Vui lòng thêm bàn mới để bắt đầu quản lý
+                    </p>
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -82,46 +88,63 @@ export default function TableList({ tables = [], onEdit, onDelete }) {
                 .map((table) => (
                   <tr
                     key={table.id}
-                    className="hover:bg-indigo-50 transition duration-150 ease-in-out"
+                    className="hover:bg-indigo-50/50 transition-colors duration-150"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                      {table.name}
+                    {/* Tên Bàn */}
+                    <td className="px-6 py-4 whitespace-nowrap ps-4">
+                      <span className="text-sm font-semibold text-gray-900">
+                        {table.name}
+                      </span>
                     </td>
-                    {/* Sức Chứa - CĂN GIỮA */}
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-center">
-                      {table.capacity} người
+                    
+                    {/* Sức Chứa - Căn Giữa */}
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <span className="text-sm text-gray-700 font-medium">
+                        {table.capacity}
+                      </span>
+                      <span className="text-xs text-gray-500 ml-1"> người</span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {table.zone}
-                    </td>
+                    
+                    {/* Khu Vực */}
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-700">
+                        {table.zone}
+                      </span>
+                    </td>
+                    
+                    {/* Trạng Thái - Căn Giữa */}
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
                       <span
-                        className={`px-3 py-1 inline-flex items-center text-xs font-bold rounded-full transition ${getStatusClass(
+                        className={`px-3 py-1.5 inline-flex items-center text-xs font-semibold rounded-full ${getStatusClass(
                           table.status
                         )}`}
                       >
                         {table.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-1">
-                      <button
-                        onClick={() => onEdit(table)}
-                        aria-label={`Sửa ${table.name}`}
-                        title="Sửa thông tin bàn"
-                        className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 transition p-2 rounded-lg hover:bg-indigo-100/50"
-                      >
-                        <Edit2 size={16} />
-                        <span className="hidden sm:inline">Sửa</span>
-                      </button>
-                      <button
-                        onClick={() => onDelete(table)}
-                        aria-label={`Xóa ${table.name}`}
-                        title="Xóa bàn khỏi danh sách"
-                        className="inline-flex items-center gap-1 text-rose-600 hover:text-rose-800 transition p-2 rounded-lg hover:bg-rose-100/50"
-                      >
-                        <Trash2 size={16} />
-                        <span className="hidden sm:inline">Xóa</span>
-                      </button>
+                    
+                    {/* Thao Tác - Căn Giữa */}
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => onEdit(table)}
+                          aria-label={`Sửa ${table.name}`}
+                          title="Sửa thông tin bàn"
+                          className="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 transition-all p-2 rounded-lg"
+                        >
+                          <Edit2 size={16} />
+                          <span className="text-sm font-medium">Sửa</span>
+                        </button>
+                        <button
+                          onClick={() => onDelete(table)}
+                          aria-label={`Xóa ${table.name}`}
+                          title="Xóa bàn"
+                          className="inline-flex items-center gap-1.5 text-rose-600 hover:text-rose-700 hover:bg-rose-50 transition-all p-2 rounded-lg"
+                        >
+                          <Trash2 size={16} />
+                          <span className="text-sm font-medium">Xóa</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
