@@ -106,6 +106,7 @@ const Review = () => {
                             </div>
                             <div className="count-review py-1 ">100 lượt đánh giá</div>
                             <Button variant="contained" color='error' onClick={handleClickOpen}>Viết đánh giá</Button>
+                            {/* Form write review for user */}
                             <Dialog open={openFormReview} onClose={handleClose}>
                                 <div className="container p-3 m-3 max-w-xl w-full mx-auto">
                                     <div className="absolute top-1 right-1 !p-3 !rounded-full !me-auto hover:bg-gray-300 !w-[40px] cursor-pointer" onClick={handleClose}><IoClose /></div>
