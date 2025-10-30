@@ -10,6 +10,7 @@ import Review from './components/Review/Review'
 import ReviewModerator from './components/ReviewModerator/ReviewModerator'
 import Invertory from './components/Inventory/Inventory'
 import IngredientInOut from './components/Inventory/IngredientInOut'
+import TableManagementAdmin from './pages/TableManagementAdmin'
 import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 
 // Import các component trang của bạn
@@ -25,7 +26,10 @@ import ForgotPassword from "./pages/ForgotPasswordPage";
 import DishTable from './components/08_hao-QLMonAn/DishTable';
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
 import TableManagementAdmin from './pages/TableManagementAdmin';
-
+import RestaurantInforManage from './components/08_hao-QLMonAn/RestaurantInforManage'
+import CategoryModal from "./components/08_hao-QLMonAn/CategoryModal";
+import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
+import DishModal from "./components/08_hao-QLMonAn/DishModal";
 function App() {
   return (
     <BrowserRouter> 
@@ -35,17 +39,20 @@ function App() {
         <Route path="/user/homepage" element={<HomePage />} />
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
+
+
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
         <Route path="/inventory" element={<Invertory/>} />
         <Route path="/export" element={<IngredientInOut/>} />
         <Route path="/inventory-overview" element={<InventoryOverview/>} />
-     
-
+        <Route path="/restaurant-info" element={<RestaurantInforManage/>} />
+        <Route path="/category-manager" element={<CategoryManager/>} />
+		<Route path="/table" element={<TableManagementAdmin/>} />
         
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path='/user/home' element={<UserDashboard />} />  
+        <Route path='/analytics' element={<UserDashboard />} />  
 
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}
         <Route path="/order-page" element={<OrderPage />} />

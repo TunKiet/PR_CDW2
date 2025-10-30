@@ -41,7 +41,7 @@ const OrderPage = () => {
           </div>
 
           {/* Tabs danh mục */}
-          <div className="flex flex-wrap gap-3 mb-6">
+          <div className="flex flex-wrap gap-3 mb-6 pb-5">
             {["Tất cả", "Đồ uống", "Món khai vị", "Món chính", "Tráng miệng", "Hải sản", "Các món chiên"].map(
               (category, idx) => (
                 <button
