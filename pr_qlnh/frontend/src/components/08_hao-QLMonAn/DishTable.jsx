@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import "./DishTable.css"; 
+import DishModal from "./DishModal";
+
+// IMPORT DishModal (GIẢ ĐỊNH) - Bạn cần tạo file DishModal.jsx
+
 
 // === HÀM HỖ TRỢ VÀ DỮ LIỆU MẪU ===
 
@@ -19,7 +23,6 @@ const formatCurrency = (amount) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
 
-// Dữ liệu mẫu (Đã mở rộng lên 6 món ăn để kiểm tra phân trang)
 const dishesData = [
   { id: 'MA001', image: 'https://placehold.co/40x40/4c4d50/ffffff?text=F', name: 'Phở Bò Đặc Biệt', categoryKey: 'main', price: 65000, statusKey: 'status_available', description: 'Món Phở truyền thống...' },
   { id: 'MA002', image: 'https://placehold.co/40x40/facc15/000000?text=C', name: 'Kem Vani Tráng Miệng', categoryKey: 'dessert', price: 35000, statusKey: 'status_unavailable', description: 'Kem vani mát lạnh...' },
@@ -29,7 +32,7 @@ const dishesData = [
   { id: 'MA006', image: 'https://placehold.co/40x40/9ca3af/ffffff?text=X', name: 'Xôi Gà', categoryKey: 'main', price: 45000, statusKey: 'status_available', description: 'Xôi dẻo thơm...' },
 ];
 
-const ITEMS_PER_PAGE = 3; // Giới hạn 5 món ăn mỗi trang
+const ITEMS_PER_PAGE = 3; 
 
 // --- Component Modal Xem Chi Tiết (Giữ nguyên) ---
 const DetailModal = ({ isVisible, onClose, dish }) => {
@@ -93,28 +96,62 @@ export default function DishTable() {
     maxPrice: "",
   });
   
-  // === STATE PHÂN TRANG MỚI ===
+  // === 1. KHAI BÁO STATE CHO MODAL THÊM/SỬA ===
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingDish, setEditingDish] = useState(null); // Lưu món ăn đang sửa (null = Thêm mới)
+  // ===========================================
+
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(filteredDishes.length / ITEMS_PER_PAGE);
-  // ============================
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedDish, setSelectedDish] = useState(null);
 
-  // Hàm mở modal chi tiết
+  // === 2. ĐỊNH NGHĨA CÁC HÀM THAO TÁC MODAL ===
+  
+  // Hàm mở Modal cho Thêm mới (dish = null) hoặc Sửa (dish = object)
+  const handleAddOrEdit = (dish = null) => {
+      setEditingDish(dish); 
+      setIsEditModalOpen(true); // Mở Modal Thêm/Sửa
+  };
+  
+  // Hàm đóng Modal Thêm/Sửa
+  const handleCloseEditModal = () => {
+      setIsEditModalOpen(false);
+      setEditingDish(null); // Reset trạng thái chỉnh sửa
+  };
+
+  // Hàm xử lý lưu dữ liệu (Thêm mới/Cập nhật)
+  const handleSaveDish = (newDishData) => {
+      if (newDishData.id) {
+          // Logic Cập nhật (giả định)
+          setDishes(prev => prev.map(d => d.id === newDishData.id ? newDishData : d));
+      } else {
+          // Logic Thêm mới (giả định)
+          const newId = `MA${String(dishes.length + 1).padStart(3, '0')}`;
+          setDishes(prev => [...prev, { ...newDishData, id: newId }]);
+      }
+      handleCloseEditModal();
+      // Yêu cầu lọc lại để hiển thị món mới/sửa đổi
+      applyFilters(); 
+  };
+  // ============================================
+
+  // Hàm mở modal chi tiết (Giữ nguyên)
   const handleDetailView = (dish) => {
       setSelectedDish(dish);
       setIsDetailModalOpen(true);
   };
   
-  // Hàm Logic Lọc
+  // Hàm Logic Lọc (Giữ nguyên)
   const applyFilters = () => {
+    // ... (logic lọc giữ nguyên)
     const { keyword, category, status, minPrice, maxPrice } = filters;
     
     const min = parseFloat(minPrice) || 0;
     const max = parseFloat(maxPrice) || Infinity;
 
-    const filteredData = dishesData.filter(dish => {
+    const filteredData = dishes.filter(dish => {
         const term = keyword.toLowerCase().trim();
         
         const matchesSearch = term === "" || 
@@ -129,10 +166,10 @@ export default function DishTable() {
     });
 
     setFilteredDishes(filteredData);
-    setCurrentPage(1); // Reset về trang 1 sau khi lọc
+    setCurrentPage(1); 
   };
   
-  // Hàm Xóa Lọc
+  // ... (clearFilters và useEffect giữ nguyên) ...
   const clearFilters = () => {
     setFilters({
         keyword: "",
@@ -141,9 +178,16 @@ export default function DishTable() {
         minPrice: "",
         maxPrice: "",
     });
-    setFilteredDishes(dishesData);
-    setCurrentPage(1); // Reset về trang 1
+    // setFilteredDishes(dishesData); // Sử dụng dishes thay vì dishesData để đồng bộ với state
+    // Gọi lại applyFilters để dùng state dishes mới nhất
+    applyFilters(); 
+    setCurrentPage(1); 
   };
+
+  useEffect(() => {
+      // Khi data dishes thay đổi (thêm/sửa), cần lọc lại.
+      applyFilters();
+  }, [dishes]); 
 
   useEffect(() => {
       // Khi filter category/status thay đổi, tự động lọc
@@ -158,28 +202,22 @@ export default function DishTable() {
     }));
   };
   
-  // === LOGIC PHÂN TRANG MỚI ===
+  // === LOGIC PHÂN TRANG (Giữ nguyên) ===
   
-  // Tính toán dữ liệu hiển thị trên trang hiện tại
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const dishesToShow = filteredDishes.slice(startIndex, endIndex);
-
-  // Tạo mảng các số trang
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-  // Thông tin hiển thị phân trang
   const displayStart = filteredDishes.length > 0 ? startIndex + 1 : 0;
   const displayEnd = Math.min(endIndex, filteredDishes.length);
   const paginationInfo = `Hiển thị ${displayStart} đến ${displayEnd} trên ${filteredDishes.length} kết quả`;
 
-  // ============================
+  // ====================================
 
 
   return (
     <div className="dish-layout"> 
       
-      {/* Sidebar giả lập (Cần import component thực tế) */}
       <Sidebar /> 
 
       <main className="dish-main">
@@ -189,16 +227,20 @@ export default function DishTable() {
 
         <div className="dish-container">
           <div className="flex justify-between items-center mb-6">
-          <button className="flex items-center px-4 py-2 bg-emerald-500 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-600 transition duration-150">
-            {/* ... Icon Thêm ... */}
+          {/* 3. GẮN onClick VÀO NÚT "Thêm Món Ăn Mới" */}
+          <button 
+              onClick={() => handleAddOrEdit(null)} // Thao tác thêm mới, truyền null
+              className="flex items-center px-4 py-2 bg-emerald-500 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-600 transition duration-150"
+          >
+            {/* Thêm Icon cho đẹp mắt */}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" /></svg>
             <span>Thêm Món Ăn Mới</span>
           </button>
         </div>
           {/* Khung Tìm kiếm Nâng cao (Giữ nguyên) */}
           <div className="dish-filter">
               <h4 className="dish-filter-title">Tìm kiếm Nâng cao</h4>
-              
-              {/* Hàng 1: ... */}
+              {/* ... (Nội dung filter giữ nguyên) ... */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                   <div className="lg:col-span-2">
                       <label htmlFor="keyword" className="block text-sm font-medium text-gray-700">Tên món/ID</label>
@@ -224,7 +266,6 @@ export default function DishTable() {
                   </div>
               </div>
               
-              {/* Hàng 2: ... */}
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-4">
                   <div>
                       <label htmlFor="minPrice" className="block text-sm font-medium text-gray-700">Giá Tối thiểu (VNĐ)</label>
@@ -255,7 +296,6 @@ export default function DishTable() {
                 </tr>
               </thead>
               <tbody>
-                {/* HIỂN THỊ DỮ LIỆU ĐÃ PHÂN TRANG */}
                 {dishesToShow.length > 0 ? (
                   dishesToShow.map((dish) => (
                     <tr key={dish.id}>
@@ -284,13 +324,16 @@ export default function DishTable() {
                       </td>
                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end items-center space-x-2">
                             <button onClick={() => handleDetailView(dish)} className="text-indigo-600 hover:text-indigo-900" title="Xem Chi Tiết">
-                                {/* ... Icon Con mắt ... */}
+                                {/* Icon Con mắt */}
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
                             </button>
-                            <button className="text-blue-600 hover:text-blue-900" title="Sửa">
-                                {/* ... Icon Sửa ... */}
+                            {/* Nút Sửa: gọi handleAddOrEdit(dish) */}
+                            <button onClick={() => handleAddOrEdit(dish)} className="text-blue-600 hover:text-blue-900" title="Sửa">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zm-3.111 10.155L5.793 17.207l1.414 1.414 4.685-4.685a2 2 0 00-2.828-2.828z" /></svg>
                             </button>
                             <button className="text-red-600 hover:text-red-900" title="Xóa">
-                                {/* ... Icon Xóa ... */}
+                                {/* Icon Xóa */}
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
                             </button>
                         </td>
                     </tr>
@@ -306,11 +349,10 @@ export default function DishTable() {
             </table>
           </div>
           
-          {/* PHÂN TRANG (PAGINATION) MỚI */}
+          {/* PHÂN TRANG (PAGINATION) MỚI (Giữ nguyên) */}
           <div className="mt-6 flex justify-between items-center text-sm text-gray-600">
                 <span id="pagination-info">{paginationInfo}</span>
                 <div className="flex space-x-2">
-                    {/* Nút TRƯỚC */}
                     <button 
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
                         className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 transition duration-150" 
@@ -319,7 +361,6 @@ export default function DishTable() {
                         Trước
                     </button>
                     
-                    {/* Các Nút SỐ TRANG */}
                     {pageNumbers.map(page => (
                         <button 
                             key={page} 
@@ -332,7 +373,6 @@ export default function DishTable() {
                         </button>
                     ))}
                     
-                    {/* Nút SAU */}
                     <button 
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
                         className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 transition duration-150"
@@ -348,10 +388,19 @@ export default function DishTable() {
       </main>
       
       {/* Modal Xem Chi Tiết */}
+      {/* Modal Xem Chi Tiết */}
       <DetailModal 
         isVisible={isDetailModalOpen} 
         onClose={() => setIsDetailModalOpen(false)} 
         dish={selectedDish} 
+      />
+
+      {/* Modal Thêm/Sửa đã import */}
+      <DishModal
+          isVisible={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          onSave={handleSaveDish} // Hàm này sẽ xử lý logic lưu data thực tế
+          dish={editingDish}
       />
     </div>
   );

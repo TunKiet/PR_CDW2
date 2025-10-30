@@ -98,11 +98,12 @@
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     /* Dùng 'hidden' và box-shadow hợp lý hơn */
-    overflow: hidden; 
+    /* overflow: hidden;  */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); 
 }
 
 .dish-table {
+    min-width: 950px;
     width: 100%;
     border-collapse: collapse;
 }
@@ -157,4 +158,61 @@
     color: #6b7280;
     font-weight: 500;
     padding: 1.25rem 0;
+}
+
+/* === DISH MODAL STYLES (Thêm vào DishTable.css) === */
+
+.dish-modal-input {
+    margin-top: 0.25rem;
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: border-color 0.15s;
+}
+
+.dish-modal-input:focus {
+    border-color: #10b981; /* Màu xanh lá (Emerald 500) */
+    outline: none;
+    box-shadow: 0 0 0 1px #10b981;
+}
+
+.dish-modal-input-readonly {
+    margin-top: 0.25rem;
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb; 
+    border-radius: 0.5rem;
+    background-color: #f9fafb; /* Nền xám nhạt */
+    color: #6b7280; 
+}
+
+/* Các button dùng chung */
+.dish-button-primary {
+    padding: 0.5rem 1rem;
+    background-color: #10b981; /* Emerald 500 */
+    color: white;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    transition: background-color 0.15s;
+}
+
+.dish-button-primary:hover {
+    background-color: #059669; /* Emerald 600 */
+}
+
+.dish-button-secondary {
+    padding: 0.5rem 1rem;
+    color: #4b5563; /* Gray 700 */
+    background-color: #f3f4f6; /* Gray 100 */
+    border-radius: 0.5rem;
+    transition: background-color 0.15s;
+}
+
+.dish-button-secondary:hover {
+    background-color: #e5e7eb; /* Gray 200 */
 }
