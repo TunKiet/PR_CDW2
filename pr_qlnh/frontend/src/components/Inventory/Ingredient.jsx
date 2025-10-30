@@ -59,7 +59,7 @@ const Ingredient = () => {
     //     min_stock_level: "",
     // })
 
-    
+
     useEffect(() => {
         axios.get("http://localhost:8000/api/category-ingredient")
             .then(res => setSelectedCategoryId(res.data.data))
