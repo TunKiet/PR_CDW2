@@ -25,7 +25,10 @@ import ForgotPassword from "./pages/ForgotPasswordPage";
 import DishTable from './components/08_hao-QLMonAn/DishTable';
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
 import TableManagementAdmin from './pages/TableManagementAdmin';
-
+import RestaurantInforManage from './components/08_hao-QLMonAn/RestaurantInforManage'
+import CategoryModal from "./components/08_hao-QLMonAn/CategoryModal";
+import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
+import DishModal from "./components/08_hao-QLMonAn/DishModal";
 function App() {
   return (
     <BrowserRouter> 
@@ -40,12 +43,13 @@ function App() {
         <Route path="/inventory" element={<Invertory/>} />
         <Route path="/export" element={<IngredientInOut/>} />
         <Route path="/inventory-overview" element={<InventoryOverview/>} />
-     
+        <Route path="/restaurant-info" element={<RestaurantInforManage/>} />
+        <Route path="/category-manager" element={<CategoryManager/>} />
 
         
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path='/user/home' element={<UserDashboard />} />  
+        <Route path='/analytics' element={<UserDashboard />} />  
 
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}
         <Route path="/order-page" element={<OrderPage />} />
