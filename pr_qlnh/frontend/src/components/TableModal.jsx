@@ -25,7 +25,8 @@ const TableModal = ({ isOpen, onClose, onSelectTable }) => {
   if (!isOpen) return null; // 🔹 không render khi đóng
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex justify-center items-center z-[9999]">
+
       <div className="bg-white rounded-2xl shadow-xl w-[400px] max-h-[80vh] overflow-y-auto p-6 relative">
         <h2 className="text-xl font-semibold mb-4 text-center">Chọn Bàn</h2>
 
