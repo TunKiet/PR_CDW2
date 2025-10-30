@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
+use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -24,10 +24,9 @@ class AuthController extends Controller
 
         $user = User::create([
             'username' => explode('@', $request->email)[0],
-            'full_name' => $request->full_name,
             'email' => $request->email,
-            'phone' => $request->phone,
             'password' => Hash::make($request->password),
+            'phone' => $request->phone,
             'role' => 'user', // Mặc định user thường
             'status' => 1,
         ]);
@@ -38,7 +37,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Đăng ký thành công!',
             'user' => $user,
-            'role' => $user->role ?? 'user', // vì chưa có quan hệ role model
+            'role' => $user->role ?? 'user',
             'token' => $token
         ], 201);
     }
@@ -49,14 +48,19 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'phone' => 'required',
-            'password' => 'required',
+            'password' => 'required|min:6',
+            'phone' => 'required_without:email',
+            'email' => 'required_without:phone|email',
         ]);
 
-        $user = User::where('phone', $request->phone)->first();
+        // Xác định trường đăng nhập
+        $loginField = $request->filled('email') ? 'email' : 'phone';
+        $identifier = $request->input($loginField);
 
-        if (!$user || !Hash::check(value: $request->password, hashedValue: $user->password)) {
-            return response()->json(['message' => 'Số điện thoại hoặc mật khẩu không đúng!'], 401);
+        $user = User::where($loginField, $identifier)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Email/SĐT hoặc mật khẩu không đúng!'], 401);
         }
 
         try {
@@ -69,10 +73,9 @@ class AuthController extends Controller
             'message' => 'Đăng nhập thành công!',
             'user' => $user,
             'role' => $user->role ?? 'user',
-            'token' => $token
+            'token' => $token,
         ], 200);
     }
-
     /**
      * Lấy thông tin người dùng hiện tại (dành cho Frontend)
      */
@@ -89,7 +92,7 @@ class AuthController extends Controller
     /**
      * Đăng xuất (hủy token)
      */
-    public function logout(Request $request)
+    public function logout()
     {
         try {
             JWTAuth::invalidate(JWTAuth::getToken());

@@ -41,23 +41,16 @@
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
     ),
   ),
-  'phiki/phiki' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Phiki\\Adapters\\Laravel\\PhikiServiceProvider',
-    ),
-  ),
-  'tymon/jwt-auth' => 
+  'php-open-source-saver/jwt-auth' => 
   array (
     'aliases' => 
     array (
-      'JWTAuth' => 'Tymon\\JWTAuth\\Facades\\JWTAuth',
-      'JWTFactory' => 'Tymon\\JWTAuth\\Facades\\JWTFactory',
+      'JWTAuth' => 'PHPOpenSourceSaver\\JWTAuth\\Facades\\JWTAuth',
+      'JWTFactory' => 'PHPOpenSourceSaver\\JWTAuth\\Facades\\JWTFactory',
     ),
     'providers' => 
     array (
-      0 => 'Tymon\\JWTAuth\\Providers\\LaravelServiceProvider',
+      0 => 'PHPOpenSourceSaver\\JWTAuth\\Providers\\LaravelServiceProvider',
     ),
   ),
 );

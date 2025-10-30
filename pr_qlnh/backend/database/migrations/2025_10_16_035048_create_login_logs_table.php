@@ -17,9 +17,8 @@ return new class extends Migration
             $table->string('ip_address', 45); // Dia chi IP
             $table->string('status', 10); // Trang thai dang nhap (thanh cong, that bai, etc.)
             $table->timestamps();
-
             // Foreign key
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
     }
 
