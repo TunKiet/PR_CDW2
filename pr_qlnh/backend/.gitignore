@@ -17,11 +17,11 @@ Thumbs.db
 .env.*
 !.env.example
 
-# Composer / PHP
+# Composer / PHP dependencies
 /vendor/
 composer.lock
 
-# Laravel storage (except necessary folders)
+# Laravel storage (keep necessary dirs)
 storage/*.key
 /storage/debugbar
 /storage/framework/cache/*
@@ -35,6 +35,9 @@ storage/*.key
 /node_modules/
 public/hot
 public/build
+public/mix-manifest.json
+resources/js/dist/
+resources/css/dist/
 
 # PHPUnit & cache
 .phpunit.result.cache
@@ -43,12 +46,19 @@ public/build
 .phpunit.xml
 .phpunit.xml.dist
 
-# Other generated files
+# Other generated / temp files
 Homestead.json
 Homestead.yaml
 auth.json
-
-# Misc
 *.cache
 *.bak
 *.tmp
+
+# IDE helper & generated files
+_ide_helper.php
+.phpstorm.meta.php
+.phpunit.result.cache
+
+# Optional — ignore local backup databases
+*.sql
+*.sqlite

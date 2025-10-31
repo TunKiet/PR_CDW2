@@ -6,12 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
-    
+
     // Khai báo khóa chính là 'user_id' thay vì 'id'
     protected $primaryKey = 'user_id';
 
@@ -42,6 +43,16 @@ class User extends Authenticatable
     ];
 
     public $timestamps = true;
+    // function
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -53,4 +64,9 @@ class User extends Authenticatable
             ? $this->role->permissions->contains('name', $permissionName)
             : false;
     }
+    public function getAuthIdentifierName()
+    {
+        return 'user_id';
+    }
+
 }
