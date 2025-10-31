@@ -14,6 +14,7 @@ import Pagination from '@mui/material/Pagination';
 import Dialog from '@mui/material/Dialog';
 import Select from '@mui/material/Select';
 import { notify, confirmAction } from '../../utils/notify'
+import exportPDF from '../../utils/exportPDF'
 import axios from "axios";
 
 const Ingredient = () => {
@@ -49,6 +50,8 @@ const Ingredient = () => {
         stock_quantity: "",
         min_stock_level: "",
     });
+
+
 
     // const [editFormData, setEditFormData] = useState({
     //     ingredient_name: "",
@@ -164,40 +167,68 @@ const Ingredient = () => {
 
     // Gửi dữ liệu cập nhật đến server
     const handleUpdateIngredient = async () => {
-        if (!editIngredient) return;
+        if (!editIngredient) {
+            notify.warning("⚠️ Không có dữ liệu nguyên liệu để cập nhật!");
+            return;
+        }
 
         try {
-            const res = await fetch(`http://localhost:8000/api/ingredients/${editIngredient.ingredient_id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                },
-                body: JSON.stringify({
-                    ingredient_name: editIngredient.ingredient_name,
-                    category_ingredient_id: editIngredient.category_ingredient_id,
-                    price: editIngredient.price,
-                    unit: editIngredient.unit,
-                    stock_quantity: editIngredient.stock_quantity,
-                    min_stock_level: editIngredient.min_stock_level,
-                }),
-            });
+            notify.info('Đang cập nhật...');
+            const payload = {
+                ingredient_name: editIngredient.ingredient_name?.trim(),
+                category_ingredient_id: editIngredient.category_ingredient_id,
+                price: editIngredient.price,
+                unit: editIngredient.unit,
+                stock_quantity: editIngredient.stock_quantity,
+                min_stock_level: editIngredient.min_stock_level,
+            };
 
-            const data = await res.json();
+            const { data } = await axios.put(
+                `http://localhost:8000/api/ingredients/${editIngredient.ingredient_id}`,
+                payload,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Accept: "application/json",
+                    },
+                }
+            );
+            notify.dismiss();
 
             if (data.success) {
-                alert("✅ Cập nhật thành công!");
+                notify.success("Cập nhật nguyên liệu thành công!");
                 setOpenUpdate(false);
-                // Gọi lại API lấy danh sách nguyên liệu (để reload)
-                fetchIngredients();
+                fetchIngredients(); // reload danh sách
             } else {
-                alert("" + data.message);
+                notify.error(`${data.message || "Cập nhật thất bại!"}`);
             }
         } catch (error) {
             console.error("Lỗi khi cập nhật nguyên liệu:", error);
-            alert("Đã xảy ra lỗi khi cập nhật!");
+            notify.error("Đã xảy ra lỗi trong quá trình cập nhật nguyên liệu!");
         }
     };
+
+    // const printRef = useRef();
+
+    const handleExportPDF = async () => {
+        if (!ingredients.length) {
+            notify.error('Không có dữ liệu để xuất PDF');
+            return;
+        }
+        try {
+            const isConfirmed = await confirmAction('Xuất nguyên liệu');
+
+            if (!isConfirmed) return;
+
+            window.print();
+
+            exportPDF(ingredients);
+            notify.success("📄 Xuất file PDF thành công!");
+        } catch (error) {
+            console.error("Lỗi khi xuất PDF:", error);
+            notify.error("Đã xảy ra lỗi khi xuất file PDF");
+        }
+    }
 
 
     return (
@@ -229,7 +260,7 @@ const Ingredient = () => {
                                 </Menu>
                             </div>
                             <div className="boxIngredient-button-left">
-                                <Button variant='contained' color='error'>
+                                <Button variant='contained' color='error' onClick={handleExportPDF}>
                                     <MdOutlineInventory size={20} />
                                     <p className='mb-0'>Xuất tồn kho (PDF)</p>
                                 </Button>
@@ -438,9 +469,6 @@ const Ingredient = () => {
                                     </div>
                                     <div className="fromUpdate-button flex">
                                         <div className='flex ms-auto py-3 gap-1.5'>
-                                            <div className="fromUpdate-button-left">
-                                                <Button variant='contained' color='error' onClick={() => setOpenUpdate(false)}>Hủy</Button>
-                                            </div>
                                             <div className="fromUpdate-button-right">
                                                 <Button variant='contained' color='primary' onClick={handleUpdateIngredient}>Cập nhật</Button>
                                             </div>
