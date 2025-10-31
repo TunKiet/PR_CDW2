@@ -16,6 +16,7 @@ const menuItems = [
       subItems: [
         { title: "Quản lý món ăn", path: '/dishtable' },
         { title: "Quản lý danh mục", path: '/category-manager' },
+        { title: "Quản lý tình trạng món ăn", path: '/dish-status-management' },
       ] 
     },
     { title: "Quản lý giỏ hàng", icon: <ShoppingCart size={20} />, path: 'cart-management' },

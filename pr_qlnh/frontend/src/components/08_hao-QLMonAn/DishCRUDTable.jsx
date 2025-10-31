@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import Sidebar from "../../components/Sidebar";
+import Sidebar from "../Sidebar";
 import "./DishTable.css"; 
 // IMPORT DishModal (Giả định bạn đã tạo file này)
 import DishModal from "./DishModal"; 
