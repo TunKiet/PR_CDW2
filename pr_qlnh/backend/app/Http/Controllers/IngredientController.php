@@ -19,6 +19,41 @@ class IngredientController extends Controller
         return response()->json($ingredients);
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'ingredient_name' => 'required|string|max:255',
+            'category_ingredient_id' => 'required|integer|exists:category_ingredients,category_ingredient_id',
+            'price' => 'required|numeric|min:0',
+            'unit' => 'required|string|max:50',
+            'stock_quantity' => 'required|integer|min:0',
+            'min_stock_level' => 'required|integer|min:0',
+        ]);
+        $validated['total_price'] = $validated['price'] * $validated['stock_quantity'];
+        $ingredient = Ingredient::create($validated);
+        return response()->json([
+            'message' => 'Thêm nguyên liệu thành công!',
+            'data' => $ingredient
+        ], 201);
+    }
+
+    public function destroy($id)
+    {
+        $ingredient = Ingredient::remove($id);
+
+        if (!$ingredient['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => $ingredient['message']
+            ], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'message' => $ingredient['message'],
+            'data' => $ingredient['data']
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
@@ -30,16 +65,19 @@ class IngredientController extends Controller
             'min_stock_level' => 'required|integer|min:0',
         ]);
 
-        $ingredient = Ingredient::updateIngredient($id, $validated);
+        $result = Ingredient::updateIngredient($id, $validated);
 
-
-        if (!$ingredient) {
-            return response()->json(['message' => 'Không tìm thấy nguyên liệu'], 404);
+        if (!$result['success']) {
+            return response()->json([
+                'success' => false,
+                'message' => $result['message']
+            ], 404);
         }
 
         return response()->json([
-            'message' => 'Cập nhật nguyên liệu thành công',
-            'data' => $ingredient
+            'success' => true,
+            'message' => $result['message'],
+            'data' => $result['data']
         ]);
     }
 }
