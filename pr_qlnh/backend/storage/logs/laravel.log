@@ -8882,3 +8882,28 @@ Did you mean one of these?
 #19 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
 #20 {main}
 "} 
+[2025-10-31 16:30:34] local.ERROR: Command "db:seedseeding" is not defined.
+
+Did you mean one of these?
+    db
+    db:monitor
+    db:seed
+    db:show
+    db:table
+    db:wipe {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"db:seedseeding\" is not defined.
+
+Did you mean one of these?
+    db
+    db:monitor
+    db:seed
+    db:show
+    db:table
+    db:wipe at /var/www/vendor/symfony/console/Application.php:740)
+[stacktrace]
+#0 /var/www/vendor/symfony/console/Application.php(298): Symfony\\Component\\Console\\Application->find('db:seedseeding')
+#1 /var/www/vendor/symfony/console/Application.php(195): Symfony\\Component\\Console\\Application->doRun(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(197): Symfony\\Component\\Console\\Application->run(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1235): Illuminate\\Foundation\\Console\\Kernel->handle(Object(Symfony\\Component\\Console\\Input\\ArgvInput), Object(Symfony\\Component\\Console\\Output\\ConsoleOutput))
+#4 /var/www/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
+#5 {main}
+"} 

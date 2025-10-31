@@ -1,16 +1,22 @@
 <?php
 
-namespace App\Models; // ⚠️ Thêm dòng này
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MenuItem extends Model
+// Tên class phải là MenuItem
+class MenuItem extends Model 
 {
     use HasFactory;
+    
+    // Tên bảng trong database
+    protected $table = 'menu_items';
 
+    // Khóa chính
     protected $primaryKey = 'menu_item_id';
 
+    // Các trường được phép Mass Assignment (cần thiết cho store/update)
     protected $fillable = [
         'category_id',
         'menu_item_name',
