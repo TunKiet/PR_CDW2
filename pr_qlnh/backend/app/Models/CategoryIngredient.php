@@ -22,5 +22,6 @@ class CategoryIngredient extends Model
     {
         return self::all();
     }
+    
 
 }

@@ -30,15 +30,21 @@ class Ingredient extends Model
     {
         return $this->belongsTo(CategoryIngredient::class, 'category_ingredient_id', 'category_ingredient_id');
     }
+    public static function exportIngredient()
+    {
+        return self::with('category_ingredient:category_ingredient_id,category_ingredient_name')
+            ->orderBy('ingredient_id', 'asc')
+            ->get();
+    }
     /**
-     * get list ingredient
+     * get list ingredient have pagination
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public static function allIngedient()
+    public static function allIngedient($perPage = 10)
     {
         return self::with('category_ingredient:category_ingredient_id,category_ingredient_name')
             ->orderBy('ingredient_id', 'desc')
-            ->paginate(10);
+            ->paginate($perPage);
     }
     /**
      * Summary of updateIngredient
@@ -101,5 +107,16 @@ class Ingredient extends Model
                 'message' => 'Không thể xóa nguyên liệu: ' . $e->getMessage()
             ];
         }
+    }
+
+    public static function getIngredients($categoryId = null, $perPage = 10)
+    {
+        $query = self::with('category_ingredient');
+
+        if ($categoryId && $categoryId !== 'all') {
+            $query->where('category_ingredient_id', $categoryId);
+        }
+
+        return $query->orderBy('ingredient_id', 'desc')->paginate($perPage);
     }
 }

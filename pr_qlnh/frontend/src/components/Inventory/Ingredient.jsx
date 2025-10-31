@@ -6,9 +6,7 @@ import { IoIosAdd } from "react-icons/io";
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { TbFilter } from "react-icons/tb";
 import { FaPencil } from "react-icons/fa6";
-import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Pagination from '@mui/material/Pagination';
 import Dialog from '@mui/material/Dialog';
@@ -16,11 +14,10 @@ import Select from '@mui/material/Select';
 import { notify, confirmAction } from '../../utils/notify'
 import exportPDF from '../../utils/exportPDF'
 import axios from "axios";
+import CategoryIngredient from './CategoryIngredient';
 
 const Ingredient = () => {
-    //Filter data ingredient category
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
+
 
     //Open dialog add ingredient
     const [openAdd, setOpenAdd] = useState(false);
@@ -41,6 +38,7 @@ const Ingredient = () => {
     const [editIngredient, setEditIngredient] = useState(null);
 
     const [selectedCategoryId, setSelectedCategoryId] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('all');
     const [formData, setFormData] = useState({
         ingredient_name: "",
         category_ingredient_id: "",
@@ -50,19 +48,6 @@ const Ingredient = () => {
         stock_quantity: "",
         min_stock_level: "",
     });
-
-
-
-    // const [editFormData, setEditFormData] = useState({
-    //     ingredient_name: "",
-    //     category_ingredient_id: "",
-    //     price: "",
-    //     unit: "",
-    //     total_price: "",
-    //     stock_quantity: "",
-    //     min_stock_level: "",
-    // })
-
 
     useEffect(() => {
         axios.get("http://localhost:8000/api/category-ingredient")
@@ -77,34 +62,36 @@ const Ingredient = () => {
         });
     };
 
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleSelect = (category) => {
-        console.log("Selected:", category);
-        handleClose();
-    };
-
-    // const handleChange = (event) => {
-    //     setCategory(event.target.value);
-    // };
-
     //fetch data
     const fetchIngredients = useCallback(async () => {
         try {
-            const res = await axios.get(`http://localhost:8000/api/ingredients?page=${page}`);
+            let url = `http://localhost:8000/api/ingredients?page=${page}`;
+            console.log(selectedCategory);
+            if (selectedCategory !== 'all') {
+                url += `&category_ingredient_id=${selectedCategory}`;
+            }
+
+            console.log("📡 Gọi API:", url);
+
+            const res = await axios.get(url);
+            console.log("📦 Dữ liệu nhận được:", res.data);
+
             setIngredients(res.data.data);
             setTotalPages(res.data.last_page);
             setLoading(false);
         } catch (error) {
-            console.error("Fetch error:", error);
+            console.error("❌ Lỗi fetch nguyên liệu:", error);
             setLoading(false);
         }
-    }, [page]); // page là dependency hợp lệ
+    }, [page, selectedCategory]); // 👈 thêm selectedCategory
+
+
+
+    const handleCategoryFilter = (categoryId) => {
+        console.log("🟢 Category selected in Ingredient:", categoryId);
+        setSelectedCategory(categoryId);
+        setPage(1);
+    };
 
     useEffect(() => {
         fetchIngredients();
@@ -116,7 +103,6 @@ const Ingredient = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
 
         try {
             notify.info('Đang thêm...');
@@ -208,8 +194,6 @@ const Ingredient = () => {
         }
     };
 
-    // const printRef = useRef();
-
     const handleExportPDF = async () => {
         if (!ingredients.length) {
             notify.error('Không có dữ liệu để xuất PDF');
@@ -217,12 +201,13 @@ const Ingredient = () => {
         }
         try {
             const isConfirmed = await confirmAction('Xuất nguyên liệu');
-
             if (!isConfirmed) return;
 
-            window.print();
-
-            exportPDF(ingredients);
+            notify.info('Đang xuất...')
+            const res = await axios.get("http://localhost:8000/api/export");
+            const allIngredient = res.data;
+            notify.dismiss();
+            exportPDF(allIngredient);
             notify.success("📄 Xuất file PDF thành công!");
         } catch (error) {
             console.error("Lỗi khi xuất PDF:", error);
@@ -247,17 +232,7 @@ const Ingredient = () => {
                     <div className="boxIngredient-wapper ms-auto">
                         <div className="boxIngredient-button flex gap-1">
                             <div className="boxIngredient-filter">
-                                <Tooltip title="Lọc danh mục">
-                                    <IconButton onClick={handleClick}>
-                                        <TbFilter size={25} />
-                                    </IconButton>
-                                </Tooltip>
-                                <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                                    <MenuItem onClick={() => handleSelect('Tất cả')}>Tất cả</MenuItem>
-                                    <MenuItem onClick={() => handleSelect('Thịt')}>Thịt</MenuItem>
-                                    <MenuItem onClick={() => handleSelect('Rau')}>Rau</MenuItem>
-                                    <MenuItem onClick={() => handleSelect('Gia vị')}>Gia vị</MenuItem>
-                                </Menu>
+                                <CategoryIngredient onSelectCategory={handleCategoryFilter} />
                             </div>
                             <div className="boxIngredient-button-left">
                                 <Button variant='contained' color='error' onClick={handleExportPDF}>
