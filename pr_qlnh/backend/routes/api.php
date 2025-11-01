@@ -26,7 +26,7 @@ Route::post('/orders', [OrderController::class, 'store']);
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\CategoryIngredientController;
 use App\Models\Ingredient;
-
+use App\Http\Controllers\Api\PreOrderController;
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
 // use App\Http\Controllers\Api\MenuItemController;
@@ -109,5 +109,10 @@ Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'
 
 
 Route::get('/categories', [CategoryController::class, 'index']);
+
+
+Route::get('/pre-orders', [PreOrderController::class, 'index']);
+Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
+Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
 
 

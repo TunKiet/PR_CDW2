@@ -32,7 +32,7 @@ const menuItems = [
     ] 
   },
   { title: "Quản lý giỏ hàng", icon: <ShoppingCart size={20} />, path: '/cart-management' },
-  { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventor' },
+  { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
   { title: "Nhân viên", icon: <User size={20} />, path: '/staff' },
   { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },
   { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },
