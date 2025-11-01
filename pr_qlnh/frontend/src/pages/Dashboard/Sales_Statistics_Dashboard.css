@@ -1,0 +1,30 @@
+/* DISH TABLE CSS - Đã sửa và tối ưu hóa */
+
+/* === 1. Layout Tổng thể (Layout Container) === */
+.dish-layout {
+    display: flex;
+    height: 100vh; /* Luôn full màn hình */
+    background-color: #f3f4f6;
+    overflow: hidden;
+}
+
+/* KHÔNG CẦN định nghĩa sidebar ở đây nếu sidebar dùng 'position: fixed' */
+/* Nếu Sidebar là component riêng, các quy tắc cho nó nên nằm trong Sidebar.css */
+
+
+/* === 2. Phần Nội dung Chính (Main Content) === */
+.dish-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    
+    /* ************************************ */
+    /* KHẮC PHỤC LỖI LAYOUT: Dịch chuyển nội dung chính */
+    /* ************************************ */
+    /* Đảm bảo nội dung chính bắt đầu SAU Sidebar (giả sử Sidebar rộng 240px) */
+    margin-left: 240px; 
+    /* Đảm bảo nó chiếm phần còn lại của màn hình */
+    width: calc(100% - 240px); 
+}

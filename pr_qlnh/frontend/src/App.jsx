@@ -24,16 +24,22 @@ import LoginPage from './pages/LoginPage';
 import ForgotPassword from "./pages/ForgotPasswordPage";
 
 //import  chức năng 08_hao
-import DishTable from './components/08_hao-QLMonAn/DishTable';
+import DishTable from './components/08_hao-QLMonAn/DishCRUDTable';
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
 import RestaurantInforManage from './components/08_hao-QLMonAn/RestaurantInforManage'
 import CategoryModal from "./components/08_hao-QLMonAn/CategoryModal";
 import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
 import DishModal from "./components/08_hao-QLMonAn/DishModal";
+import RestaurantInfoManage from "./components/08_hao-QLMonAn/restaurant_infor_manage";
+import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
+// import TableManagementAdmin from './pages/TableManagementAdmin';
+
 function App() {
   return (
     <BrowserRouter> 
       <Routes>
+        <Route path="/dish-status-management" element={<DishStatusManagement />} />
+        <Route path="/category-manager" element={<CategoryManager />} />
         <Route path ="/" element={<LoginPage/>}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/user/homepage" element={<HomePage />} />
@@ -43,6 +49,9 @@ function App() {
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
+        <Route path="/restaurant-info" element={<RestaurantInfoManage />} />
+        <Route path="/inventory" element={<Invertory />} />
+        <Route path="/export" element={<IngredientInOut />} />
         <Route path="/inventory" element={<Invertory/>} />
         <Route path="/export" element={<IngredientInOut/>} />
         <Route path="/inventory-overview" element={<InventoryOverview/>} />
