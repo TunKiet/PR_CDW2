@@ -89,4 +89,12 @@ class IngredientController extends Controller
         $dataExport = Ingredient::exportIngredient();
         return response()->json($dataExport);
     }
+
+    public function alertIngredient()
+    {
+        $alerts = Ingredient::getIngredientAlert();
+        return response()->json([
+            'data' => $alerts
+        ]);
+    }
 }

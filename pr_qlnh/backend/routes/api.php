@@ -62,6 +62,7 @@ Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAll
 Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
 Route::get('/export', [IngredientController::class, 'exportPDF']);
 Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
+Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 
 
 /*

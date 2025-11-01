@@ -108,7 +108,12 @@ class Ingredient extends Model
             ];
         }
     }
-
+    /**
+     * Summary of getIngredients
+     * @param mixed $categoryId
+     * @param mixed $perPage
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
     public static function getIngredients($categoryId = null, $perPage = 10)
     {
         $query = self::with('category_ingredient');
@@ -118,5 +123,13 @@ class Ingredient extends Model
         }
 
         return $query->orderBy('ingredient_id', 'desc')->paginate($perPage);
+    }
+
+    public static function getIngredientAlert()
+    {
+        return self::with('category_ingredient:category_ingredient_id,category_ingredient_name')
+            ->whereColumn('stock_quantity', '<=', 'min_stock_level')
+            ->orderBy('stock_quantity', 'asc')
+            ->get();
     }
 }
