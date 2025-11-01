@@ -14,6 +14,7 @@ import TableManagementAdmin from './pages/TableManagementAdmin'
 import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 
 // Import các component trang của bạn
+import CartManagement from "./pages/CartManagement";
 import OrderPage from './pages/OrderPage';
 import OrderManagementPage from './pages/OrderManagementPage';
 import CustomerManagementPage from './pages/CustomerManagementPage';
@@ -38,7 +39,7 @@ function App() {
         <Route path="/user/homepage" element={<HomePage />} />
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
-
+        <Route path="/cart-management" element={<CartManagement />} />
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
@@ -47,7 +48,7 @@ function App() {
         <Route path="/inventory-overview" element={<InventoryOverview/>} />
         <Route path="/restaurant-info" element={<RestaurantInforManage/>} />
         <Route path="/category-manager" element={<CategoryManager/>} />
-		    <Route path="/table" element={<TableManagementAdmin/>} />
+		    <Route path="/tables" element={<TableManagementAdmin/>} />
         
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
