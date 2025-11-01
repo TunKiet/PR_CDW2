@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-// import { motion, AnimatePresence } from "framer-motion";
+// import { AnimatePresence } from "framer-motion";
 import { X, User, MapPin, Users, Info } from "lucide-react";
 
 export default function TableModal({ isOpen, onClose, onSave, table }) {
