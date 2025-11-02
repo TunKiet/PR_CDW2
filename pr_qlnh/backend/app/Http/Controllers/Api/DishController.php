@@ -77,10 +77,31 @@ class DishController extends Controller
         ]);
     }
 
+    /**
+     * Xóa món ăn theo ID
+     * DELETE /api/dishes/{id}
+     */
     public function destroy($id)
     {
-        // SỬA LỖI: Dùng Model đã sửa tên
+        // 1. Tìm món ăn theo ID
         $dish = MenuItem::find($id);
-        // ... delete code ...
+
+        // 2. Kiểm tra nếu không tìm thấy
+        if (!$dish) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không tìm thấy món ăn để xóa!'
+            ], 404); // Trả về lỗi 404 Not Found
+        }
+
+        // 3. Tiến hành xóa
+        $dish->delete();
+
+        // 4. Trả về phản hồi thành công (200 OK hoặc 204 No Content)
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Xóa món ăn thành công!'
+        ], 200);
+        // Lưu ý: Có thể dùng status 204 (No Content) nếu không cần trả về body
     }
 }

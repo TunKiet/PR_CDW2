@@ -161,7 +161,7 @@ const Review = () => {
                                 <span>5</span>
                                 <FaStar className="text-yellow-400 ml-1" />
                             </div>
-                            <progress max={100} value={85} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
+                            <progress max={100} value={85} className='custom-progress w-[250px] h-2.5 appearance-none '></progress>
                             <span className="text-sm text-gray-600 ml-2">85 đánh giá</span>
                         </div>
                         <div className="rating-level flex items-center gap-2">

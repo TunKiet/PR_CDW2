@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { CiSearch } from "react-icons/ci";
 import Button from '@mui/material/Button';
 import { MdOutlineInventory } from "react-icons/md";
@@ -27,7 +27,7 @@ const Ingredient = () => {
     const [openUpdate, setOpenUpdate] = useState(false);
 
     //Set ingredient category
-    const [category, setCategory] = useState(false);
+    // const [category, setCategory] = useState(false);
 
     const [ingredients, setIngredients] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -38,9 +38,40 @@ const Ingredient = () => {
     //Save change when edit ingredient
     const [editIngredient, setEditIngredient] = useState(null);
 
-    const [selectedCategoryId, setSelectedCategoryId] = useState("");
+    const [selectedCategoryId, setSelectedCategoryId] = useState([]);
+    const [formData, setFormData] = useState({
+        ingredient_name: "",
+        category_ingredient_id: "",
+        price: "",
+        unit: "",
+        total_price: "",
+        stock_quantity: "",
+        min_stock_level: "",
+    });
+
+    // const [editFormData, setEditFormData] = useState({
+    //     ingredient_name: "",
+    //     category_ingredient_id: "",
+    //     price: "",
+    //     unit: "",
+    //     total_price: "",
+    //     stock_quantity: "",
+    //     min_stock_level: "",
+    // })
 
 
+    useEffect(() => {
+        axios.get("http://localhost:8000/api/category-ingredient")
+            .then(res => setSelectedCategoryId(res.data.data))
+            .catch(err => console.log(err));
+    }, []);
+
+    const handleChange = e => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -54,31 +85,98 @@ const Ingredient = () => {
         handleClose();
     };
 
-    const handleChange = (event) => {
-        setCategory(event.target.value);
-    };
+    // const handleChange = (event) => {
+    //     setCategory(event.target.value);
+    // };
 
     //fetch data
-    useEffect(() => {
-        const fetchIngredients = async () => {
-            try {
-                const res = await axios.get(`http://localhost:8000/api/ingredients?page=${page}`);
-                setIngredients(res.data.data);
-                setLoading(false);
-                setTotalPages(res.data.last_page)
-            } catch (error) {
-                console.error("Fetch error:", error);
-                // setError("Không thể tải dữ liệu");
-                setLoading(false);
+    const fetchIngredients = useCallback(async () => {
+        try {
+            const res = await axios.get(`http://localhost:8000/api/ingredients?page=${page}`);
+            setIngredients(res.data.data);
+            setTotalPages(res.data.last_page);
+            setLoading(false);
+        } catch (error) {
+            console.error("Fetch error:", error);
+            setLoading(false);
+        }
+    }, [page]); // page là dependency hợp lệ
 
-            }
-        };
+    useEffect(() => {
         fetchIngredients();
-    }, [page]);
+    }, [fetchIngredients]);
 
     const handlePageChange = (event, value) => {
         setPage(value);
     };
+
+    const handleSubmit = e => {
+        e.preventDefault();
+
+        axios.post("http://localhost:8000/api/add", formData)
+            .then(res => {
+                alert("Thêm nguyên liệu thành công!");
+                console.log(res.data);
+                fetchIngredients();
+            })
+            .catch(err => {
+                console.log(err.response.data);
+                alert("Có lỗi xảy ra khi thêm nguyên liệu!");
+            });
+    };
+
+    const handleDelete = async (id) => {
+        const confirmDelete = window.confirm("Bạn có chắc muốn xóa nguyên liệu này không?");
+        if (!confirmDelete) return;
+
+        try {
+            const res = await axios.delete(`http://localhost:8000/api/ingredients/delete/${id}`);
+            alert(res.data.message);
+
+            fetchIngredients();
+        } catch (error) {
+            console.error("Lỗi khi xóa nguyên liệu:", error);
+            alert("Xóa nguyên liệu thất bại!");
+        }
+    }
+
+    // Gửi dữ liệu cập nhật đến server
+    const handleUpdateIngredient = async () => {
+        if (!editIngredient) return;
+
+        try {
+            const res = await fetch(`http://localhost:8000/api/ingredients/${editIngredient.ingredient_id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                body: JSON.stringify({
+                    ingredient_name: editIngredient.ingredient_name,
+                    category_ingredient_id: editIngredient.category_ingredient_id,
+                    price: editIngredient.price,
+                    unit: editIngredient.unit,
+                    stock_quantity: editIngredient.stock_quantity,
+                    min_stock_level: editIngredient.min_stock_level,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                alert("✅ Cập nhật thành công!");
+                setOpenUpdate(false);
+                // Gọi lại API lấy danh sách nguyên liệu (để reload)
+                fetchIngredients();
+            } else {
+                alert("" + data.message);
+            }
+        } catch (error) {
+            console.error("Lỗi khi cập nhật nguyên liệu:", error);
+            alert("Đã xảy ra lỗi khi cập nhật!");
+        }
+    };
+
 
     return (
         <>
@@ -121,58 +219,73 @@ const Ingredient = () => {
                                 </Button>
                                 {/* Dialog add ingredient form */}
                                 <Dialog open={openAdd} onClose={() => setOpenAdd(false)} maxWidth="sm" fullWidth>
-                                    <h3 className='text-center mt-3 border-b border-b-[#e8e8e8]'>Thêm mới nguyên liệu</h3>
-                                    <div className="formAdd-ingredient">
-                                        <div className="formAdd-info p-3">
-                                            <div>
-                                                <label htmlFor="">Mã NL</label>
-                                                <input className='form-control' type="text" name="" id="" value={1} />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="">Tên nguyên liệu</label>
-                                                <input className='form-control' type="text" name="" id="" value={`Ga`} />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="">Danh mục</label>
-                                                <Select value={category} onChange={handleChange} className='w-full' sx={{
-                                                    '& .MuiSelect-select': {
-                                                        padding: '8px',
-                                                    },
-                                                }}>
-                                                    <MenuItem value={1}>Thịt</MenuItem>
-                                                    <MenuItem value={2}>Rau</MenuItem>
-                                                    <MenuItem value={3}>Cá</MenuItem>
-                                                    <MenuItem value={4}>Nước</MenuItem>
-                                                </Select>
-                                            </div>
-                                            <div>
-                                                <label htmlFor="">Tồn kho</label>
-                                                <input className='form-control' type="text" name="" id="" value={10} />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="">Đơn vị</label>
-                                                <input className='form-control' type="text" name="" id="" value={`Con`} />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="">Ngưỡng cảnh báo</label>
-                                                <input className='form-control' type="text" name="" id="" value={2} />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="">Giá</label>
-                                                <input className='form-control' type="text" name="" id="" value={120.000} />
-                                            </div>
-                                            <div className="formAdd-button flex">
-                                                <div className='flex ms-auto py-3 gap-1.5'>
-                                                    <div className="formAdd-button-left">
-                                                        <Button variant='contained' color='error'>Hủy</Button>
-                                                    </div>
-                                                    <div className="formAdd-button-right">
-                                                        <Button variant='contained' color='primary'>Thêm</Button>
+                                    <form onSubmit={handleSubmit}>
+                                        <h3 className='text-center mt-3 border-b border-b-[#e8e8e8]'>Thêm mới nguyên liệu</h3>
+                                        <div className="formAdd-ingredient">
+                                            <div className="formAdd-info p-3">
+
+                                                <div>
+                                                    <label htmlFor="">Tên nguyên liệu</label>
+                                                    <input className='form-control' type="text" onChange={handleChange} name="ingredient_name" value={formData.ingredient_name} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Danh mục</label>
+                                                    <Select name='category_ingredient_id'
+                                                        value={formData.category_ingredient_id}
+                                                        onChange={handleChange} className='w-full' required sx={{
+                                                            '& .MuiSelect-select': {
+                                                                padding: '8px',
+                                                            },
+                                                        }}>
+                                                        {selectedCategoryId.map(ca => (
+                                                            <MenuItem
+                                                                key={ca.category_ingredient_id}
+                                                                value={ca.category_ingredient_id}
+                                                            >
+                                                                {ca.category_ingredient_name}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Tồn kho</label>
+                                                    <input className='form-control' type="number"
+                                                        name="stock_quantity"
+                                                        value={formData.stock_quantity}
+                                                        onChange={handleChange} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Ngưỡng cảnh báo</label>
+                                                    <input className='form-control' type="number"
+                                                        name="min_stock_level"
+                                                        value={formData.min_stock_level}
+                                                        onChange={handleChange} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Đơn vị</label>
+                                                    <input className='form-control' type="text" name="unit"
+                                                        value={formData.unit}
+                                                        onChange={handleChange} />
+                                                </div>
+                                                <div>
+                                                    <label htmlFor="">Giá</label>
+                                                    <input className='form-control' type="number" name="price"
+                                                        value={formData.price}
+                                                        onChange={handleChange} />
+                                                </div>
+                                                <div className="formAdd-button flex">
+                                                    <div className='flex ms-auto py-3 gap-1.5'>
+                                                        <div className="formAdd-button-left">
+                                                            <Button variant='contained' color='error'>Hủy</Button>
+                                                        </div>
+                                                        <div className="formAdd-button-right">
+                                                            <Button type='submit' variant='contained' color='primary'>Thêm</Button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </form>
                                 </Dialog>
                             </div>
                         </div>
@@ -213,8 +326,8 @@ const Ingredient = () => {
                                                 <td className='text-center border-b'>{ingredient.stock_quantity}</td>
                                                 <td className='text-center border-b'>{ingredient.min_stock_level}</td>
                                                 <td className='text-center border-b'>{ingredient.unit}</td>
-                                                <td className='text-center border-b'>{ingredient.price} đ</td>
-                                                <td className='text-center border-b'>{ingredient.total_price} đ</td>
+                                                <td className='text-center border-b'>{Number(ingredient.price).toLocaleString('vi-VN')} đ</td>
+                                                <td className='text-center border-b'>{Number(ingredient.total_price).toLocaleString('vi-VN')} đ</td>
                                                 <td className='text-center border-b'>{ingredient.created_at}</td>
                                                 <td className='text-center border-b'>
                                                     <Tooltip title="Update">
@@ -225,7 +338,7 @@ const Ingredient = () => {
                                                     {/* Dialog update ingredient */}
 
                                                     <Tooltip title="Delete">
-                                                        <IconButton>
+                                                        <IconButton onClick={() => handleDelete(ingredient.ingredient_id)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </Tooltip>
@@ -258,21 +371,36 @@ const Ingredient = () => {
                                     </div>
                                     <div>
                                         <label htmlFor="">Danh mục</label>
-                                        <Select value={editIngredient.category_ingredient_id}
-                                            onChange={(e) => setEditIngredient({ ...editIngredient, category_ingredient_id: e.target.value })} className='w-full' sx={{
-                                                '& .MuiSelect-select': {
-                                                    padding: '8px',
-                                                },
-                                            }}>
-                                            <MenuItem value={1}>Thịt</MenuItem>
-                                            <MenuItem value={2}>Rau</MenuItem>
-                                            <MenuItem value={3}>Cá</MenuItem>
-                                            <MenuItem value={4}>Nước</MenuItem>
+                                        <Select
+                                            value={editIngredient.category_ingredient_id}
+                                            onChange={(e) =>
+                                                setEditIngredient({
+                                                    ...editIngredient,
+                                                    category_ingredient_id: e.target.value,
+                                                })
+                                            }
+                                            className="w-full"
+                                            sx={{ "& .MuiSelect-select": { padding: "8px" } }}
+                                        >
+                                            {selectedCategoryId.map(ca => (
+                                                <MenuItem
+                                                    key={ca.category_ingredient_id}
+                                                    value={ca.category_ingredient_id}
+                                                >
+                                                    {ca.category_ingredient_name}
+                                                </MenuItem>
+                                            ))}
                                         </Select>
                                     </div>
                                     <div>
                                         <label htmlFor="">Tồn kho</label>
-                                        <input className='form-control' type="number" value={editIngredient.stock_quantity} />
+                                        <input className='form-control' type="number" value={editIngredient.stock_quantity}
+                                            onChange={(e) =>
+                                                setEditIngredient({
+                                                    ...editIngredient,
+                                                    stock_quantity: e.target.value,
+                                                })
+                                            } />
                                     </div>
                                     <div>
                                         <label htmlFor="">Ngưỡng cảnh báo</label>
@@ -286,7 +414,7 @@ const Ingredient = () => {
                                     </div>
                                     <div>
                                         <label htmlFor="">Giá</label>
-                                        <input className='form-control' type="number" name="" id="" value={editIngredient.price}
+                                        <input className='form-control' type="number" value={editIngredient.price}
                                             onChange={(e) => setEditIngredient({ ...editIngredient, price: e.target.value })} />
                                     </div>
                                     <div className="fromUpdate-button flex">
@@ -295,7 +423,7 @@ const Ingredient = () => {
                                                 <Button variant='contained' color='error' onClick={() => setOpenUpdate(false)}>Hủy</Button>
                                             </div>
                                             <div className="fromUpdate-button-right">
-                                                <Button variant='contained' color='primary'>Cập nhật</Button>
+                                                <Button variant='contained' color='primary' onClick={handleUpdateIngredient}>Cập nhật</Button>
                                             </div>
                                         </div>
                                     </div>

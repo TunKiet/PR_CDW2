@@ -10,9 +10,11 @@ import Review from './components/Review/Review'
 import ReviewModerator from './components/ReviewModerator/ReviewModerator'
 import Invertory from './components/Inventory/Inventory'
 import IngredientInOut from './components/Inventory/IngredientInOut'
+import TableManagementAdmin from './pages/TableManagementAdmin'
 import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 
 // Import các component trang của bạn
+import CartManagement from "./pages/CartManagement";
 import OrderPage from './pages/OrderPage';
 import OrderManagementPage from './pages/OrderManagementPage';
 import CustomerManagementPage from './pages/CustomerManagementPage';
@@ -27,7 +29,6 @@ import HomePage from "./components/08_hao-QLMonAn/HomePage";
 import RestaurantInfoManage from "./components/08_hao-QLMonAn/restaurant_infor_manage";
 import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
-import TableManagementAdmin from './pages/TableManagementAdmin';
 
 function App() {
   return (
@@ -40,20 +41,22 @@ function App() {
         <Route path="/user/homepage" element={<HomePage />} />
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
+        <Route path="/cart-management" element={<CartManagement />} />
+
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
-        <Route path="/restaurant-info" element={<RestaurantInfoManage />} />
+        <Route path="/restaurant-info" element={<RestaurantInfoManage/>} />
         <Route path="/inventory" element={<Invertory />} />
         <Route path="/export" element={<IngredientInOut />} />
         <Route path="/inventory" element={<Invertory/>} />
         <Route path="/export" element={<IngredientInOut/>} />
         <Route path="/inventory-overview" element={<InventoryOverview/>} />
-     
-
+        <Route path="/category-manager" element={<CategoryManager/>} />
+		    <Route path="/tables" element={<TableManagementAdmin/>} />
         
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path='/user/home' element={<UserDashboard />} />  
+        <Route path='/analytics' element={<UserDashboard />} />  
 
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}
         <Route path="/order-page" element={<OrderPage />} />

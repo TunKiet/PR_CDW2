@@ -24,8 +24,9 @@ use App\Http\Controllers\Api\MenuItemController;
 Route::get('/menu-items', [MenuItemController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
 use App\Http\Controllers\Api\CategoryController;
-
-
+use App\Http\Controllers\CategoryIngredientController;
+use App\Models\Ingredient;
+use App\Http\Controllers\Api\PreOrderController;
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
 // use App\Http\Controllers\Api\MenuItemController;
@@ -56,6 +57,9 @@ Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
 Route::get('/reviews/{menuItemId}/average', [ReviewController::class, 'averageRating']);
 Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
 Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
+Route::post('/add', [IngredientController::class, 'store']);
+Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
+Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
 
 /*
 |--------------------------------------------------------------------------
@@ -105,5 +109,10 @@ Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'
 
 
 Route::get('/categories', [CategoryController::class, 'index']);
+
+
+Route::get('/pre-orders', [PreOrderController::class, 'index']);
+Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
+Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
 
 

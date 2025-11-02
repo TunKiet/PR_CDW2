@@ -63,8 +63,6 @@ const IngredientInOut = () => {
                   <SearchIcon />
                 </IconButton>
               </Tooltip>
-
-
             </div>
           </div>
         </div>
