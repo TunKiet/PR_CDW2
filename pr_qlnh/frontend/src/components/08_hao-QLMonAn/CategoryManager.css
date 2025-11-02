@@ -14,8 +14,8 @@
     display: flex;
     flex-direction: column;
     /* Giả định Sidebar rộng 240px */
-    margin-left: 240px; 
-    width: calc(100% - 240px); 
+    /* margin-left: 240px; 
+    width: calc(100% - 240px);  */
 }
 
 /* Tiêu đề và nút Thêm mới */

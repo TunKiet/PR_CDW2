@@ -11,9 +11,8 @@
     /* KHẮC PHỤC LỖI LAYOUT: Dịch chuyển nội dung chính */
     /* ************************************ */
     /* Đảm bảo nội dung chính bắt đầu SAU Sidebar (giả sử Sidebar rộng 240px) */
-    margin-left: 240px; 
     /* Đảm bảo nó chiếm phần còn lại của màn hình */
-    width: calc(100% - 240px); 
+    /* width: calc(100% - 240px);  */
 }
 
 /* Container chứa nội dung tab (settings-view) */

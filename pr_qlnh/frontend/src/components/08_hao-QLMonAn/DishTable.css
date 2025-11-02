@@ -1,5 +1,22 @@
 /* === DISH MODAL STYLES (Đã có trong file bạn gửi) === */
+.dish-layout {
+    display: flex;
+    height: 100vh;
+    background-color: #f3f4f6;
+    overflow: hidden;
+}
 
+/* Phần Nội dung Chính (Main Content) */
+.dish-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    /* Giả định Sidebar rộng 240px */
+    /* margin-left: 240px; 
+    width: calc(100% - 240px);  */
+}
 .dish-modal-header {
     display: flex;
     justify-content: space-between;
