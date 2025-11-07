@@ -11,16 +11,14 @@ const Invertory = () => {
 
     const tabs = [
         { id: 2, label: "Quản lý nguyên liệu" },
-        { id: 1, label: "Cảnh báo nguyên liệu" },
-        { id: 3, label: "Thống kê Nhập/Xuất" },
+        { id: 3, label: "Cảnh báo nguyên liệu" },
+        { id: 1, label: "Thống kê Nhập/Xuất" },
     ];
     return (
         <>
             <div className="section">
                 <div className="flex min-h-screen">
-                    <div className="w-[20%]">
-                        <Sidebar />
-                    </div>
+                    <Sidebar />
                     <div className="w-[80%] bg-gray-100 p-6">
                         <div className="boxIngredient">
                             <div className="boxIngredient-head">
@@ -47,8 +45,8 @@ const Invertory = () => {
                             </div>
                             <div className="boxIngredient-content mt-4">
                                 {activeTab === 2 && <Ingredient />}
-                                {activeTab === 1 && <IngredientAlert />}
-                                {activeTab === 3 && <IngredientInOut />}
+                                {activeTab === 3 && <IngredientAlert />}
+                                {activeTab === 1 && <IngredientInOut />}
                             </div>
                         </div>
                     </div>

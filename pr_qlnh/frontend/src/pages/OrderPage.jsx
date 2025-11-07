@@ -1,110 +1,82 @@
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import OrderList from "../components/OrderList";
-import CartPanel from "../components/CartPanel";
+import Sidebar from "../components/Sidebar/Sidebar";
+import MenuList from "../components/MenuList";
+import OrderSummary from "../components/OrderSummary";
+import TableModal from "../components/TableModal";
 
-const menuItems = [
-  { name: "Phở Bò", price: 55000 },
-  { name: "Bún Chả", price: 45000 },
-  { name: "Nem Cua Bể", price: 60000 },
-  { name: "Chả Cá Lã Vọng", price: 120000 },
-  { name: "Gỏi Cuốn", price: 40000 },
-  { name: "Cà Phê Sữa Đá", price: 25000 },
-  { name: "Nước Dừa", price: 20000 },
-  { name: "Trà Chanh", price: 20000 },
-];
+const OrderPage = () => {
+  const [cartItems, setCartItems] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("Tất cả");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTable, setSelectedTable] = useState(null);
 
-const membersData = {
-  "0901234567": { name: "Nguyễn Văn A", rank: "Kim Cương" },
-  "0987654321": { name: "Trần Thị B", rank: "Vàng" },
+  const handleAddToCart = (item) => {
+    const existing = cartItems.find((i) => i.menu_item_id === item.menu_item_id);
+    if (existing) {
+      setCartItems(
+        cartItems.map((i) =>
+          i.menu_item_id === item.menu_item_id ? { ...i, qty: i.qty + 1 } : i
+        )
+      );
+    } else {
+      setCartItems([...cartItems, { ...item, qty: 1 }]);
+    }
+  };
+
+  return (
+    <div className="flex bg-gray-50 min-h-screen">
+      <Sidebar />
+
+      <div className="flex-1 ml-64 p-6 flex gap-6">
+        {/* Khu vực menu món */}
+        <div className="flex-1">
+          <div className="flex justify-between items-center mb-5">
+            <h1 className="text-2xl font-bold text-gray-800">Đơn hàng mới</h1>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700 transition"
+            >
+              {selectedTable ? selectedTable.table_name : "Chọn Bàn"}
+            </button>
+          </div>
+
+          {/* Tabs danh mục */}
+          <div className="flex flex-wrap gap-3 mb-6 pb-5">
+            {["Tất cả", "Đồ uống", "Món khai vị", "Món chính", "Tráng miệng", "Hải sản", "Các món chiên"].map(
+              (category, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                    selectedCategory === category
+                      ? "bg-indigo-600 text-white"
+                      : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                  }`}
+                >
+                  {category}
+                </button>
+              )
+            )}
+          </div>
+
+          <MenuList
+            onAddToCart={handleAddToCart}
+            selectedCategory={selectedCategory}
+          />
+        </div>
+
+        {/* Cột thanh toán */}
+        <OrderSummary cartItems={cartItems} table={selectedTable} />
+      </div>
+
+      {/* Modal chọn bàn */}
+      <TableModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelectTable={setSelectedTable}
+      />
+    </div>
+  );
 };
 
-export default function OrderPage() {
-  const [orderItems, setOrderItems] = useState({});
-  const [selectedTable, setSelectedTable] = useState("Chưa chọn");
-  const [showModal, setShowModal] = useState(false);
-  const [memberPhone, setMemberPhone] = useState("");
-  const [memberFound, setMemberFound] = useState(null);
-
-  const addItem = (item) => {
-    setOrderItems((prev) => {
-      const newItems = { ...prev };
-      if (newItems[item.name]) newItems[item.name].quantity += 1;
-      else newItems[item.name] = { ...item, quantity: 1 };
-      return newItems;
-    });
-  };
-
-  const removeItem = (name) => {
-    setOrderItems((prev) => {
-      const newItems = { ...prev };
-      delete newItems[name];
-      return newItems;
-    });
-  };
-
-  const lookupMember = () => {
-    if (membersData[memberPhone]) setMemberFound(membersData[memberPhone]);
-    else setMemberFound(false);
-  };
-
-  const subtotal = Object.values(orderItems).reduce(
-    (sum, i) => sum + i.price * i.quantity,
-    0
-  );
-
-  return (
-    <div className="flex bg-gray-100 min-h-screen">
-      <Sidebar />
-      {/* KHẮC PHỤC Ở ĐÂY: Thêm ml-64 để đẩy nội dung sang phải */}
-      <div className="flex-grow flex h-full ml-64 space-x-6 p-6"> 
-        <OrderList
-          menuItems={menuItems}
-          addItem={addItem}
-          setShowModal={setShowModal}
-        />
-        <CartPanel
-          orderItems={orderItems}
-          removeItem={removeItem}
-          subtotal={subtotal}
-          selectedTable={selectedTable}
-          memberPhone={memberPhone}
-          setMemberPhone={setMemberPhone}
-          memberFound={memberFound}
-          lookupMember={lookupMember}
-        />
-      </div>
-
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4 z-50">
-          <div className="bg-white p-5 rounded-lg w-full sm:w-4/5 lg:w-3/5 shadow-lg">
-            <h3 className="text-lg font-bold mb-4">Chọn Bàn</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {["Bàn 01", "Bàn 02", "Bàn 05", "Bàn 06", "Mang về"].map((b) => (
-                <div
-                  key={b}
-                  onClick={() => {
-                    setSelectedTable(b);
-                    setShowModal(false);
-                  }}
-                  className="p-4 rounded-lg text-center cursor-pointer bg-green-100 hover:bg-green-200"
-                >
-                  <div className="text-xl font-bold text-green-800">{b}</div>
-                  <div className="text-sm text-green-600 mt-1">Đang trống</div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() => setShowModal(false)}
-                className="bg-gray-300 px-4 py-2 rounded-lg font-semibold hover:bg-gray-400"
-              >
-                Đóng
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+export default OrderPage;

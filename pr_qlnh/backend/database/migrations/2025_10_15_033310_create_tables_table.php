@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('table_id');
             $table->string('table_name', 50)->unique();
             $table->string('table_type', 50);
-            $table->integer('capacity');
+            $table->integer('capacity')->default(4);
             $table->text('note')->nullable();
             $table->string('status', 20)->default('available');
             $table->timestamps();

@@ -16,6 +16,7 @@ const menuItems = [
       subItems: [
         { title: "Quản lý món ăn", path: '/dishtable' },
         { title: "Quản lý danh mục", path: '/category-manager' },
+        { title: "Quản lý tình trạng món ăn", path: '/dish-status-management' },
       ] 
     },
     { title: "Quản lý giỏ hàng", icon: <ShoppingCart size={20} />, path: 'cart-management' },
@@ -23,10 +24,7 @@ const menuItems = [
     { title: "Nhân viên", icon: <User size={20} />, path: '/staff' },
     { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },
     { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },
-    { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/settings' },
-    // ... (Giữ nguyên menuItems) ...
-    
-    // ... (Giữ nguyên menuItems) ...
+    { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/restaurant-info' },
 ];
 
 const Sidebar = () => {
@@ -71,7 +69,8 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-64 h-screen bg-white border-r flex flex-col fixed top-0 left-0">
+    <div className="w-64 h-screen bg-white border-r flex flex-col">
+      {/* Header */}
       <div className="flex items-center p-4 border-b">
         <div className="bg-indigo-600 text-white w-10 h-10 flex items-center justify-center rounded-full font-semibold">
           Ad

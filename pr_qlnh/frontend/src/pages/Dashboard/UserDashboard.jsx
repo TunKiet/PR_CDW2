@@ -1,5 +1,6 @@
 // src/pages/Dashboard/StatisticDashboard.jsx
 import React from "react";
+import './Sales_Statistics_Dashboard.css';
 import Sidebar from "../../components/Sidebar";
 import {
   BarChart2,
@@ -39,17 +40,16 @@ const topFoods = [
 
 const StatisticDashboard = () => {
   return (
-    <div className="flex min-h-screen bg-gray-50 font-inter">
+    <div className="dish-layout">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main content */}
-      <main className="ml-64 flex-1 p-8">
+      <main className="dish-main">
         <h1 className="text-3xl font-extrabold text-gray-900">
           Bảng Điều Khiển Thống Kê Bán Hàng
         </h1>
         <p className="text-gray-600 mt-1 mb-8">
-          Đây là giao diện mô tả (dữ liệu giả định). Trang hiện tại là{" "}
           <strong>“Thống kê”</strong>.
         </p>
 

@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('123456'),
                 'phone' => '090' . str_pad($i, 7, '0', STR_PAD_LEFT),
                 'role' => 'user',
-                'is_active' => 1,
+                'status' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -38,7 +38,7 @@ class UserSeeder extends Seeder
             'password' => Hash::make('admin123'),
             'phone' => '0999999999',
             'role' => 'admin',
-            'is_active' => 1,
+            'status' => 1,
             'created_at' => now(),
             'updated_at' => now(),
             

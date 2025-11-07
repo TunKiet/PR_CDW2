@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class MenuItemSeeder extends Seeder
 {
-    const MAX_RECORDS = 20; // số lượng món ăn muốn tạo
+    const MAX_RECORDS = 50; // Số lượng món ăn muốn tạo
 
     /**
      * Run the database seeds.
@@ -16,15 +16,16 @@ class MenuItemSeeder extends Seeder
     {
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             DB::table('menu_items')->insert([
-                'category_id' => rand(1, 10), // giả sử có 10 category
-                'menu_item_name' => 'Menu Item ' . $i,
-                'price' => rand(20000, 100000), // giá ngẫu nhiên 20k–100k
-                'image_url' => null,
-                'description' => 'Description for menu item ' . $i,
+                'category_id' => rand(1, 5), // Giả định có 5 danh mục
+                'menu_item_name' => 'Món ăn ' . $i,
+                'price' => rand(30, 200) * 1000,
+                'image_url' => '/images/menu-item-' . $i . '.jpg', // ✅ đúng cột trong DB
+                'description' => 'Món ăn số ' . $i . ' được chế biến theo phong cách đặc biệt.',
                 'status' => 'active',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+            
         }
     }
 }

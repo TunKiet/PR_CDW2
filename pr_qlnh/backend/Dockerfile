@@ -32,11 +32,13 @@ RUN apt-get update && apt-get install -y \
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Install PHP extensions + Redis
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
+    && pecl install redis || true \
+    && docker-php-ext-enable redis
 
-# ✅ Install and enable Redis extension
-RUN pecl install redis && docker-php-ext-enable redis
+# # Install and enable Redis extension
+# RUN pecl install redis && docker-php-ext-enable redis
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -50,9 +52,9 @@ COPY . /var/www
 # Install dependencies
 RUN composer install --no-interaction --optimize-autoloader
 
-# Install PHP extensions
-RUN pecl install redis && docker-php-ext-enable redis \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# # Install PHP extensions
+# RUN pecl install redis && docker-php-ext-enable redis \
+#     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
