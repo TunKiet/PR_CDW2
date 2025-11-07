@@ -22,6 +22,10 @@ const OrderPage = () => {
       setCartItems([...cartItems, { ...item, qty: 1 }]);
     }
   };
+  const handleRemoveItem = (id) => {
+  setCartItems((prev) => prev.filter((item) => item.menu_item_id !== id));
+};
+
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
@@ -66,7 +70,12 @@ const OrderPage = () => {
         </div>
 
         {/* Cột thanh toán */}
-        <OrderSummary cartItems={cartItems} table={selectedTable} />
+        <OrderSummary
+  cartItems={cartItems}
+  table={selectedTable}
+  onRemoveItem={handleRemoveItem}
+/>
+
       </div>
 
       {/* Modal chọn bàn */}

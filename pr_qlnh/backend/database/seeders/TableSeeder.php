@@ -5,25 +5,18 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class TableSeeder extends Seeder
-{
-    const MAX_RECORDS = 15; // số lượng bàn muốn tạo
+class TableSeeder extends Seeder {
+    public function run(): void {
+        DB::table('tables')->truncate();
 
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
-    {
-        for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
+        for ($i = 1; $i <= 8; $i++) {
             DB::table('tables')->insert([
-                'table_name' => 'Table ' . $i,
-                'table_type' => $i % 2 === 0 ? 'VIP' : 'Normal',
-                'capacity' => rand(2, 10),
-                'note' => 'Note for table ' . $i,
+                'table_name' => "Bàn số $i",
+                'table_type' => $i <= 6 ? 'Normal' : 'VIP',
+                'capacity' => $i <= 6 ? 4 : 8,
                 'status' => 'available',
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         }
     }
 }
+

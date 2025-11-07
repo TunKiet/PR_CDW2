@@ -10,14 +10,17 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('points', function (Blueprint $table) {
-            $table->id('point_id');
-            $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade');
-            $table->foreignId('order_id')->constrained('orders', 'order_id')->onDelete('cascade');
-            $table->integer('points');
-            $table->timestamps();
-        });
+{
+    Schema::create('points', function (Blueprint $table) {
+        $table->bigIncrements('point_id');
+        $table->unsignedBigInteger('customer_id')->nullable();
+        $table->unsignedBigInteger('order_id')->nullable(); // chỉ tạo cột, KHÔNG tạo FK
+        $table->integer('points')->default(0);
+        $table->timestamps();
+    });
+
+
+
     }
 
     /**
