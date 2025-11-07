@@ -4,22 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// Bổ sung: Import Model MenuItem (Giả định bạn có Model này)
+use App\Models\MenuItem; 
 
 class Category extends Model
 {
     use HasFactory;
 
     protected $primaryKey = 'category_id';
-    // Đảm bảo khóa chính là tự động tăng (mặc định là true, nhưng khai báo cho rõ)
+    
+    // Khóa chính là tự động tăng (mặc định là true)
     public $incrementing = true; 
     
-    // Tên bảng (nếu không theo quy tắc số nhiều mặc định)
     protected $table = 'categories';
 
     // Cho phép gán hàng loạt (Mass Assignment) cho các trường này
     protected $fillable = [
         'category_name',
-        'description',
+        'description', // Giữ lại trường này nếu bạn dùng nó trong DB
+        'slug',        // BỔ SUNG: Rất quan trọng cho API Store/Update
+        'is_hidden',   // BỔ SUNG: Rất quan trọng cho API Store/Update
     ];
 
     /**
@@ -27,8 +31,10 @@ class Category extends Model
      */
     public function menuItems()
     {
-        // 1. Sửa tên Class: Menu_Item::class (hoặc MenuItem::class)
-        // 2. Sửa Khóa cục bộ: Dùng 'category_id' thay vì 'id'
-        return $this->hasMany(menuItems::class, 'category_id', 'category_id'); 
+        // SỬA LỖI: Dùng tên Class đúng là MenuItem::class
+        // Tham số 1: Tên Model của đối tượng liên quan (Món ăn)
+        // Tham số 2: Tên khóa ngoại trên bảng 'menu_items' (category_id)
+        // Tham số 3: Tên khóa cục bộ trên bảng 'categories' (category_id)
+        return $this->hasMany(MenuItem::class, 'category_id', 'category_id'); 
     }
 }
