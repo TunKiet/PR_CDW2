@@ -51,7 +51,6 @@ function App() {
         <Route path="/inventory" element={<Invertory/>} />
         <Route path="/export" element={<IngredientInOut/>} />
         <Route path="/inventory-overview" element={<InventoryOverview/>} />
-        <Route path="/restaurant-info" element={<RestaurantInforManage/>} />
         <Route path="/category-manager" element={<CategoryManager/>} />
 		    <Route path="/tables" element={<TableManagementAdmin/>} />
         
