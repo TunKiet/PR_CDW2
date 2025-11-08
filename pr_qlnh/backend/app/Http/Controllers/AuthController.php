@@ -56,8 +56,8 @@ class AuthController extends Controller
         // Xác định trường đăng nhập
         $loginField = $request->filled('email') ? 'email' : 'phone';
         $identifier = $request->input($loginField);
-
-        $user = User::where($loginField, $identifier)->first();
+        //Goi ham lay nguoi dung
+        $user = User::getUserbyEmailOrPhone($loginField, $identifier);
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Email/SĐT hoặc mật khẩu không đúng!'], 401);

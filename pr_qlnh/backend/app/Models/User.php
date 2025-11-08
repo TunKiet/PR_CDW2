@@ -68,10 +68,13 @@ class User extends Authenticatable implements JWTSubject
     {
         return 'user_id';
     }
-    //lay ds ng dung
-    public function getUser()
-    {
+
         
+
+    //lay nguoi dung theo email hoac phone
+    public static function getUserbyEmailOrPhone(string $field, string $value) 
+    {
+        return self::where($field, $value)->first();
     }
 
 }

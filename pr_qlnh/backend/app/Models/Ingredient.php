@@ -5,42 +5,131 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class MenuItem extends Model
+class Ingredient extends Model
 {
-    use HasFactory;
-
-    protected $table = 'menu_items';
-
-    // ⚠️ Đây là điểm quan trọng
-    protected $primaryKey = 'menu_item_id';
-
-    // Nếu khóa chính tự động tăng (AUTO_INCREMENT)
-    public $incrementing = true;
-
-    // Nếu là integer
-    protected $keyType = 'int';
+    protected $table = 'ingredients';
+    protected $primaryKey = 'ingredient_id';
+    public $timestamps = true;
 
     protected $fillable = [
-        'menu_item_id',
-        'name',
+        'category_ingredient_id',
+        'ingredient_name',
         'price',
-        'description',
-        'category_id',
-        'status'
+        'unit',
+        'total_price',
+        'stock_quantity',
+        'min_stock_level'
     ];
-    public function run(): void
-{
-    DB::statement('SET FOREIGN_KEY_CHECKS=0;'); // 🔧 tắt kiểm tra khóa ngoại
-    DB::table('ingredients')->truncate();
 
-    DB::table('ingredients')->insert([
-        ['ingredient_id' => 1, 'ingredient_name' => 'Thịt bò', 'unit' => 'kg', 'created_at' => now(), 'updated_at' => now()],
-        ['ingredient_id' => 2, 'ingredient_name' => 'Bún tươi', 'unit' => 'kg', 'created_at' => now(), 'updated_at' => now()],
-        ['ingredient_id' => 3, 'ingredient_name' => 'Hành lá', 'unit' => 'g', 'created_at' => now(), 'updated_at' => now()],
-        ['ingredient_id' => 4, 'ingredient_name' => 'Nước mắm', 'unit' => 'ml', 'created_at' => now(), 'updated_at' => now()],
-        ['ingredient_id' => 5, 'ingredient_name' => 'Đường', 'unit' => 'g', 'created_at' => now(), 'updated_at' => now()],
-    ]);
-    DB::statement('SET FOREIGN_KEY_CHECKS=1;'); // 🔒 bật lại
-}
+    protected $casts = [
+        'created_at' => 'datetime:Y/m/d H:i:s',
+        'updated_at' => 'datetime:Y/m/d H:i:s',
+    ];
 
+    public function category_ingredient()
+    {
+        return $this->belongsTo(CategoryIngredient::class, 'category_ingredient_id', 'category_ingredient_id');
+    }
+    public static function exportIngredient()
+    {
+        return self::with('category_ingredient:category_ingredient_id,category_ingredient_name')
+            ->orderBy('ingredient_id', 'asc')
+            ->get();
+    }
+    /**
+     * get list ingredient have pagination
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public static function allIngedient($perPage = 10)
+    {
+        return self::with('category_ingredient:category_ingredient_id,category_ingredient_name')
+            ->orderBy('ingredient_id', 'desc')
+            ->paginate($perPage);
+    }
+    /**
+     * Summary of updateIngredient
+     * @param mixed $id
+     * @param mixed $data
+     * @return array{data: Ingredient|\Illuminate\Database\Eloquent\Collection<int, Ingredient>, message: string, success: bool|null}
+     */
+    public static function updateIngredient($id, $data)
+    {
+        $ingredient = self::find($id);
+
+        if (!$ingredient) {
+            return [
+                'success' => false,
+                'message' => 'Nguyên liệu không tồn tại.'
+            ];
+        }
+
+        $ingredient->update([
+            'ingredient_name'        => $data['ingredient_name'],
+            'category_ingredient_id' => $data['category_ingredient_id'],
+            'price'                  => $data['price'],
+            'unit'                   => $data['unit'],
+            'stock_quantity'         => $data['stock_quantity'],
+            'min_stock_level'        => $data['min_stock_level'],
+            'total_price'            => $data['price'] * $data['stock_quantity']
+        ]);
+        return [
+            'success' => true,
+            'message' => 'Cập nhật nguyên liệu thành công.',
+            'data' => $ingredient->fresh()->load('category_ingredient')
+        ];
+    }
+    /**
+     * Summary of remove
+     * @param mixed $id
+     * @return array{data: Ingredient|\Illuminate\Database\Eloquent\Collection<int, Ingredient>, message: string, success: bool|array{message: string, success: bool}}
+     */
+    public static function remove($id)
+    {
+        try {
+            $ingredient = self::find($id);
+            if (!$ingredient) {
+                return [
+                    'success' => false,
+                    'message' => 'Xóa không hợp lệ'
+                ];
+            }
+
+            $ingredient->delete();
+
+            return [
+                'success' => true,
+                'message' => 'Xóa nguyên liệu thành công.',
+                'data' => $ingredient
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Không thể xóa nguyên liệu: ' . $e->getMessage()
+            ];
+        }
+    }
+    /**
+     * Summary of getIngredients
+     * @param mixed $categoryId
+     * @param mixed $perPage
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public static function getIngredients($categoryId = null, $perPage = 10)
+    {
+        $query = self::with('category_ingredient');
+
+        if ($categoryId && $categoryId !== 'all') {
+            $query->where('category_ingredient_id', $categoryId);
+        }
+
+        return $query->orderBy('ingredient_id', 'desc')->paginate($perPage);
+    }
+
+    public static function getIngredientAlert()
+    {
+        return self::with('category_ingredient:category_ingredient_id,category_ingredient_name')
+            ->whereColumn('stock_quantity', '<=', 'min_stock_level')
+            ->orderBy('stock_quantity', 'asc')
+            ->get();
+    }
 }

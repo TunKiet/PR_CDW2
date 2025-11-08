@@ -75,7 +75,7 @@ export default function LoginPage() {
 
         alert(res.data.message);
         if (res.data.user.role === "admin") navigate("/admin/dashboard");
-        else navigate("/user/home");
+        else navigate("/order-page");
       } catch (err) {
         const msg = err.response?.data?.message || "Đăng nhập thất bại!";
         alert(msg);

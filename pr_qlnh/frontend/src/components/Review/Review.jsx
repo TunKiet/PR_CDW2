@@ -9,7 +9,6 @@ import { FaStar } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import BoxReview from './BoxReview';
 import { CiCamera } from "react-icons/ci";
-import Feedback from './Feedback';
 import axios from "axios";
 
 const Review = () => {
@@ -120,7 +119,7 @@ const Review = () => {
                                         </div>
                                     </div>
                                     <div className="formReview-select-rating py-2">
-                                        <Rating value={rating} size='large' onChange={(e, newValue) => { setRating(newValue) }} readOnly />
+                                        <Rating value={rating} size='large' onChange={(e, newValue) => { setRating(newValue) }} />
                                     </div>
                                     <div className="formReview-upload mb-2">
                                         <div className="formReview-upload-title">
@@ -162,7 +161,7 @@ const Review = () => {
                                 <span>5</span>
                                 <FaStar className="text-yellow-400 ml-1" />
                             </div>
-                            <progress max={100} value={85} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
+                            <progress max={100} value={85} className='custom-progress w-[250px] h-2.5 appearance-none '></progress>
                             <span className="text-sm text-gray-600 ml-2">85 đánh giá</span>
                         </div>
                         <div className="rating-level flex items-center gap-2">

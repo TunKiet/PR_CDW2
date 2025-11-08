@@ -7,7 +7,7 @@ const UserFeedback = () => {
                 <div className="box-rep-info flex items-center">
                     <div className="box-info flex items-center">
                         <div className="box-info-avatar">
-                            <div className='flex justify-center items-center w-[40px] h-[40px] bg-red-600 rounded-full'>
+                            <div className='flex justify-center items-center w-10 h-10 bg-red-600 rounded-full'>
                                 <p className='flex justify-center items-center text-white font-bold text-2xl m-0 p-0'>T</p>
                             </div>
                         </div>
