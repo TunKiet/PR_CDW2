@@ -23,6 +23,7 @@ const Sidebar = () => {
     { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },
     { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },
     { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/settings' },
+    { title: "Log Out", icon: <Building size={20} />, path: '/' },
   ];
 
   // Logic kiểm tra xem đường dẫn có đang khớp với path của item hay không

@@ -68,5 +68,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return 'user_id';
     }
+    //lay ds ng dung
+    public function getUser()
+    {
+        
+    }
 
 }
