@@ -1,43 +1,30 @@
-// src/components/Sidebar.jsx
-import React from "react";
-// 1. IMPORT Link và useLocation từ react-router-dom
-import { Link, useLocation } from "react-router-dom";
-import {
-  ClipboardList,
-  BarChart2,
-  FileText,
-  Calendar,
-  ShoppingCart,
-  Menu,
-  Zap,
-  User,
-  Users,
-  Settings,
-  Building,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+// src/components/Sidebar.jsx (ĐÃ CẬP NHẬT để tạo hiệu ứng ĐỘNG)
+import React, { useState, useEffect, useRef } from 'react'; // IMPORT useRef
+import { Link, useLocation } from 'react-router-dom';
+import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, User, Users, Settings, Building, ChevronDown, ChevronUp } from "lucide-react";
 
 const menuItems = [
-  { title: "Đơn hàng mới", icon: <ClipboardList size={20} />, path: '/order-page' },
-  { title: "Thống kê", icon: <BarChart2 size={20} />, path: '/analytics' },
-  { title: "Hóa đơn", icon: <FileText size={20} />, path: '/order-management' },
-  { title: "Đặt bàn", icon: <Calendar size={20} />, path: '/tables' },
-  {
-    title: "Thực đơn",
-    icon: <Menu size={20} />,
-    isParent: true,
-    subItems: [
-      { title: "Quản lý món ăn", path: '/dishtable' },
-      { title: "Quản lý danh mục", path: '/category-manager' },
-    ]
-  },
-  { title: "Quản lý giỏ hàng", icon: <ShoppingCart size={20} />, path: '/cart-management' },
-  { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
-  { title: "Nhân viên", icon: <User size={20} />, path: '/staff' },
-  { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },
-  { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },
-  { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/restaurant-info' },
+   { title: "Đơn hàng mới", icon: <ClipboardList size={20} />, path: '/order-page' },
+    { title: "Thống kê", icon: <BarChart2 size={20} />, path: '/analytics' },
+    { title: "Hóa đơn", icon: <FileText size={20} />, path: '/order-management' },
+    { title: "Đặt bàn", icon: <Calendar size={20} />, path: '/tables' },
+    { 
+      title: "Thực đơn", 
+      icon: <Menu size={20} />, 
+      path: '/menu-management-placeholder', 
+      isParent: true,
+      subItems: [
+        { title: "Quản lý món ăn", path: '/dishtable' },
+        { title: "Quản lý danh mục", path: '/category-manager' },
+        { title: "Quản lý tình trạng món ăn", path: '/dish-status-management' },
+      ] 
+    },
+    { title: "Quản lý giỏ hàng", icon: <ShoppingCart size={20} />, path: 'cart-management' },
+    { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
+    { title: "Nhân viên", icon: <User size={20} />, path: '/staff' },
+    { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },
+    { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },
+    { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/restaurant-info' },
 ];
 
 const Sidebar = () => {
@@ -90,8 +77,34 @@ const Sidebar = () => {
 
   // Logic kiểm tra xem đường dẫn có đang khớp với path của item hay không
   const isActive = (path) => {
-    // Dùng startsWith để highlight các đường dẫn con (nếu có)
-    return location.pathname.startsWith(path);
+      if (!path) return false;
+      return location.pathname.startsWith(path);
+  };
+  const isParentActive = (item) => {
+    return item.subItems && item.subItems.some(sub => isActive(sub.path));
+  };
+  
+  // Hiệu ứng side-effect khi trạng thái menu thay đổi
+  useEffect(() => {
+    const activeParent = menuItems.find(item => isParentActive(item));
+    if (activeParent && openSubMenu !== activeParent.title) {
+        setOpenSubMenu(activeParent.title);
+    } 
+  }, [location.pathname]);
+
+  // 3. Logic ĐO và THIẾT LẬP CHIỀU CAO khi menu được mở hoặc đóng
+  useEffect(() => {
+    if (submenuRef.current && openSubMenu === 'Thực đơn') {
+        // Nếu menu được mở, lấy chiều cao cuộn thực tế
+        setSubmenuHeight(submenuRef.current.scrollHeight);
+    } else {
+        // Nếu menu đóng, đặt chiều cao về 0
+        setSubmenuHeight(0);
+    }
+  }, [openSubMenu]); // Chạy lại khi trạng thái mở/đóng thay đổi
+
+  const toggleSubMenu = (title) => {
+    setOpenSubMenu(openSubMenu === title ? null : title);
   };
 
   return (
