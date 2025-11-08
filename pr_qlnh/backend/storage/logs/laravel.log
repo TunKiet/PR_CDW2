@@ -9046,3 +9046,107 @@ Did you mean one of these?
 #69 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
 #70 {main}
 "} 
+[2025-11-08 02:50:17] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(402): Illuminate\\Log\\LogManager->error('syntax error, u...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(365): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(ParseError))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(562): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(ParseError))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException(Object(ParseError))
+#7 /var/www/public/index.php(22): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
+#9 {main}
+"} 
+[2025-11-08 02:50:17] laravel.ERROR: syntax error, unexpected token "<<", expecting "]" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting \"]\" at /var/www/config/cors.php:8)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'cors', '/var/www/config...', Array)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#7 /var/www/public/index.php(22): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
+#9 {main}
+"} 
+[2025-11-08 02:50:18] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(402): Illuminate\\Log\\LogManager->error('syntax error, u...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(365): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(ParseError))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(562): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(ParseError))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException(Object(ParseError))
+#7 /var/www/public/index.php(22): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
+#9 {main}
+"} 
+[2025-11-08 02:50:18] laravel.ERROR: syntax error, unexpected token "<<", expecting "]" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting \"]\" at /var/www/config/cors.php:8)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'cors', '/var/www/config...', Array)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#7 /var/www/public/index.php(22): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
+#9 {main}
+"} 
+[2025-11-08 02:50:18] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(402): Illuminate\\Log\\LogManager->error('syntax error, u...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(365): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(ParseError))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(562): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(ParseError))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException(Object(ParseError))
+#7 /var/www/public/index.php(22): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
+#9 {main}
+"} 
+[2025-11-08 02:50:18] laravel.ERROR: syntax error, unexpected token "<<", expecting "]" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting \"]\" at /var/www/config/cors.php:8)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'cors', '/var/www/config...', Array)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#7 /var/www/public/index.php(22): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
+#9 {main}
+"} 
+[2025-11-08 02:50:18] laravel.EMERGENCY: Unable to create configured logger. Using emergency logger. {"exception":"[object] (InvalidArgumentException(code: 0): Log [] is not defined. at /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php:222)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(138): Illuminate\\Log\\LogManager->resolve(NULL, NULL)
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(125): Illuminate\\Log\\LogManager->get(NULL)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Log/LogManager.php(703): Illuminate\\Log\\LogManager->driver()
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(402): Illuminate\\Log\\LogManager->error('syntax error, u...', Array)
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Exceptions/Handler.php(365): Illuminate\\Foundation\\Exceptions\\Handler->reportThrowable(Object(ParseError))
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(562): Illuminate\\Foundation\\Exceptions\\Handler->report(Object(ParseError))
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(146): Illuminate\\Foundation\\Http\\Kernel->reportException(Object(ParseError))
+#7 /var/www/public/index.php(22): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
+#9 {main}
+"} 
+[2025-11-08 02:50:18] laravel.ERROR: syntax error, unexpected token "<<", expecting "]" {"exception":"[object] (ParseError(code: 0): syntax error, unexpected token \"<<\", expecting \"]\" at /var/www/config/cors.php:8)
+[stacktrace]
+#0 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(99): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->Illuminate\\Foundation\\Bootstrap\\{closure}()
+#1 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(80): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFile(Object(Illuminate\\Config\\Repository), 'cors', '/var/www/config...', Array)
+#2 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/LoadConfiguration.php(39): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->loadConfigurationFiles(Object(Illuminate\\Foundation\\Application), Object(Illuminate\\Config\\Repository))
+#3 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(342): Illuminate\\Foundation\\Bootstrap\\LoadConfiguration->bootstrap(Object(Illuminate\\Foundation\\Application))
+#4 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(186): Illuminate\\Foundation\\Application->bootstrapWith(Array)
+#5 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(170): Illuminate\\Foundation\\Http\\Kernel->bootstrap()
+#6 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#7 /var/www/public/index.php(22): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#8 /var/www/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('/var/www/public...')
+#9 {main}
+"} 
