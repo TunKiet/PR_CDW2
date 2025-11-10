@@ -36,14 +36,14 @@ const mapApiDataToReact = (item) => ({
 });
 
 // Hàm ánh xạ dữ liệu React sang API (cho POST/PUT)
-const mapReactDataToApi = (dish) => ({
-  category_id: parseInt(dish.categoryKey),
-  menu_item_name: dish.name,
-  description: dish.description,
-  price: dish.price,
-  image_url: dish.image,
-  status: dish.statusKey,
-});
+// const mapReactDataToApi = (dish) => ({
+//   category_id: parseInt(dish.categoryKey),
+//   menu_item_name: dish.name,
+//   description: dish.description,
+//   price: dish.price,
+//   image_url: dish.image,
+//   status: dish.statusKey,
+// });
 
 export default function DishCRUDTable() {
   // === STATES DỮ LIỆU ===
@@ -105,28 +105,44 @@ export default function DishCRUDTable() {
   // 2. LOGIC CRUD & HỖ TRỢ
   // =========================================================
 
-  const handleSaveDish = async (dishData) => {
-    try {
-      const apiData = mapReactDataToApi(dishData);
+  const handleSaveDish = async (formData, dishId) => { // formData bây giờ là đối tượng FormData
+        try {
+            
+            if (dishId) {
+                // CHẾ ĐỘ CHỈNH SỬA: SỬ DỤNG ID và formData
+                // Axios sẽ tự động gửi dưới dạng multipart/form-data
+                await axios.post(`${API_URL}/${dishId}`, formData); // Dùng POST cho PUT với _method
+                alert(`✅ Cập nhật món ăn thành công!`);
+            } else {
+                // CHẾ ĐỘ THÊM MỚI: SỬ DỤNG formData
+                await axios.post(API_URL, formData);
+                alert(`✅ Thêm món ăn thành công!`);
+            }
+            
+            handleCloseEditModal();
+            fetchDishes();
 
-      if (dishData.id) {
-        await axios.put(`${API_URL}/${dishData.id}`, apiData);
-        alert(`✅ Cập nhật món ăn "${dishData.name}" thành công!`);
-      } else {
-        await axios.post(API_URL, apiData);
-        alert(`✅ Thêm món ăn "${dishData.name}" thành công!`);
-      }
+        } catch (err) {
+            console.error("Lỗi khi lưu món ăn:", err.response ? err.response.data : err.message);
+            
+            let detailedError = "Không thể lưu món ăn. Vui lòng kiểm tra console để biết chi tiết.";
 
-      handleCloseEditModal();
-      fetchDishes();
-    } catch (err) {
-      console.error(
-        "Lỗi khi lưu món ăn:",
-        err.response ? err.response.data : err.message
-      );
-      alert(`Lỗi: ${err.response?.data?.message || "Không thể lưu món ăn."}`);
-    }
-  };
+            if (err.response && err.response.status === 422) {
+                const errors = err.response.data.errors;
+                if (errors) {
+                    detailedError = "Lỗi Validation: ";
+                    for (const key in errors) {
+                        detailedError += `[${key}]: ${errors[key].join(', ')} | `;
+                    }
+                    detailedError = detailedError.trim().slice(0, -1); 
+                }
+            } else if (err.response?.data?.message) {
+                 detailedError = err.response.data.message;
+            }
+            
+            alert(`Lỗi: ${detailedError}`);
+        }
+    };
 
   const handleDeleteDish = async (id, name) => {
     if (!window.confirm(`Bạn có chắc chắn muốn xóa món ăn "${name}" không?`)) {

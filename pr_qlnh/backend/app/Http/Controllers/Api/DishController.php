@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 // SỬA LỖI: Dùng Model chuẩn là MenuItem
 use App\Models\MenuItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DishController extends Controller
 {
@@ -30,17 +31,31 @@ class DishController extends Controller
 
     public function store(Request $request)
     {
-        // === VỊ TRÍ 1: BIẾN $validated ĐƯỢC GÁN TẠI ĐÂY ===
+        // 1. Validation: Yêu cầu file ảnh khi thêm mới
         $validated = $request->validate([
             'category_id' => 'required|integer|exists:categories,category_id',
             'menu_item_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'image_url' => 'nullable|string',
+            // QUAN TRỌNG: 'image_file' phải khớp với tên field trong FormData ở Frontend
+            'image_file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', 
             'status' => 'nullable|string|max:50',
         ]);
 
-        // Nếu validation thành công, code tiếp tục chạy và sử dụng $validated
+        // 2. XỬ LÝ UPLOAD FILE
+        if ($request->hasFile('image_file')) {
+            // Lưu file vào thư mục public/images/dishes
+            // 'public' là tên của đĩa (disk) đã được cấu hình trong config/filesystems.php
+            $path = $request->file('image_file')->store('images/dishes', 'public');
+            
+            // Gán URL công khai vào trường image_url
+            $validated['image_url'] = Storage::disk('public')->url($path);
+        }
+
+        // 3. Tạo món ăn
+        // Loại bỏ trường file khỏi $validated trước khi tạo, nếu không sẽ bị lỗi
+        unset($validated['image_file']); 
+        
         $dish = MenuItem::create($validated);
 
         return response()->json([
@@ -50,6 +65,9 @@ class DishController extends Controller
         ], 201);
     }
 
+    /**
+     * Cập nhật món ăn (Update)
+     */
     public function update(Request $request, $id)
     {
         $dish = MenuItem::find($id);
@@ -57,17 +75,41 @@ class DishController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Không tìm thấy món ăn!'], 404);
         }
 
-        // === VỊ TRÍ 2: BIẾN $validated ĐƯỢC GÁN TẠI ĐÂY ===
+        // 1. Validation: File ảnh là tùy chọn (nullable) khi update
         $validated = $request->validate([
             'category_id' => 'sometimes|integer|exists:categories,category_id',
             'menu_item_name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
             'price' => 'sometimes|numeric|min:0',
-            'image_url' => 'nullable|string',
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
             'status' => 'nullable|string|max:50',
+            // Laravel sẽ tự xử lý _method, không cần validate
         ]);
 
-        // Nếu validation thành công, code tiếp tục chạy và sử dụng $validated
+        // 2. XỬ LÝ UPLOAD FILE MỚI
+        if ($request->hasFile('image_file')) {
+            
+            // XÓA ẢNH CŨ (Tùy chọn)
+            if ($dish->image_url) {
+                // Tách path file ra khỏi URL công khai (ví dụ: 'http://.../storage/images/dishes/xyz.jpg' -> 'images/dishes/xyz.jpg')
+                $pathSegments = parse_url($dish->image_url, PHP_URL_PATH);
+                $oldPath = str_replace('/storage/', '', $pathSegments);
+                
+                // Kiểm tra và xóa file cũ
+                if (Storage::disk('public')->exists($oldPath)) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+            
+            // Lưu file mới và lấy URL
+            $path = $request->file('image_file')->store('images/dishes', 'public');
+            $validated['image_url'] = Storage::disk('public')->url($path);
+        }
+        
+        // 3. Cập nhật món ăn
+        // Loại bỏ trường file khỏi $validated trước khi update
+        unset($validated['image_file']);
+        
         $dish->update($validated);
 
         return response()->json([
