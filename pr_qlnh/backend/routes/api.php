@@ -51,6 +51,7 @@ Route::get('/test', function () {
 |--------------------------------------------------------------------------
 */
 Route::apiResource('dishes', DishController::class);
+Route::apiResource('categories', CategoryController::class);
 
 Route::post('/reviews', [ReviewController::class, 'store']);
 Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
