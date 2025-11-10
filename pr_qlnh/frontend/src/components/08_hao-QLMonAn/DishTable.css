@@ -37,6 +37,19 @@
     /* Đảm bảo nó chiếm phần còn lại của màn hình */
 }
 
+.dish-modal-input-readonly {
+    margin-top: 0.25rem;
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e5e7eb; /* Màu border nhạt */
+    border-radius: 0.5rem;
+    background-color: #f9fafb; /* Nền màu xám nhẹ */
+    color: #1f2937; /* Màu chữ đậm */
+    min-height: 38px;
+    /* Đảm bảo nó không có hiệu ứng hover/focus */
+}
+
 .dish-modal-close-btn:hover {
     color: #4b5563;
 }

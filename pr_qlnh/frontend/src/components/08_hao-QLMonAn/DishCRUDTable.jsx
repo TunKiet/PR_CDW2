@@ -1,245 +1,276 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
-import Sidebar from "../../components/Sidebar"; 
-import "./DishTable.css"; // Đảm bảo đã import file CSS
-import axios from 'axios'; 
-import DishModal from "./DishModal"; // Đảm bảo Modal được import
+import Sidebar from "../../components/Sidebar";
+import "./DishTable.css";
+import axios from "axios";
+import DishModal from "./DishModal";
+import DetailModal from "./DetailModal"; // KHAI BÁO MỚI: Cần file này
 
 // === CẤU HÌNH API ===
-const API_URL = 'http://127.0.0.1:8000/api/dishes'; 
-const CATEGORY_API_URL = 'http://127.0.0.1:8000/api/categories'; 
+const API_URL = "http://127.0.0.1:8000/api/dishes";
+const CATEGORY_API_URL = "http://127.0.0.1:8000/api/categories";
 
 // === HÀM HỖ TRỢ VÀ MAPS ===
-
-// Trạng thái món ăn (Vẫn dùng hằng số)
 const statusMap = {
-  'active': "Còn hàng",
-  'inactive': "Hết hàng",
-  'draft': "Nháp/Ẩn",
+  active: "Còn hàng",
+  inactive: "Hết hàng",
+  draft: "Nháp/Ẩn",
 };
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('vi-VN', { 
-    style: 'currency', 
-    currency: 'VND', 
-    minimumFractionDigits: 0 
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
   }).format(amount);
 };
 
 // Hàm ánh xạ dữ liệu API sang React
 const mapApiDataToReact = (item) => ({
-    id: item.menu_item_id,       
-    categoryKey: String(item.category_id), // Lưu ID danh mục
-    name: item.menu_item_name,   
-    price: parseFloat(item.price),
-    image: item.image_url,
-    description: item.description,
-    statusKey: item.status,      
+  id: item.menu_item_id,
+  categoryKey: String(item.category_id),
+  name: item.menu_item_name,
+  price: parseFloat(item.price),
+  image: item.image_url,
+  description: item.description,
+  statusKey: item.status,
 });
 
 // Hàm ánh xạ dữ liệu React sang API (cho POST/PUT)
 const mapReactDataToApi = (dish) => ({
-    category_id: parseInt(dish.categoryKey),
-    menu_item_name: dish.name,
-    description: dish.description,
-    price: dish.price,
-    image_url: dish.image,
-    status: dish.statusKey,
+  category_id: parseInt(dish.categoryKey),
+  menu_item_name: dish.name,
+  description: dish.description,
+  price: dish.price,
+  image_url: dish.image,
+  status: dish.statusKey,
 });
 
-
 export default function DishCRUDTable() {
-    // === STATES DỮ LIỆU ===
-    const [dishes, setDishes] = useState([]);
-    const [categories, setCategories] = useState([]); // Danh sách danh mục từ API
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+  // === STATES DỮ LIỆU ===
+  const [dishes, setDishes] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    // === STATES LỌC & PHÂN TRANG ===
-    const [currentPage, setCurrentPage] = useState(1);
-    const [searchText, setSearchText] = useState("");
-    const [filterCategory, setFilterCategory] = useState(""); 
-    const [filterStatus, setFilterStatus] = useState("");  
-    const [minPrice, setMinPrice] = useState(""); // Giá tối thiểu
-    const [maxPrice, setMaxPrice] = useState(""); // Giá tối đa
-    const itemsPerPage = 10; 
+  // === STATES LỌC & PHÂN TRANG ===
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchText, setSearchText] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const itemsPerPage = 10;
 
-    // === STATES MODAL ===
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [editingDish, setEditingDish] = useState(null);
+  // === STATES MODAL ===
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingDish, setEditingDish] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false); // STATE CÓ VẤN ĐỀ
+  const [selectedDish, setSelectedDish] = useState(null);
 
+  // =========================================================
+  // 1. FETCH DỮ LIỆU
+  // =========================================================
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await axios.get(CATEGORY_API_URL);
+      setCategories(response.data.data);
+    } catch (err) {
+      console.error("Lỗi khi fetch danh mục:", err);
+    }
+  }, []);
 
-    // =========================================================
-    // 1. FETCH DỮ LIỆU
-    // =========================================================
+  const fetchDishes = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(API_URL);
+      const mappedData = response.data.data.map(mapApiDataToReact);
+      setDishes(mappedData);
+      setError(null);
+    } catch (err) {
+      console.error("Lỗi khi fetch data:", err);
+      setError(
+        "Không thể tải dữ liệu món ăn. Vui lòng kiểm tra Server Backend."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-    // A. Fetch Danh mục
-    const fetchCategories = useCallback(async () => {
-        try {
-            const response = await axios.get(CATEGORY_API_URL);
-            setCategories(response.data.data); 
-        } catch (err) {
-            console.error("Lỗi khi fetch danh mục:", err);
-        }
-    }, []);
+  useEffect(() => {
+    fetchCategories();
+    fetchDishes();
+  }, [fetchCategories, fetchDishes]);
 
-    // B. Fetch Món ăn
-    const fetchDishes = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            const response = await axios.get(API_URL);
-            const mappedData = response.data.data.map(mapApiDataToReact);
-            setDishes(mappedData);
-            setError(null);
-        } catch (err) {
-            console.error("Lỗi khi fetch data:", err);
-            setError("Không thể tải dữ liệu món ăn. Vui lòng kiểm tra Server Backend.");
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
+  // =========================================================
+  // 2. LOGIC CRUD & HỖ TRỢ
+  // =========================================================
 
-    useEffect(() => {
-        fetchCategories(); 
-        fetchDishes();     
-    }, [fetchCategories, fetchDishes]);
+  const handleSaveDish = async (dishData) => {
+    try {
+      const apiData = mapReactDataToApi(dishData);
 
-    
-    // =========================================================
-    // 2. LOGIC CRUD (Lưu & Xóa)
-    // =========================================================
+      if (dishData.id) {
+        await axios.put(`${API_URL}/${dishData.id}`, apiData);
+        alert(`✅ Cập nhật món ăn "${dishData.name}" thành công!`);
+      } else {
+        await axios.post(API_URL, apiData);
+        alert(`✅ Thêm món ăn "${dishData.name}" thành công!`);
+      }
 
-    const handleSaveDish = async (dishData) => {
-        try {
-            const apiData = mapReactDataToApi(dishData);
-            
-            if (dishData.id) {
-                await axios.put(`${API_URL}/${dishData.id}`, apiData);
-                alert(`✅ Cập nhật món ăn "${dishData.name}" thành công!`);
-            } else {
-                await axios.post(API_URL, apiData);
-                alert(`✅ Thêm món ăn "${dishData.name}" thành công!`);
-            }
-            
-            handleCloseEditModal();
-            fetchDishes();
+      handleCloseEditModal();
+      fetchDishes();
+    } catch (err) {
+      console.error(
+        "Lỗi khi lưu món ăn:",
+        err.response ? err.response.data : err.message
+      );
+      alert(`Lỗi: ${err.response?.data?.message || "Không thể lưu món ăn."}`);
+    }
+  };
 
-        } catch (err) {
-            console.error("Lỗi khi lưu món ăn:", err.response ? err.response.data : err.message);
-            alert(`Lỗi: ${err.response?.data?.message || "Không thể lưu món ăn."}`);
-        }
-    };
-    
-    const handleDeleteDish = async (id, name) => {
-        if (!window.confirm(`Bạn có chắc chắn muốn xóa món ăn "${name}" không?`)) {
-            return;
-        }
-        
-        try {
-            await axios.delete(`${API_URL}/${id}`);
-            alert(`✅ Xóa món ăn "${name}" thành công!`);
-            fetchDishes(); 
+  const handleDeleteDish = async (id, name) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa món ăn "${name}" không?`)) {
+      return;
+    }
 
-        } catch (err) {
-            console.error("Lỗi khi xóa món ăn:", err.response ? err.response.data : err.message);
-            alert(`Lỗi: ${err.response?.data?.message || "Không thể xóa món ăn."}`);
-        }
-    };
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      alert(`✅ Xóa món ăn "${name}" thành công!`);
+      fetchDishes();
+    } catch (err) {
+      console.error(
+        "Lỗi khi xóa món ăn:",
+        err.response ? err.response.data : err.message
+      );
+      alert(`Lỗi: ${err.response?.data?.message || "Không thể xóa món ăn."}`);
+    }
+  };
 
-    // Hàm lấy tên danh mục từ ID
-    const getCategoryName = useCallback((categoryId) => {
-        const category = categories.find(cat => String(cat.category_id) === String(categoryId));
-        return category ? category.category_name : 'N/A';
-    }, [categories]);
+  const getCategoryName = useCallback(
+    (categoryId) => {
+      const category = categories.find(
+        (cat) => String(cat.category_id) === String(categoryId)
+      );
+      return category ? category.category_name : "N/A";
+    },
+    [categories]
+  );
 
-    // =========================================================
-    // 3. LOGIC LỌC VÀ PHÂN TRANG
-    // =========================================================
-    
-    // Lọc và Tìm kiếm (Đã bổ sung LỌC GIÁ)
-    const filteredDishes = useMemo(() => {
-        let currentDishes = dishes;
-        const minP = minPrice ? parseFloat(minPrice) : null;
-        const maxP = maxPrice ? parseFloat(maxPrice) : null;
+  // =========================================================
+  // 3. LOGIC LỌC VÀ PHÂN TRANG
+  // =========================================================
 
-        // 1. Lọc theo Danh mục
-        if (filterCategory) {
-            currentDishes = currentDishes.filter(dish => dish.categoryKey === filterCategory);
-        }
+  // HÀM MỚI: XÓA TẤT CẢ BỘ LỌC
+  const handleClearFilters = () => {
+    setSearchText("");
+    setFilterCategory("");
+    setFilterStatus("");
+    setMinPrice("");
+    setMaxPrice("");
+    setCurrentPage(1);
+  };
 
-        // 2. Lọc theo Trạng thái
-        if (filterStatus) {
-            currentDishes = currentDishes.filter(dish => dish.statusKey === filterStatus);
-        }
-        
-        // 3. Lọc theo Khoảng Giá
-        if (minP !== null && !isNaN(minP)) {
-            currentDishes = currentDishes.filter(dish => dish.price >= minP);
-        }
-        if (maxP !== null && !isNaN(maxP)) {
-            currentDishes = currentDishes.filter(dish => dish.price <= maxP);
-        }
+  // Lọc và Tìm kiếm (Memoized)
+  const filteredDishes = useMemo(() => {
+    let currentDishes = dishes;
+    const minP = minPrice ? parseFloat(minPrice) : null;
+    const maxP = maxPrice ? parseFloat(maxPrice) : null;
 
-        // 4. Tìm kiếm theo Tên/Mô tả (Keyword)
-        if (searchText) {
-            const lowerSearchText = searchText.toLowerCase();
-            currentDishes = currentDishes.filter(
-                (dish) =>
-                    dish.name.toLowerCase().includes(lowerSearchText) ||
-                    (dish.description && dish.description.toLowerCase().includes(lowerSearchText))
-            );
-        }
+    // 1. Lọc theo Danh mục
+    if (filterCategory) {
+      currentDishes = currentDishes.filter(
+        (dish) => dish.categoryKey === filterCategory
+      );
+    }
 
-        // Reset về trang 1 sau khi lọc/tìm kiếm
-        setCurrentPage(1); 
-        return currentDishes;
-    }, [dishes, searchText, filterCategory, filterStatus, minPrice, maxPrice]);
-    
-    // Phân trang
-    const totalPages = Math.ceil(filteredDishes.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentData = filteredDishes.slice(startIndex, startIndex + itemsPerPage);
-    
-    // Tạo danh sách số trang
-    const pageNumbers = useMemo(() => {
-        const pages = [];
-        const maxPagesToShow = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
-        let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-        
-        if (endPage - startPage + 1 < maxPagesToShow) {
-            startPage = Math.max(1, endPage - maxPagesToShow + 1);
-        }
+    // 2. Lọc theo Trạng thái
+    if (filterStatus) {
+      currentDishes = currentDishes.filter(
+        (dish) => dish.statusKey === filterStatus
+      );
+    }
 
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(i);
-        }
-        return pages;
-    }, [totalPages, currentPage]);
-    
-    
-    // =========================================================
-    // 4. LOGIC MODAL
-    // =========================================================
+    // 3. Lọc theo Khoảng Giá
+    if (minP !== null && !isNaN(minP)) {
+      currentDishes = currentDishes.filter((dish) => dish.price >= minP);
+    }
+    if (maxP !== null && !isNaN(maxP)) {
+      currentDishes = currentDishes.filter((dish) => dish.price <= maxP);
+    }
 
-    const handleAddDish = () => {
-        setEditingDish(null);
-        setIsEditModalOpen(true);
-    };
+    // 4. Tìm kiếm theo Tên/Mô tả (Keyword)
+    if (searchText) {
+      const lowerSearchText = searchText.toLowerCase();
+      currentDishes = currentDishes.filter(
+        (dish) =>
+          dish.name.toLowerCase().includes(lowerSearchText) ||
+          (dish.description &&
+            dish.description.toLowerCase().includes(lowerSearchText))
+      );
+    }
 
-    const handleEditDish = (dish) => {
-        setEditingDish(dish);
-        setIsEditModalOpen(true);
-    };
-    
-    const handleCloseEditModal = () => {
-        setIsEditModalOpen(false);
-        setEditingDish(null);
-    };
+    return currentDishes;
+  }, [dishes, searchText, filterCategory, filterStatus, minPrice, maxPrice]);
 
+  // Phân trang
+  const totalPages = Math.ceil(filteredDishes.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = filteredDishes.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
-    // =========================================================
-    // 5. HIỂN THỊ (JSX)
-    // =========================================================
+  // Tạo danh sách số trang (Giữ nguyên)
+  const pageNumbers = useMemo(() => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }, [totalPages, currentPage]);
+
+  // =========================================================
+  // 4. LOGIC MODAL
+  // =========================================================
+
+  const handleAddDish = () => {
+    setEditingDish(null);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditDish = (dish) => {
+    setEditingDish(dish);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingDish(null);
+  };
+
+  // HÀM MỚI: Mở Modal Xem Chi Tiết
+  const handleViewDetail = (dish) => {
+    setSelectedDish(dish);
+    setIsDetailModalOpen(true);
+  };
+
+  // HÀM MỚI: Đóng Modal Xem Chi Tiết
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedDish(null);
+  };
+
+  // =========================================================
+  // 5. HIỂN THỊ (JSX)
+  // =========================================================
   return (
     <div className="dish-layout">
       <Sidebar />
@@ -253,80 +284,103 @@ export default function DishCRUDTable() {
           <div className="flex flex-col gap-4 mb-6">
             {/* Hàng 1: Tìm kiếm (Keyword) & Nút Thêm */}
             <div className="flex flex-wrap items-center justify-between gap-3">
-                {/* 1. Thanh tìm kiếm (Keyword) */}
-                <input
-                    type="text"
-                    placeholder="Tìm kiếm tên/mô tả (Keyword)..."
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    className="w-full sm:flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150"
-                />
-                
-                {/* Nút Thêm Món */}
-                <button
-                    onClick={handleAddDish}
-                    className="dish-button-primary dish-button-base flex items-center gap-1 min-w-[150px]"
+              {/* 1. Thanh tìm kiếm (Keyword) */}
+              <input
+                type="text"
+                placeholder="Tìm kiếm tên/mô tả (Keyword)..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="w-full sm:flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150"
+              />
+
+              {/* Nút Thêm Món */}
+              <button
+                onClick={handleAddDish}
+                className="dish-button-primary dish-button-base flex items-center gap-1 min-w-[150px]"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                    </svg>
-                    Thêm Món Ăn
-                </button>
+                  <path
+                    fillRule="evenodd"
+                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Thêm Món Ăn
+              </button>
             </div>
 
-            {/* Hàng 2: Bộ lọc Category, Status, Price */}
+            {/* Hàng 2: Bộ lọc Category, Status, Price & Nút Xóa Lọc */}
             <div className="flex flex-wrap items-center gap-3">
-                {/* 2. Lọc Danh mục */}
-                <select
-                    value={filterCategory}
-                    onChange={(e) => setFilterCategory(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[150px]"
-                >
-                    <option value="">Tất cả Danh mục</option>
-                    {categories.map((cat) => (
-                        <option key={cat.category_id} value={String(cat.category_id)}>
-                            {cat.category_name}
-                        </option>
-                    ))}
-                </select>
+              {/* 2. Lọc Danh mục */}
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[150px]"
+              >
+                <option value="">Tất cả Danh mục</option>
+                {categories.map((cat) => (
+                  <option key={cat.category_id} value={String(cat.category_id)}>
+                    {cat.category_name}
+                  </option>
+                ))}
+              </select>
 
-                {/* 3. Lọc Trạng thái */}
-                <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[150px]"
+              {/* 3. Lọc Trạng thái */}
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[150px]"
+              >
+                <option value="">Tất cả Trạng thái</option>
+                {Object.entries(statusMap).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+
+              {/* 4. Giá tối thiểu */}
+              <input
+                type="number"
+                placeholder="Giá Min"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[120px]"
+                min="0"
+              />
+
+              {/* 5. Giá tối đa */}
+              <input
+                type="number"
+                placeholder="Giá Max"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[120px]"
+                min="0"
+              />
+
+              {/* 6. Nút Xóa Lọc */}
+              {(searchText ||
+                filterCategory ||
+                filterStatus ||
+                minPrice ||
+                maxPrice) && (
+                <button
+                  onClick={handleClearFilters}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-red-50 text-red-600 transition duration-150 min-w-[100px]"
+                  title="Xóa tất cả các điều kiện lọc"
                 >
-                    <option value="">Tất cả Trạng thái</option>
-                    {Object.entries(statusMap).map(([key, value]) => (
-                        <option key={key} value={key}>
-                            {value}
-                        </option>
-                    ))}
-                </select>
-                
-                {/* 4. Giá tối thiểu */}
-                <input
-                    type="number"
-                    placeholder="Giá Min"
-                    value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[120px]"
-                    min="0"
-                />
-                
-                {/* 5. Giá tối đa */}
-                <input
-                    type="number"
-                    placeholder="Giá Max"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[120px]"
-                    min="0"
-                />
+                  Xóa Lọc
+                </button>
+              )}
             </div>
           </div>
           {/* HẾT Thanh công cụ tìm kiếm và lọc */}
-
 
           {/* Hiển thị lỗi hoặc Loading */}
           {isLoading && (
@@ -396,7 +450,6 @@ export default function DishCRUDTable() {
                             </div>
                           </div>
                         </td>
-                        {/* CỘT DANH MỤC: DÙNG HÀM LẤY TÊN TỪ ID */}
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                           {getCategoryName(dish.categoryKey)}
                         </td>
@@ -418,21 +471,72 @@ export default function DishCRUDTable() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center space-x-2">
+                          {/* Nút Xem Chi Tiết */}
+                          <button
+                            onClick={() => handleViewDetail(dish)}
+                            className="text-gray-500 hover:text-gray-700"
+                            title="Xem chi tiết"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 inline-block"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                              />
+                            </svg>
+                          </button>
+
                           {/* Nút Chỉnh sửa */}
                           <button
                             onClick={() => handleEditDish(dish)}
                             className="text-indigo-600 hover:text-indigo-900"
                             title="Chỉnh sửa"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fillRule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clipRule="evenodd" /></svg>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 inline-block"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                              <path
+                                fillRule="evenodd"
+                                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
                           </button>
+
                           {/* Nút Xóa */}
                           <button
                             onClick={() => handleDeleteDish(dish.id, dish.name)}
                             className="text-red-600 hover:text-red-900"
                             title="Xóa"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 inline-block"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
                           </button>
                         </td>
                       </tr>
@@ -492,14 +596,21 @@ export default function DishCRUDTable() {
             </div>
           </div>
 
+          {/* Modal Xem Chi Tiết */}
+          <DetailModal
+            isVisible={isDetailModalOpen}
+            onClose={handleCloseDetailModal}
+            dish={selectedDish}
+            categories={categories}
+          />
+
           {/* Modal Thêm/Sửa */}
           <DishModal
             isVisible={isEditModalOpen}
             onClose={handleCloseEditModal}
             onSave={handleSaveDish}
             dish={editingDish}
-            // TRUYỀN DANH MỤC ĐỘNG VÀO MODAL
-            categories={categories} 
+            categories={categories}
           />
         </div>
       </main>
