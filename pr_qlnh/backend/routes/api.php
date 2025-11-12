@@ -17,6 +17,11 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ForgotPasswordController;
 // Payment
 use App\Http\Controllers\Api\PaymentController;
+//Customer
+// use App\Http\Controllers\Api\CustomerController;
+
+// Route::apiResource('customers', CustomerController::class);
+
 
 // 🔹 Thêm controller mới cho Order
 use App\Http\Controllers\Api\OrderController;

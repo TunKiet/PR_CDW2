@@ -37,7 +37,7 @@ const OrderManagementPage = () => {
                   minute: "2-digit",
                 })
               : "--:--",
-            notes: "",
+            notes: o.note || o.notes || "",
             statusColor:
               o.status === "Đã hủy"
                 ? "bg-red-100 text-red-700"
@@ -48,12 +48,13 @@ const OrderManagementPage = () => {
                 : "bg-green-100 text-green-700",
 
             customer: o.customer
-              ? {
-                  name: o.customer.customer_name,
-                  phone: o.customer.phone,
-                  points: o.customer.points,
-                }
-              : null,
+                ? {
+                    name: o.customer.name,
+                    phone: o.customer.phone,
+                    points: o.customer.points,
+                  }
+                : null,
+
 
             // ✅ Bắt lỗi .map() bằng fallback mảng rỗng
             items: (o.orderDetails ?? o.order_details ?? []).map((d) => ({
