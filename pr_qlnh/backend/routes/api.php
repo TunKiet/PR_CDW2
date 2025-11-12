@@ -29,6 +29,18 @@ use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\TableController;
 use App\Http\Controllers\CustomerController;
 
+Route::get('/customers', [CustomerController::class, 'index']);
+
+Route::prefix('customers')->group(function () {
+    Route::get('/', [CustomerController::class, 'index']);
+    Route::post('/', [CustomerController::class, 'store']);
+    Route::put('/{id}', [CustomerController::class, 'update']);
+    Route::delete('/{id}', [CustomerController::class, 'destroy']);
+    Route::get('/search', [CustomerController::class, 'search']);
+});
+
+
+
 
 Route::get('/menu-items', [MenuItemController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
@@ -149,8 +161,10 @@ Route::prefix('orders')->group(function () {
 
 //Menu
 Route::get('/menu', [OrderController::class, 'menu']); // lấy menu
-Route::get('/customers', [OrderController::class, 'customers']); // lấy danh sách KH
-Route::get('/customers/search', [CustomerController::class, 'search']);
+
+ //12/11/2025
+// Route::get('/customers', [OrderController::class, 'customers']); // lấy danh sách KH
+// Route::get('/customers/search', [CustomerController::class, 'search']);   
 
 // Payments
 // Route::get('/payments', [PaymentController::class, 'index']);
