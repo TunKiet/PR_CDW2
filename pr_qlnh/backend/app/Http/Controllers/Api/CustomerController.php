@@ -3,28 +3,72 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
 use Illuminate\Http\Request;
+use App\Models\Customer;
 
 class CustomerController extends Controller
 {
-    public function index() {
-        return Customer::all();
+    /**
+     * 📋 Lấy danh sách tất cả khách hàng
+     */
+    public function index()
+    {
+        return response()->json(Customer::orderBy('customer_id', 'desc')->get());
     }
 
-    public function store(Request $request) {
-        return Customer::create($request->all());
+    /**
+     * ➕ Thêm khách hàng mới
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:120',
+            'phone' => 'nullable|string|max:30|unique:customers,phone',
+            'points' => 'nullable|integer|min:0',
+        ]);
+
+        $customer = Customer::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Thêm khách hàng thành công',
+            'data' => $customer,
+        ], 201);
     }
 
-    public function update(Request $request, $id) {
+    /**
+     * ✏️ Cập nhật thông tin khách hàng
+     */
+    public function update(Request $request, $id)
+    {
         $customer = Customer::findOrFail($id);
-        $customer->update($request->all());
-        return $customer;
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:120',
+            'phone' => 'nullable|string|max:30|unique:customers,phone,' . $id . ',customer_id',
+            'points' => 'nullable|integer|min:0',
+        ]);
+
+        $customer->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật thông tin khách hàng thành công',
+            'data' => $customer,
+        ]);
     }
 
-    public function destroy($id) {
+    /**
+     * ❌ Xóa khách hàng
+     */
+    public function destroy($id)
+    {
         $customer = Customer::findOrFail($id);
         $customer->delete();
-        return response()->noContent();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Khách hàng đã được xóa thành công',
+        ]);
     }
 }
