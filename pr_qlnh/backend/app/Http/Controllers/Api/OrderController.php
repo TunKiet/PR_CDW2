@@ -22,6 +22,7 @@ class OrderController extends Controller
             'items' => 'required|array|min:1',
             'items.*.menu_item_id' => 'required|exists:menu_items,menu_item_id',
             'items.*.quantity' => 'required|integer|min:1',
+            'note' => 'nullable|string|max:255', // 🆕 Thêm validate ghi chú
         ]);
 
         try {
@@ -30,6 +31,7 @@ class OrderController extends Controller
             $order = Order::create([
                 'customer_id' => $request->customer_id,
                 'total_price' => 0,
+                'note' => $request->note, // 🆕 Lưu ghi chú
             ]);
 
             $total = 0;
@@ -57,7 +59,6 @@ class OrderController extends Controller
                 'success' => true,
                 'message' => 'Đơn hàng được tạo thành công',
                 'data' => $order->load(['customer', 'orderDetails.menuItem', 'payments'])
-
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();

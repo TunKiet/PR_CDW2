@@ -8,6 +8,7 @@ const OrderSummary = ({ cartItems, table, onRemoveItem }) => {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customer, setCustomer] = useState(null);
   const [searchMessage, setSearchMessage] = useState("");
+  const [note, setNote] = useState(""); // 🆕 Ghi chú
   const navigate = useNavigate();
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -34,6 +35,7 @@ const OrderSummary = ({ cartItems, table, onRemoveItem }) => {
     }
   };
 
+  // ✅ Khi thanh toán xong
   const handlePaymentComplete = (order) => {
     localStorage.setItem("lastOrder", JSON.stringify(order));
     navigate("/order-management");
@@ -89,7 +91,9 @@ const OrderSummary = ({ cartItems, table, onRemoveItem }) => {
         {/* Danh sách món */}
         <div className="mb-4">
           {cartItems.length === 0 ? (
-            <p className="text-gray-400 italic text-sm">Chưa có món nào trong đơn hàng.</p>
+            <p className="text-gray-400 italic text-sm">
+              Chưa có món nào trong đơn hàng.
+            </p>
           ) : (
             cartItems.map((item) => (
               <div
@@ -125,9 +129,27 @@ const OrderSummary = ({ cartItems, table, onRemoveItem }) => {
           </div>
         </div>
 
+        {/* 📝 Ô ghi chú */}
+        <div className="mt-3">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Ghi chú:
+          </label>
+          <textarea
+            placeholder="Ví dụ: không cay, không hành..."
+            className="w-full border rounded-lg p-2 text-sm focus:ring-1 focus:ring-indigo-500 resize-none"
+            rows={3}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+        </div>
+
         {/* Nút thanh toán */}
         <button
-          className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-medium"
+          className={`mt-4 ${
+            cartItems.length === 0
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700 text-white"
+          } py-2 rounded-lg font-medium`}
           onClick={() => setOpenPayment(true)}
           disabled={cartItems.length === 0}
         >
@@ -140,8 +162,10 @@ const OrderSummary = ({ cartItems, table, onRemoveItem }) => {
         isOpen={openPayment}
         onClose={() => setOpenPayment(false)}
         orderItems={cartItems}
+        
         onCompletePayment={handlePaymentComplete}
         customer={customer}
+        note={note} // 🆕 Truyền ghi chú sang PaymentModal
       />
     </>
   );
