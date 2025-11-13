@@ -25,6 +25,7 @@ Route::get('/menu-items', [MenuItemController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\CategoryIngredientController;
+use App\Http\Controllers\PurchaseOrderController;
 use App\Models\Ingredient;
 
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
@@ -62,6 +63,8 @@ Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAll
 Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
 Route::get('/export', [IngredientController::class, 'exportPDF']);
 Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
+Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
+Route::get('/ingredients/used', [IngredientController::class, 'getUsedIngredients']);
 
 
 /*

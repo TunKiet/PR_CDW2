@@ -89,4 +89,22 @@ class IngredientController extends Controller
         $dataExport = Ingredient::exportIngredient();
         return response()->json($dataExport);
     }
+
+    public function getUsedIngredients()
+    {
+        try {
+            $ingredientExport = Ingredient::getIngredientExports();
+
+            return response()->json([
+                'data' => $ingredientExport
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Ingredient Usage Error: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Server error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

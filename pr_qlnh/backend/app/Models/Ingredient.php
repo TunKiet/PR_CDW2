@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Ingredient extends Model
 {
@@ -118,5 +119,28 @@ class Ingredient extends Model
         }
 
         return $query->orderBy('ingredient_id', 'desc')->paginate($perPage);
+    }
+
+    public static function getIngredientExports()
+    {
+        return DB::table('order_details')
+            ->join('orders', 'order_details.order_id', '=', 'orders.order_id')
+            ->join('cooking_recipes', 'order_details.menu_item_id', '=', 'cooking_recipes.menu_item_id')
+            ->join('ingredients', 'cooking_recipes.ingredient_id', '=', 'ingredients.ingredient_id')
+            ->where('orders.payment_status', 'paid')
+            ->select(
+        'ingredients.ingredient_id',
+                'ingredients.ingredient_name',
+                'ingredients.unit',
+                'ingredients.stock_quantity',
+                DB::raw('YEAR(orders.created_at) AS year'),
+                DB::raw('MONTH(orders.created_at) AS month'),
+                DB::raw('SUM(order_details.quantity * cooking_recipes.quantity_needed) as total_used')
+            )
+            ->groupBy('ingredients.ingredient_id', 'ingredients.ingredient_name', 'ingredients.unit', 'ingredients.stock_quantity', 'year', 'month')
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->orderBy('ingredients.ingredient_name', 'asc')
+            ->get();
     }
 }

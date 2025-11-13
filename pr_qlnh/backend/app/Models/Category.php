@@ -29,6 +29,6 @@ class Category extends Model
     {
         // 1. Sửa tên Class: Menu_Item::class (hoặc MenuItem::class)
         // 2. Sửa Khóa cục bộ: Dùng 'category_id' thay vì 'id'
-        return $this->hasMany(menuItems::class, 'category_id', 'category_id'); 
+        return $this->hasMany(MenuItem::class, 'category_id', 'category_id'); 
     }
 }
