@@ -7,10 +7,12 @@ export const getCustomers = async () => {
   return res.data;
 };
 
-export const searchCustomers = async (query) => {
-  const res = await axios.get(`${API_BASE_URL}/search`, { params: { q: query } });
+export const searchCustomers = async (phone) => {
+  const res = await axios.get(`${API_BASE_URL}/search`, { params: { phone } });
   return res.data;
 };
+
+
 
 export const addCustomer = async (customerData) => {
   const res = await axios.post(API_BASE_URL, customerData);
@@ -27,21 +29,31 @@ export const deleteCustomer = async (id) => {
   return res.data;
 };
 // src/data/customerData.js
-export const formatCurrency = (amount) => {
-  if (!amount) return '0 ₫';
-  return amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+export const formatCurrency = (value) => {
+  const number = Math.floor(Number(value) || 0);
+  return number.toLocaleString("vi-VN") + "đ";
 };
 
+
+// 🧮 Hàm xác định hạng thành viên dựa trên điểm
+export const getRankName = (points) => {
+  if (points >= 15000) return "Kim Cương";
+  if (points >= 5000) return "Vàng";
+  if (points >= 1500) return "Bạc";
+  return "Đồng";
+};
+
+
+// 🎨 Màu hiển thị tương ứng với hạng
 export const getRankColor = (rank) => {
   switch (rank) {
-    case 'Kim Cương':
-      return 'bg-blue-500 text-white';
-    case 'Vàng':
-      return 'bg-yellow-400 text-gray-800';
-    case 'Bạc':
-      return 'bg-gray-300 text-gray-800';
-    case 'Đồng':
+    case "Kim Cương":
+      return "bg-gradient-to-r from-cyan-400 to-blue-600 text-white";
+    case "Vàng":
+      return "bg-yellow-400 text-white";
+    case "Bạc":
+      return "bg-gray-300 text-gray-800";
     default:
-      return 'bg-orange-300 text-gray-800';
+      return "bg-orange-300 text-white";
   }
 };

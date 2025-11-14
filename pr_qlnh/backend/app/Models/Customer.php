@@ -26,6 +26,7 @@ class Customer extends Model
         'name',
         'phone',
         'points',
+        'total_spent',
     ];
 
     public $timestamps = false;
@@ -45,4 +46,9 @@ class Customer extends Model
     {
         return $this->hasMany(Point::class, 'customer_id', 'customer_id');
     }
+    public function getTotalSpentAttribute()
+{
+    return $this->orders()->sum('total_price');
+}
+
 }
