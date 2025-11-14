@@ -13,12 +13,16 @@ return new class extends Migration
             $table->string('phone', 30)->nullable()->unique();
             $table->string('name', 120)->nullable();
             $table->integer('points')->default(0);
+             $table->decimal('total_spent', 15, 2)->default(0);
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('customers');
+        Schema::table('customers', function (Blueprint $table) {
+        $table->dropColumn('total_spent');
+    });
+        
     }
 };

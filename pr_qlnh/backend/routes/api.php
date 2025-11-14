@@ -29,7 +29,6 @@ use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\TableController;
 use App\Http\Controllers\CustomerController;
 
-Route::get('/customers', [CustomerController::class, 'index']);
 
 Route::prefix('customers')->group(function () {
     Route::get('/', [CustomerController::class, 'index']);
