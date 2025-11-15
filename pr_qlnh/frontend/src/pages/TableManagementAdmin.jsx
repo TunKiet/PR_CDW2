@@ -2,33 +2,37 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import TableList from "../components/Table/TableList";
 import TableModal from "../components/Table/TableModal";
-import DeleteModal from "../components/Table/DeleteModal";
 import axiosClient from "../api/axiosClient";
+import { notify, confirmAction } from "../utils/notify";
 
 export default function TableManagementAdmin() {
   const [tables, setTables] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [totalTables, setTotalTables] = useState(0);
-
   const [loading, setLoading] = useState(true);
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [editingTable, setEditingTable] = useState(null);
-  const [deleteInfo, setDeleteInfo] = useState({ open: false, table: null });
 
   const fetchTables = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await axiosClient.get(`/tables?page=${page}`);
-      
-      setTables(response.data.data);
-      setCurrentPage(response.data.current_page);
-      setLastPage(response.data.last_page);
-      setTotalTables(response.data.total_tables);
+      const res = await axiosClient.get(`/tables?page=${page}`);
 
-      setLoading(false);
-    } catch (error) {
-      console.error("fetchTables error", error);
+      if (res.data?.success === false) {
+        notify.error(res.data.error || "Lỗi khi tải danh sách!");
+        setLoading(false);
+        return;
+      }
+
+      setTables(res.data.data);
+      setCurrentPage(res.data.current_page);
+      setLastPage(res.data.last_page);
+      setTotalTables(res.data.total_tables);
+    } catch (err) {
+      notify.error("Lỗi kết nối tới server");
+    } finally {
       setLoading(false);
     }
   };
@@ -48,19 +52,30 @@ export default function TableManagementAdmin() {
   };
 
   const handleSaved = () => {
+    notify.success("Lưu thành công");
     fetchTables(currentPage);
   };
 
-  const handleDelete = (table) => {
-    setDeleteInfo({ open: true, table });
-  };
+  const handleDelete = async (table) => {
+    const ok = await confirmAction("Xác nhận xóa", `Bạn có muốn xóa bàn ${table.table_name}?`);
+    if (!ok) return;
 
-  const handleDeleted = (deletedTable) => {
-    setTables((prev) => prev.filter((t) => t.table_id !== deletedTable.table_id));
-  };
+    try {
+      const res = await axiosClient.delete(`/tables/${table.table_id}`);
 
-  const handleCloseDelete = () =>
-    setDeleteInfo({ open: false, table: null });
+      if (res.data?.success === false) {
+        notify.error(res.data.error || "Không thể xóa");
+        return;
+      }
+
+      notify.success("Xóa thành công");
+      // nếu page rỗng sau xóa, chuyển về trang trước nếu có
+      // refresh current page
+      fetchTables(currentPage);
+    } catch (err) {
+      notify.error(err?.response?.data?.error || "Lỗi khi xóa");
+    }
+  };
 
   return (
     <div className="min-h-screen flex bg-gray-50">
@@ -74,68 +89,28 @@ export default function TableManagementAdmin() {
             Tổng số bàn: <strong>{totalTables}</strong>
           </span>
 
-          <button
-            onClick={openCreate}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
+          <button onClick={openCreate} className="px-4 py-2 bg-green-600 text-white rounded-lg">
             Thêm bàn mới
           </button>
         </div>
 
         {loading ? (
-          <div className="text-center py-6">Đang tải dữ liệu...</div>
+          <div className="text-center py-6">Đang tải...</div>
         ) : (
-          <TableList
-            tables={tables}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <TableList tables={tables} onEdit={handleEdit} onDelete={handleDelete} />
         )}
 
-        {/* Pagination */}
-        <div className="flex justify-center items-center gap-3 mt-8">
-          <button
-            disabled={currentPage === 1}
-            onClick={() => fetchTables(currentPage - 1)}
-            className={`px-4 py-2 rounded-lg border ${
-              currentPage === 1
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-white hover:bg-gray-100"
-            }`}
-          >
+        <div className="flex justify-center items-center gap-3 mt-6">
+          <button disabled={currentPage === 1} onClick={() => fetchTables(currentPage - 1)} className="px-4 py-2 rounded border">
             Trang trước
           </button>
-
-          <span className="text-gray-700">
-            Trang {currentPage} / {lastPage}
-          </span>
-
-          <button
-            disabled={currentPage === lastPage}
-            onClick={() => fetchTables(currentPage + 1)}
-            className={`px-4 py-2 rounded-lg border ${
-              currentPage === lastPage
-                ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                : "bg-white hover:bg-gray-100"
-            }`}
-          >
+          <span>Trang {currentPage} / {lastPage}</span>
+          <button disabled={currentPage === lastPage} onClick={() => fetchTables(currentPage + 1)} className="px-4 py-2 rounded border">
             Trang sau
           </button>
         </div>
 
-        <TableModal
-          isOpen={isModalOpen}
-          onClose={() => setModalOpen(false)}
-          editingTable={editingTable}
-          onSaved={handleSaved}
-        />
-
-        <DeleteModal
-          isOpen={deleteInfo.open}
-          onClose={handleCloseDelete}
-          table={deleteInfo.table}
-          onDeleted={handleDeleted}
-        />
+        <TableModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} editingTable={editingTable} onSaved={handleSaved} />
       </main>
     </div>
   );
