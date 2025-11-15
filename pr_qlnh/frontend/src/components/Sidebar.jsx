@@ -19,8 +19,8 @@ const menuItems = [
         { title: "Quản lý tình trạng món ăn", path: '/dish-status-management' },
       ] 
     },
-    { title: "Quản lý giỏ hàng", icon: <ShoppingCart size={20} />, path: 'cart-management' },
-    { title: "Mặt hàng", icon: <Zap size={20} />, path: '/products' },
+    { title: "Quản lý giỏ hàng", icon: <ShoppingCart size={20} />, path: '/cart-management' },
+    { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
     { title: "Nhân viên", icon: <User size={20} />, path: '/staff' },
     { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },
     { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },

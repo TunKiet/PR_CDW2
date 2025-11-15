@@ -12,9 +12,12 @@ class IngredientController extends Controller
      * Summary of getAllIngredient
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getAllIngredient()
+    public function getAllIngredient(Request $request)
     {
-        $ingredients = Ingredient::allIngedient();
+        $perPage = $request->get('per_page', 10);
+        $categoryId = $request->query('category_ingredient_id', null);
+
+        $ingredients = Ingredient::getIngredients($categoryId, $perPage);
 
         return response()->json($ingredients);
     }
@@ -78,6 +81,20 @@ class IngredientController extends Controller
             'success' => true,
             'message' => $result['message'],
             'data' => $result['data']
+        ]);
+    }
+
+    public function exportPDF()
+    {
+        $dataExport = Ingredient::exportIngredient();
+        return response()->json($dataExport);
+    }
+
+    public function alertIngredient()
+    {
+        $alerts = Ingredient::getIngredientAlert();
+        return response()->json([
+            'data' => $alerts
         ]);
     }
 }

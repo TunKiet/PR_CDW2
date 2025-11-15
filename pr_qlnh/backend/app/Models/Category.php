@@ -4,19 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-// Bổ sung: Import Model MenuItem (Giả định bạn có Model này)
-use App\Models\MenuItem; 
 
 class Category extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'category_id';
-    
-    // Khóa chính là tự động tăng (mặc định là true)
-    public $incrementing = true; 
-    
     protected $table = 'categories';
+    protected $primaryKey = 'category_id';
 
     // Cho phép gán hàng loạt (Mass Assignment) cho các trường này
     protected $fillable = [
