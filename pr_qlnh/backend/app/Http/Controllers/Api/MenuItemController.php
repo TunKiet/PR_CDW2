@@ -13,4 +13,15 @@ class MenuItemController extends Controller
         $menuItems = MenuItem::with('category')->get();
         return response()->json($menuItems);
     }
+    public function show($id)
+    {
+    $item = MenuItem::find($id);
+
+    if (!$item) {
+        return response()->json(['message' => 'Menu item not found'], 404);
+    }
+
+    return response()->json($item);
+}
+
 }

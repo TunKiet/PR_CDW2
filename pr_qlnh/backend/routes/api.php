@@ -183,3 +183,5 @@ Route::post('/promotions/validate', [PromotionController::class, 'validateCode']
 
 
 Route::get('/tables', [TableController::class, 'index']);
+
+Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);

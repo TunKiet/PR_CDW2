@@ -149,7 +149,7 @@ const OrderManagementPage = () => {
       <Sidebar />
 
       <div className="flex-1 ml-64 p-6">
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-800">
             Quản Lý Đơn Hàng
           </h1>
