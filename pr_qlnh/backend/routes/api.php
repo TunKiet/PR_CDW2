@@ -15,10 +15,29 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ForgotPasswordController;
+// Payment
+use App\Http\Controllers\Api\PaymentController;
+//Customer
+// use App\Http\Controllers\Api\CustomerController;
+
+// Route::apiResource('customers', CustomerController::class);
+
 
 // 🔹 Thêm controller mới cho Order
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\MenuItemController;
+use App\Http\Controllers\Api\TableController;
+use App\Http\Controllers\CustomerController;
+
+Route::prefix('customers')->group(function () {
+    Route::get('/', [CustomerController::class, 'index']);
+    Route::post('/', [CustomerController::class, 'store']);
+    Route::put('/{id}', [CustomerController::class, 'update']);
+    Route::delete('/{id}', [CustomerController::class, 'destroy']);
+    Route::get('/search', [CustomerController::class, 'search']);
+});
+
+
 
 
 Route::get('/menu-items', [MenuItemController::class, 'index']);
@@ -120,3 +139,47 @@ Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']
 Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
 
 
+// Orders
+// Route::get('/orders', [OrderController::class, 'index']);
+// Route::get('/orders/{id}', [OrderController::class, 'show']);
+// Route::post('/orders', [OrderController::class, 'store']);
+// Route::put('/orders/{id}', [OrderController::class, 'update']);
+// Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
+
+
+Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
+Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
+
+Route::prefix('orders')->group(function () {
+    Route::get('/', [OrderController::class, 'index']);
+    Route::get('/{id}', [OrderController::class, 'show']);
+    Route::post('/', [OrderController::class, 'store']);
+    Route::delete('/{id}', [OrderController::class, 'destroy']);
+});
+
+//Menu
+Route::get('/menu', [OrderController::class, 'menu']); // lấy menu
+
+ //12/11/2025
+// Route::get('/customers', [OrderController::class, 'customers']); // lấy danh sách KH
+// Route::get('/customers/search', [CustomerController::class, 'search']);   
+
+// Payments
+// Route::get('/payments', [PaymentController::class, 'index']);
+// Route::get('/payments/{id}', [PaymentController::class, 'show']);
+// Route::post('/payments', [PaymentController::class, 'store']);
+Route::prefix('payments')->group(function () {
+    Route::get('/', [PaymentController::class, 'index']);
+    Route::get('/{id}', [PaymentController::class, 'show']);
+    Route::post('/', [PaymentController::class, 'store']);
+});
+// Promotions
+Route::get('/promotions', [PromotionController::class, 'index']);
+Route::get('/promotions/{id}', [PromotionController::class, 'show']);
+Route::post('/promotions', [PromotionController::class, 'store']);
+Route::put('/promotions/{id}', [PromotionController::class, 'update']);
+Route::delete('/promotions/{id}', [PromotionController::class, 'destroy']);
+Route::post('/promotions/validate', [PromotionController::class, 'validateCode']);
+
+
+Route::get('/tables', [TableController::class, 'index']);
