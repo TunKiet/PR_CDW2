@@ -5,7 +5,7 @@ import React from 'react';
 // Cần draftjs-to-html để chuyển JSON thành HTML
 import draftToHtml from 'draftjs-to-html';
 // Cần convertFromRaw để chuyển đổi RawContentState JSON thành ContentState
-import { convertFromRaw } from 'draft-js'; 
+// import { convertFromRaw } from 'draft-js'; 
 
 // ========================
 
@@ -50,7 +50,7 @@ export default function DetailModal({ isVisible, onClose, dish, categories }) {
             // Kiểm tra xem có đúng định dạng Draft.js RawContentState không
             if (rawContentState.blocks && Array.isArray(rawContentState.blocks)) {
                 // 2. Chuyển RawContentState object thành ContentState
-                const contentState = convertFromRaw(rawContentState); 
+                // const contentState = convertFromRaw(rawContentState); 
                 // 3. Chuyển ContentState thành HTML để hiển thị
                 htmlDescription = draftToHtml(rawContentState);
                 // console.log("HTML được tạo ra:", htmlDescription);

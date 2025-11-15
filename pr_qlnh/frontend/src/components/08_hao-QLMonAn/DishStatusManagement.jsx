@@ -45,7 +45,7 @@ export default function DishStatusManagement() {
     return result;
   }, [dishes, filters]);
 
-  const totalPages = Math.ceil(filteredDishes.length / itemsPerPage);
+  // const totalPages = Math.ceil(filteredDishes.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = filteredDishes.slice(startIndex, startIndex + itemsPerPage);
 
