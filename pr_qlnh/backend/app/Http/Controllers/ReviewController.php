@@ -14,7 +14,7 @@ class ReviewController extends Controller
             'menu_item_id' => 'required|exists:menu_items,menu_item_id',
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'nullable|string',
-            'image_url' => 'nullable|image|max:2048',
+            'image_url' => 'nullable|string',
         ]);
 
         $path = null;
@@ -28,7 +28,7 @@ class ReviewController extends Controller
             'menu_item_id' => 1,
             'rating' => $validated['rating'],
             'comment' => $validated['comment'] ?? null,
-            'image_url' => $path,
+            'image_url' => $validated['image_url'] ?? null,
         ]);
 
         $reviewWithUser = Review::with('user:user_id,username')->find($review->review_id);

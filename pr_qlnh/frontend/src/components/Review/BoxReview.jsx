@@ -3,6 +3,7 @@ import { BsChatRightText } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 import { AiOutlineLike } from "react-icons/ai";
 import { AiOutlineDislike } from "react-icons/ai";
+import Dialog from '@mui/material/Dialog';
 import Tooltip from '@mui/material/Tooltip';
 import { MdAccessTime } from "react-icons/md";
 import Feedback from './Feedback';
@@ -34,6 +35,8 @@ const BoxReview = () => {
 
     // 👉 ID của review đang mở phản hồi
     const [activeFeedbackId, setActiveFeedbackId] = useState(null);
+
+    // const [openImgae, setOpenImage] = useState(true);
 
     // 👉 Toggle mở/đóng phản hồi của 1 review
     const handleToggleFeedback = (reviewId) => {
@@ -76,11 +79,11 @@ const BoxReview = () => {
                 reviews.map((review) => {
                     const isOpenFeedback = activeFeedbackId === review.review_id;
                     return (
-                        <div>
-                            <div key={review.review_id} className="boxReview-comment flex mb-1 p-1">
+                        <div key={review.review_id}>
+                            <div className="boxReview-comment flex mb-1 p-1">
                                 <div className="boxReview-comment-titel w-[200px] flex items-start mb-2">
                                     <div className="flex">
-                                        <p className='w-[40px] h-[40px] flex items-center justify-center text-white text-2xl font-bold bg-blue-700 rounded-full m-0'>A</p>
+                                        <p className='w-10 h-10 flex items-center justify-center text-white text-2xl font-bold bg-blue-700 rounded-full m-0'>A</p>
                                     </div>
                                     <div className="block-infor flex ms-2 mt-1">
                                         <div className="block-infor-name">
@@ -107,11 +110,16 @@ const BoxReview = () => {
                                         review.image_url && (
                                             <div className="comment-item-view-image my-3">
                                                 <div className="view-image-item w-[200px] h-[100px]">
-                                                    <img src={`http://localhost:8000/storage/${review.image_url}`} alt="" />
+                                                    <img src={review.image_url} alt="" />
                                                 </div>
                                             </div>
                                         )
                                     }
+                                    {/* <Dialog open={open} onClose={() => setOpenImage(false)} maxWidth="lg">
+                                        <div className="p-2">
+                                            <img src={review.image_url} alt="Review Large" className="w-full h-auto max-h-[80vh] object-contain" />
+                                        </div>
+                                    </Dialog> */}
 
                                     <div className="comment-control flex items-center">
                                         <div className="comment-control-like flex items-center me-2 cursor-pointer">

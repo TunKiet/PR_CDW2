@@ -14,7 +14,7 @@ const RatingInfo = () => {
 
     //get average, count, breakdown review
     const [ratingData, setRatingData] = useState(null);
-    
+
     //get information review
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
@@ -45,36 +45,57 @@ const RatingInfo = () => {
 
     //Handle button submit
     const handleSubmit = async () => {
+
         if (!rating) return alert('Vui long chon sao!');
         setLoading(true);
 
-        const formData = new FormData();
-        formData.append("menu_item_id", menuItemId);
-        formData.append("rating", rating);
-        formData.append("comment", comment);
-
-        if (image) {
-            formData.append("image_url", image);
-        }
-
-        for (let pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        }
-
         try {
+            let imageUrl = null;
+
+            if (image) {
+                const cloudFormData = new FormData();
+                cloudFormData.append("file", image);
+                cloudFormData.append("upload_preset", "image_review");
+
+                const cloudRes = await fetch(
+                    "https://api.cloudinary.com/v1_1/dpq6tyosc/image/upload",
+                    { method: "POST", body: cloudFormData }
+                );
+
+                const cloudData = await cloudRes.json();
+                imageUrl = cloudData.secure_url;
+
+                console.log(imageUrl);
+            }
+
+            const formData = new FormData();
+            formData.append("menu_item_id", menuItemId);
+            formData.append("rating", rating);
+            formData.append("comment", comment);
+            if (imageUrl) formData.append("image_url", imageUrl);
+
             const res = await axios.post("http://localhost:8000/api/reviews", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
+
             alert(res.data.message);
             handleClose();
+
+            setRatingData((prev) => {
+                const newCount = prev.count + 1;
+                const newAverage = ((prev.average * prev.count + rating) / newCount).toFixed(1);
+                const newBreakdown = { ...prev.breakdown };
+                newBreakdown[rating] = (newBreakdown[rating] ?? 0) + 1;
+                return { ...prev, count: newCount, average: parseFloat(newAverage), breakdown: newBreakdown };
+            });
+
         } catch (error) {
             console.log(error);
-            alert("Gui danh gia that bai");
-        }
-        finally {
+            alert("Gửi đánh giá thất bại");
+        } finally {
             setLoading(false);
         }
     }
