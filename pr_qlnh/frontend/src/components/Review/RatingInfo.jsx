@@ -7,6 +7,9 @@ import { IoClose } from "react-icons/io5";
 import { FaStar } from "react-icons/fa";
 import Button from '@mui/material/Button';
 import axios from "axios";
+
+const endPoint = 'http://127.0.0.1:8000/api';
+
 const RatingInfo = () => {
     const menuItemId = 1;
 
@@ -62,7 +65,7 @@ const RatingInfo = () => {
         }
 
         try {
-            const res = await axios.post("http://localhost:8000/api/reviews", formData, {
+            const res = await axios.post(`${endPoint}/api/reviews`, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -84,7 +87,7 @@ const RatingInfo = () => {
         if (!menuItemId) return; // tránh fetch khi chưa có id
         const fetchRating = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/menu/${menuItemId}/ratings`);
+                const res = await axios.get(`${endPoint}/menu/${menuItemId}/ratings`);
                 setRatingData(res.data.data);
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu đánh giá:", error);
@@ -97,7 +100,7 @@ const RatingInfo = () => {
     const breakdown = ratingData?.breakdown || {};
     return (
         <>
-            <div className="boxReview w-full h-[200px] bg-white p-3 flex rounded-[8px]">
+            <div className="boxReview w-full h-[200px] bg-white p-3 flex rounded-lg">
                 <div className="boxReview-overview w-[250px]">
                     <div className="boxReview-score">
                         <div className="rating text-4xl"><span className="average-rating text-6xl">{ratingData?.average ?? 0}</span>/5</div>
@@ -108,7 +111,7 @@ const RatingInfo = () => {
                         <Button variant="contained" color='error' onClick={handleClickOpen}>Viết đánh giá</Button>
                         <Dialog open={openFormReview} onClose={handleClose}>
                             <div className="container p-3 m-3 max-w-xl w-full mx-auto">
-                                <div className="absolute top-1 right-1 !p-3 !rounded-full !me-auto hover:bg-gray-300 !w-[40px] cursor-pointer" onClick={handleClose}><IoClose /></div>
+                                <div className="absolute top-1 right-1 p-3! rounded-full! me-auto! hover:bg-gray-300 w-10! cursor-pointer" onClick={handleClose}><IoClose /></div>
                                 <h2 className='text-5xl font-bold pt-3'>Đánh giá về chúng tôi</h2>
                                 <div className="formReview-info flex items-center">
                                     <div className="formReview-info-avatar">
@@ -140,7 +143,7 @@ const RatingInfo = () => {
                                     </div>
                                     <div className="formReview-comment-content">
                                         <textarea
-                                            className='w-[500px] h-[200px] border border-[#333] focus:ring-0 focus:outline-none !resize-none p-2'
+                                            className='w-[500px] h-[200px] border border-[#333] focus:ring-0 focus:outline-none resize-none! p-2'
                                             placeholder='Nhập đánh giá của bạn về chúng tôi...'
                                             value={comment}
                                             onChange={(e) => setComment(e.target.value)}></textarea>
@@ -167,7 +170,7 @@ const RatingInfo = () => {
                                     <span>{star}</span>
                                     <FaStar className="text-yellow-400 ml-1" />
                                 </div>
-                                <progress max={100} value={percent} className='custom-progress w-[250px] h-[10px] appearance-none'></progress>
+                                <progress max={100} value={percent} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
                                 <span className="text-sm text-gray-600 ml-2">{starCount} đánh giá</span>
                             </div>
                         )

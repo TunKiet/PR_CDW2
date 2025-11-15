@@ -41,7 +41,7 @@ class Review extends Model
             ->where('menu_item_id', $menuItemId)
             ->where('status', 'pending')
             ->orderBy('created_at', 'desc')
-            
+
             ->get();
     }
     /**

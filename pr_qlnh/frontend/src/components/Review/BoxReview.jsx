@@ -15,7 +15,7 @@ import Box from '@mui/material/Box';
 import NoReview from '../../assets/icon/no-review.svg';
 import axios from "axios";
 
-
+const endPoint = 'http://127.0.0.1:8000/api';
 
 const BoxReview = () => {
     const menuItemId = 1;
@@ -59,7 +59,9 @@ const BoxReview = () => {
     useEffect(() => {
         const fetchReview = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/reviews/${menuItemId}`);
+                const res = await axios.get(`${endPoint}/reviews/${menuItemId}`);
+
+                console.log(res.data.data);
                 setReviews(res.data);
             } catch (error) {
                 console.error("Error fetching reviews:", error);
@@ -110,7 +112,7 @@ const BoxReview = () => {
                             <div key={review.review_id} className="boxReview-comment flex mb-1 p-1">
                                 <div className="boxReview-comment-titel w-[200px] flex items-start mb-2">
                                     <div className="flex">
-                                        <p className='w-[40px] h-[40px] flex items-center justify-center text-white text-2xl font-bold bg-blue-700 rounded-full m-0'>A</p>
+                                        <p className='w-10 h-10 flex items-center justify-center text-white text-2xl font-bold bg-blue-700 rounded-full m-0'>A</p>
                                     </div>
                                     <div className="block-infor flex ms-2 mt-1">
                                         <div className="block-infor-name">

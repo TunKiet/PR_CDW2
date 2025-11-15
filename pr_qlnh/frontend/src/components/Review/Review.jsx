@@ -37,7 +37,7 @@ const Review = () => {
 
                 <RatingInfo />
 
-                <div className='w-full h-auto bg-white p-3 my-2 rounded-[8px]' >
+                <div className='w-full h-auto bg-white p-3 my-2 rounded-lg' >
                     <div className="boxReview-filter flex items-center mb-3">
                         <div className="title">Lọc đánh giá</div>
                         <div className="container-filter flex items-center">
