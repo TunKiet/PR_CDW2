@@ -136,7 +136,7 @@ const CustomerManagementPage = () => {
               placeholder=" Tìm khách hàng theo tên hoặc SĐT..." 
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700"
+              className="w-full pl-10 pr-4 py-3 px-5 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700"
             />
             
           </div>

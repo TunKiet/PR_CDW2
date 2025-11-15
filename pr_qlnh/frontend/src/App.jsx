@@ -22,7 +22,7 @@ import UserDashboard from './pages/Dashboard/UserDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 import LoginPage from './pages/LoginPage';
 import ForgotPassword from "./pages/ForgotPasswordPage";
-
+import MenuItemDetailPage from "./pages/MenuItemDetailPage";
 //import  chức năng 08_hao
 import DishTable from './components/08_hao-QLMonAn/DishCRUDTable';
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
@@ -42,6 +42,7 @@ function App() {
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/cart-management" element={<CartManagement />} />
+<Route path="/menu-item/:id" element={<MenuItemDetailPage />} />
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
