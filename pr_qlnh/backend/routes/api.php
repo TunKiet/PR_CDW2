@@ -123,5 +123,8 @@ Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus'
 
 
 //Table
-Route::apiResource('tables', TableController::class);
-
+// Route::apiResource('tables', TableController::class);
+Route::get('/tables', [TableController::class, 'index']);
+Route::post('/tables', [TableController::class, 'store']);
+Route::put('/tables/{id}', [TableController::class, 'update']);
+Route::delete('/tables/{id}', [TableController::class, 'destroy']);

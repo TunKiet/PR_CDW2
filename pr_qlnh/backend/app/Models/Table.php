@@ -9,7 +9,10 @@ class Table extends Model
 {
     use HasFactory;
 
+    protected $table = 'tables';
     protected $primaryKey = 'table_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'table_name',
