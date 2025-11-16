@@ -19,26 +19,22 @@ class MessageSent
      * Create a new event instance.
      */
 
+    use Dispatchable, InteractsWithSockets, SerializesModels;
+
     public $message;
 
-    public function __construct(Message $message)
+    public function __construct($message)
     {
         $this->message = $message;
     }
 
-    
     public function broadcastOn()
     {
-        return new PrivateChannel('conversation.' . $this->message->conversation_id);
+        return new Channel('chat');  // Channel name
     }
 
-    public function broadcastWith()
+    public function broadcastAs()
     {
-        return [
-            'id' => $this->message->message_id,
-            'sender_id' => $this->message->sender_id,
-            'content' => $this->message->message,
-            'created_at' => $this->message->created_at->toDateTimeString(),
-        ];
+        return 'message.sent';  // Event name
     }
 }

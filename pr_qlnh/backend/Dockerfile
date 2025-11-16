@@ -10,11 +10,6 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip
 
-# Install SQL Server PDO driver
-RUN apt-get update && apt-get install -y gnupg2 unixodbc-dev && \
-    pecl install sqlsrv pdo_sqlsrv && \
-    docker-php-ext-enable sqlsrv pdo_sqlsrv
-
 # Install dependencies + ODBC driver + SQLSRV extensions
 RUN apt-get update && apt-get install -y \
     gnupg2 \
@@ -34,9 +29,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions + Redis
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
-    && pecl install redis || true \
+    && pecl install redis \
     && docker-php-ext-enable redis
-
 # # Install and enable Redis extension
 # RUN pecl install redis && docker-php-ext-enable redis
 

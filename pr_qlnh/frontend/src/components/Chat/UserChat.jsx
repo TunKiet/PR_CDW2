@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlineMessage } from "react-icons/ai";
 import { ImAttachment } from "react-icons/im";
 import { FaImage } from "react-icons/fa";
@@ -7,24 +7,18 @@ import { BsEmojiSmile } from "react-icons/bs";
 import { SlLike } from "react-icons/sl";
 import Receiver from "./Receiver";
 import Sender from "./Sender";
-import Echo from "../../utils/echo";
+import axios from 'axios';
 
 const endPoint = 'http://127.0.0.1:8000/api';
 
 const UserChat = () => {
-    const conversationId = 1; // demo test
-    const senderId = 1; // demo test
 
     const [openChat, setOpenChat] = useState(false);
     const [messages, setMessages] = useState([]);
-    const [text, setText] = useState("");
-
-    const messagesEndRef = useRef(null);
-
-    // ⏬ Auto scroll xuống cuối
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    const [input, setInput] = useState('');
+    // const [conversationId, setConversationId] = useState(null);  // Giả định lấy từ API hoặc props
+    const userId = 2;  // Hardcode user_id của customer
+    const conversationId = 1;
 
     useEffect(() => {
         scrollToBottom();

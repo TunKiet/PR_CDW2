@@ -7,15 +7,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Conversation extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes;
+
     protected $primaryKey = 'conversation_id';
     protected $table = 'conversations';
     protected $fillable = [
         'customer_id',
         'admin_id',
         'last_message_id',
+        'status',  // Thêm status (active/inactive)
     ];
+
+    protected $casts = [
+        'status' => 'string',  // Enum, nhưng cast string OK
+    ];
+
     public $timestamps = true;
+
     public function customer()
     {
         return $this->belongsTo(User::class, 'customer_id', 'user_id');

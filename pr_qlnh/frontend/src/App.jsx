@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as BrowserRouter, Routes, Route , Navigate } from "react-router-dom";
+import { BrowserRouter as BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 // import React from 'react'
 import './App.css'
 import MenuList from "./components/MenuList";
@@ -29,11 +29,27 @@ import RestaurantInforManage from './components/08_hao-QLMonAn/RestaurantInforMa
 import CategoryModal from "./components/08_hao-QLMonAn/CategoryModal";
 import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
 import DishModal from "./components/08_hao-QLMonAn/DishModal";
+import UserChat from "./components/Chat/UserChat";
+import AdminChat from "./components/Chat/AdminChat";
+import Echo from 'laravel-echo';
+import io from 'socket.io-client';
+
+window.io = io;  // Cần cho Echo
+
+window.Echo = new Echo({
+  broadcaster: 'socket.io',
+  host: 'http://localhost:3001',  // Socket.io server
+  auth: {
+    headers: {
+      Authorization: 'Bearer ' + localStorage.getItem('token'),  // Nếu cần auth
+    },
+  },
+});
 function App() {
   return (
-    <BrowserRouter> 
+    <BrowserRouter>
       <Routes>
-        <Route path ="/" element={<LoginPage/>}/>
+        <Route path="/" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/user/homepage" element={<HomePage />} />
         <Route path="/dishtable" element={<DishTable />} />
@@ -42,16 +58,19 @@ function App() {
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
-        <Route path="/inventory" element={<Invertory/>} />
-        <Route path="/export" element={<IngredientInOut/>} />
-        <Route path="/inventory-overview" element={<InventoryOverview/>} />
-        <Route path="/restaurant-info" element={<RestaurantInforManage/>} />
-        <Route path="/category-manager" element={<CategoryManager/>} />
-		    <Route path="/table" element={<TableManagementAdmin/>} />
-        
+        <Route path="/inventory" element={<Invertory />} />
+        <Route path="/export" element={<IngredientInOut />} />
+        <Route path="/inventory-overview" element={<InventoryOverview />} />
+        <Route path="/restaurant-info" element={<RestaurantInforManage />} />
+        <Route path="/category-manager" element={<CategoryManager />} />
+        <Route path="/table" element={<TableManagementAdmin />} />
+        <Route path="/chat" element={<UserChat />} />
+        <Route path="/admin-chat" element={<AdminChat />} />
+
+
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path='/analytics' element={<UserDashboard />} />  
+        <Route path='/analytics' element={<UserDashboard />} />
 
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}
         <Route path="/order-page" element={<OrderPage />} />
@@ -67,7 +86,7 @@ function App() {
         {/* <Route path="/invoices" element={<InvoicePage />} /> */}
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
-        <Route path="*" element={<h1>404 - Trang không tồn tại</h1>}/>
+        <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} />
       </Routes>
 
     </BrowserRouter>
