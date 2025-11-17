@@ -20,4 +20,36 @@ class Role extends Model
     {
         return $this->belongsToMany(Permission::class, 'role_permission'); // ham belongsToMany de thiet lap quan he nhieu-nhieu
     }
+    // method
+    // get all roles
+    public static function getAllRoles(){
+        return self::all();
+    }
+    // add role
+    public static function addRole(array $data){
+        return self::create($data);
+    }
+    // update role
+    public static function updateRole($id, array $data){
+        $role = self::find($id);
+        if($role){
+            $role->update($data);
+            return $role;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    // delete role
+    public static function deleteRole($id){
+        $role = self::find($id);
+        if($role){
+            return $role->delete();
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

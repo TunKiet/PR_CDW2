@@ -69,9 +69,31 @@ class User extends Authenticatable implements JWTSubject
         return 'user_id';
     }
     //lay nguoi dung theo email hoac phone
-    public static function getUserbyEmailOrPhone(string $field, string $value) 
+    public static function getUserbyEmailOrPhone(string $field, string $value)
     {
         return self::where($field, $value)->first();
     }
-
+    // get all users
+    public static function getAllUsers(){
+        return self::all();
+    }
+    // add user
+    public static function addUser(array $data){
+        return self::create($data);
+    }
+    // update user
+    public static function updateUser($id, array $data){
+        $user = self::find($id);
+        if($user){
+            $user->update($data);
+            return $user;
+        }
+    }
+    // delete user
+    public static function deleteUser($id){
+        $user = self::find($id);
+        if($user){
+            return $user->delete();
+        }
+    }
 }

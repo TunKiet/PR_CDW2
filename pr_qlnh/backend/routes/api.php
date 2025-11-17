@@ -111,40 +111,12 @@ Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
 Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
 Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);
 
-/*
-|--------------------------------------------------------------------------
-| 🧾 Order Routes (Chức năng thêm đơn hàng)
-|--------------------------------------------------------------------------
-|
-| Controller chỉ nhận request, Model xử lý logic.
-|
-| - POST   /api/orders      → Tạo đơn hàng mới
-| - GET    /api/orders      → (Tuỳ chọn) Lấy danh sách đơn hàng
-| - GET    /api/orders/{id} → (Tuỳ chọn) Lấy chi tiết đơn hàng
-|
-*/
-// Route::prefix('orders')->group(function () {
-//     Route::post('/', [OrderController::class, 'store'])->name('orders.store');
-//     Route::get('/', [OrderController::class, 'index'])->name('orders.index');
-//     Route::get('/{order_id}', [OrderController::class, 'show'])->name('orders.show');
-// });
-// Route::get('/orders', [OrderController::class, 'index']);
-
-
 Route::get('/categories', [CategoryController::class, 'index']);
 
 
 Route::get('/pre-orders', [PreOrderController::class, 'index']);
 Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
 Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
-
-
-// Orders
-// Route::get('/orders', [OrderController::class, 'index']);
-// Route::get('/orders/{id}', [OrderController::class, 'show']);
-// Route::post('/orders', [OrderController::class, 'store']);
-// Route::put('/orders/{id}', [OrderController::class, 'update']);
-// Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
 
 
 Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
@@ -159,15 +131,7 @@ Route::prefix('orders')->group(function () {
 
 //Menu
 Route::get('/menu', [OrderController::class, 'menu']); // lấy menu
-
- //12/11/2025
-// Route::get('/customers', [OrderController::class, 'customers']); // lấy danh sách KH
-// Route::get('/customers/search', [CustomerController::class, 'search']);   
-
 // Payments
-// Route::get('/payments', [PaymentController::class, 'index']);
-// Route::get('/payments/{id}', [PaymentController::class, 'show']);
-// Route::post('/payments', [PaymentController::class, 'store']);
 Route::prefix('payments')->group(function () {
     Route::get('/', [PaymentController::class, 'index']);
     Route::get('/{id}', [PaymentController::class, 'show']);

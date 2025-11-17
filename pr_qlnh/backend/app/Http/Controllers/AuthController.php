@@ -21,13 +21,13 @@ class AuthController extends Controller
             'phone' => 'required|unique:users,phone',
             'password' => 'required|min:6',
         ]);
-
-        $user = User::create([
+        // Them nguoi dung moi va dong thoi them vai tro mac dinh la customer
+        $user = User::addUser([
             'username' => explode('@', $request->email)[0],
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
-            'role' => 'user', // Mặc định user thường
+            'role' => 'user',
             'status' => 1,
         ]);
 

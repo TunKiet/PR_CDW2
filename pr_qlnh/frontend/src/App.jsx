@@ -19,7 +19,7 @@ import OrderPage from './pages/OrderPage';
 import OrderManagementPage from './pages/OrderManagementPage';
 import CustomerManagementPage from './pages/CustomerManagementPage';
 import UserDashboard from './pages/Dashboard/UserDashboard'
-import AdminDashboard from './pages/AdminDashboard'
+import AdminDashboard from './pages/Dashboard/AdminDashboard'
 import LoginPage from './pages/LoginPage';
 import ForgotPassword from "./pages/ForgotPasswordPage";
 import MenuItemDetailPage from "./pages/MenuItemDetailPage";
@@ -42,7 +42,7 @@ function App() {
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/cart-management" element={<CartManagement />} />
-<Route path="/menu-item/:id" element={<MenuItemDetailPage />} />
+        <Route path="/menu-item/:id" element={<MenuItemDetailPage />} />
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
@@ -68,9 +68,6 @@ function App() {
 
         {/* ROUTE MỚI: Trang Quản Lý Khách Hàng */}
         <Route path="/customers" element={<CustomerManagementPage />} />
-
-        {/* Thêm các route khác nếu có: /invoices, /menu, ... */}
-        {/* <Route path="/invoices" element={<InvoicePage />} /> */}
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
         <Route path="*" element={<h1>404 - Trang không tồn tại</h1>}/>

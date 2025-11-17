@@ -18,7 +18,7 @@ const mockRecentOrders = [
 ];
 
 // Component: Thẻ Số Liệu (Metric Card)
-const MetricCard = ({ title, value, change, icon: Icon, color, bgColor }) => {
+const MetricCard = ({ title, value, change, color, bgColor }) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl border border-gray-100">
       <div className="flex items-center justify-between mb-4">
