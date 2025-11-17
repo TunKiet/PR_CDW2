@@ -17,12 +17,27 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ForgotPasswordController;
 // Payment
 use App\Http\Controllers\Api\PaymentController;
+//Customer
+// use App\Http\Controllers\Api\CustomerController;
+
+// Route::apiResource('customers', CustomerController::class);
+
 
 // 🔹 Thêm controller mới cho Order
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\TableController;
 use App\Http\Controllers\CustomerController;
+
+Route::prefix('customers')->group(function () {
+    Route::get('/', [CustomerController::class, 'index']);
+    Route::post('/', [CustomerController::class, 'store']);
+    Route::put('/{id}', [CustomerController::class, 'update']);
+    Route::delete('/{id}', [CustomerController::class, 'destroy']);
+    Route::get('/search', [CustomerController::class, 'search']);
+});
+
+
 
 
 Route::get('/menu-items', [MenuItemController::class, 'index']);
@@ -144,8 +159,10 @@ Route::prefix('orders')->group(function () {
 
 //Menu
 Route::get('/menu', [OrderController::class, 'menu']); // lấy menu
-Route::get('/customers', [OrderController::class, 'customers']); // lấy danh sách KH
-Route::get('/customers/search', [CustomerController::class, 'search']);
+
+ //12/11/2025
+// Route::get('/customers', [OrderController::class, 'customers']); // lấy danh sách KH
+// Route::get('/customers/search', [CustomerController::class, 'search']);   
 
 // Payments
 // Route::get('/payments', [PaymentController::class, 'index']);
@@ -166,3 +183,5 @@ Route::post('/promotions/validate', [PromotionController::class, 'validateCode']
 
 
 Route::get('/tables', [TableController::class, 'index']);
+
+Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
