@@ -53,17 +53,36 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-    public function role()
+    public function roles()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+    }
+    // Gán role cho user
+    public function assignRole($roleName = 'customer')
+    {
+        $role = Role::firstOrCreate(['name' => $roleName]);
+        $this->roles()->syncWithoutDetaching($role->id);
+        return $this;
     }
 
     public function hasPermission($permissionName)
     {
-        return $this->role
-            ? $this->role->permissions->contains('name', $permissionName)
-            : false;
+        foreach ($this->roles as $role) {
+            if ($role->permissions->contains('name', $permissionName)) {
+                return true;
+            }
+        }
+        return false;
     }
+    public function getAllPermissions()
+    {
+        return Permission::whereIn('id', function ($query) {
+            $query->select('permission_id')
+                ->from('role_permissions')
+                ->whereIn('role_id', $this->roles()->pluck('id'));
+        })->pluck('name');
+    }
+
     public function getAuthIdentifierName()
     {
         return 'user_id';
@@ -74,26 +93,38 @@ class User extends Authenticatable implements JWTSubject
         return self::where($field, $value)->first();
     }
     // get all users
-    public static function getAllUsers(){
+    public static function getAllUsers()
+    {
         return self::all();
     }
     // add user
-    public static function addUser(array $data){
-        return self::create($data);
+    public static function addUser($data)
+    {
+        return self::create([
+            'full_name' => $data['username'] ?? null,
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'phone' => $data['phone'],
+            'status' => $data['status'] ?? 1,
+        ]);
     }
+
     // update user
-    public static function updateUser($id, array $data){
+    public static function updateUser($id, array $data)
+    {
         $user = self::find($id);
-        if($user){
+        if ($user) {
             $user->update($data);
             return $user;
         }
     }
     // delete user
-    public static function deleteUser($id){
+    public static function deleteUser($id)
+    {
         $user = self::find($id);
-        if($user){
+        if ($user) {
             return $user->delete();
         }
     }
+
 }
