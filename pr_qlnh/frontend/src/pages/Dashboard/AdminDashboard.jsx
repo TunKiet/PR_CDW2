@@ -1,215 +1,160 @@
-import React, { useState } from 'react';
-import { LayoutDashboard, Users, Package, ShoppingCart, Settings, LogOut, Menu, X, ArrowUpRight } from 'lucide-react';
+// src/pages/Dashboard/StatisticDashboard.jsx
+import React from "react";
+import './Sales_Statistics_Dashboard.css';
+import Sidebar from "../../components/Sidebar";
+import {
+  BarChart2,
+  Users,
+  Coffee,
+  User,
+  Info,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  BarChart,
+  Bar,
+} from "recharts";
 
-// Dữ liệu mô phỏng (Mock Data)
-const mockMetrics = [
-  { title: "Tổng Doanh Thu", value: "250.000.000 VNĐ", change: "+12.5%", icon: LayoutDashboard, color: "text-green-500", bgColor: "bg-green-100" },
-  { title: "Tổng Đơn Hàng", value: "1,250", change: "+5.2%", icon: ShoppingCart, color: "text-blue-500", bgColor: "bg-blue-100" },
-  { title: "Người Dùng Mới", value: "45", change: "+8.9%", icon: Users, color: "text-yellow-500", bgColor: "bg-yellow-100" },
-  { title: "Sản Phẩm Tồn", value: "780", change: "-1.1%", icon: Package, color: "text-red-500", bgColor: "bg-red-100" },
+const revenueData = [
+  { name: "13 thg 9", value: 38 },
+  { name: "18 thg 9", value: 32 },
+  { name: "23 thg 9", value: 28 },
+  { name: "28 thg 9", value: 30 },
+  { name: "3 thg 10", value: 25 },
+  { name: "9 thg 10", value: 22 },
+  { name: "15 thg 10", value: 20 },
 ];
 
-const mockRecentOrders = [
-  { id: '#1001', customer: 'Nguyễn Văn A', amount: '2.500.000 VNĐ', status: 'Đã giao', date: '20/09/2025' },
-  { id: '#1002', customer: 'Trần Thị B', amount: '500.000 VNĐ', status: 'Đang xử lý', date: '20/09/2025' },
-  { id: '#1003', customer: 'Lê Văn C', amount: '12.000.000 VNĐ', status: 'Đã giao', date: '19/09/2025' },
-  { id: '#1004', customer: 'Phạm Thị D', amount: '750.000 VNĐ', status: 'Đã hủy', date: '19/09/2025' },
-  { id: '#1005', customer: 'Hoàng Văn E', amount: '3.100.000 VNĐ', status: 'Đã giao', date: '18/09/2025' },
+const topFoods = [
+  { name: "Phở Bò", sold: 450 },
+  { name: "Bún Chả", sold: 370 },
+  { name: "Bánh Mì", sold: 330 },
+  { name: "Gỏi Cuốn", sold: 290 },
+  { name: "Cơm Tấm", sold: 250 },
 ];
 
-// Component: Thẻ Số Liệu (Metric Card)
-const MetricCard = ({ title, value, change, color, bgColor }) => {
+const StatisticDashboard = () => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl border border-gray-100">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm font-medium text-gray-500">{title}</p>
-        <div className={`p-2 rounded-full ${bgColor} ${color}`}>
-          <Icon size={20} />
-        </div>
-      </div>
-      <h2 className="text-3xl font-bold text-gray-900 mb-2">{value}</h2>
-      <div className="flex items-center text-sm">
-        <ArrowUpRight size={16} className={`${color} mr-1`} />
-        <span className={`${color} font-semibold`}>{change}</span>
-        <span className="text-gray-400 ml-1">so với tháng trước</span>
-      </div>
-    </div>
-  );
-};
+    <div className="dish-layout">
+      {/* Sidebar */}
+      <Sidebar />
 
-// Component: Thanh Bên (Sidebar)
-const Sidebar = ({ active, setActive, isMenuOpen, setIsMenuOpen }) => {
-  const navItems = [
-    { name: "Dashboard", icon: LayoutDashboard },
-    { name: "Người dùng", icon: Users },
-    { name: "Sản phẩm", icon: Package },
-    { name: "Đơn hàng", icon: ShoppingCart },
-    { name: "Cài đặt", icon: Settings },
-  ];
-
-  return (
-    <>
-      {/* Overlay cho mobile */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden" onClick={() => setIsMenuOpen(false)}></div>
-      )}
-
-      {/* Sidebar chính */}
-      <div className={`fixed top-0 left-0 h-full w-64 bg-white shadow-2xl p-6 flex flex-col transition-transform duration-300 z-40 lg:static lg:translate-x-0 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between mb-10 border-b pb-4">
-          <h1 className="text-2xl font-extrabold text-indigo-600">Admin Panel</h1>
-          <button className="lg:hidden text-gray-500 hover:text-indigo-600" onClick={() => setIsMenuOpen(false)}>
-            <X size={24} />
-          </button>
-        </div>
-
-        <nav className="flex-grow">
-          <ul className="space-y-2">
-            {navItems.map((item) => (
-              <li key={item.name}>
-                <button
-                  onClick={() => {
-                    setActive(item.name);
-                    setIsMenuOpen(false); // Đóng menu sau khi chọn trên mobile
-                  }}
-                  className={`w-full flex items-center p-3 rounded-lg transition duration-200 ${active === item.name
-                      ? "bg-indigo-600 text-white shadow-md"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-indigo-600"
-                    }`}
-                >
-                  <item.icon size={20} className="mr-3" />
-                  <span className="font-medium">{item.name}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <div className="pt-4 border-t">
-          <button className="w-full flex items-center p-3 text-red-500 hover:bg-red-50 hover:text-red-600 rounded-lg transition duration-200">
-            <LogOut size={20} className="mr-3" />
-            <span className="font-medium">Đăng xuất</span>
-          </button>
-        </div>
-      </div>
-    </>
-  );
-};
-
-// Component: Bảng Đơn Hàng Gần Đây
-const RecentOrders = () => {
-  const getStatusClasses = (status) => {
-    switch (status) {
-      case 'Đã giao':
-        return 'bg-green-100 text-green-700';
-      case 'Đang xử lý':
-        return 'bg-yellow-100 text-yellow-700';
-      case 'Đã hủy':
-        return 'bg-red-100 text-red-700';
-      default:
-        return 'bg-gray-100 text-gray-700';
-    }
-  };
-
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-      <h3 className="text-xl font-semibold text-gray-800 mb-4">Đơn Hàng Gần Đây</h3>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              {['Mã ĐH', 'Khách hàng', 'Số tiền', 'Trạng thái', 'Ngày', 'Chi tiết'].map((header) => (
-                <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {mockRecentOrders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50 transition duration-150">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.customer}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">{order.amount}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(order.status)}`}>
-                    {order.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.date}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <a href="#" className="text-indigo-600 hover:text-indigo-900 transition duration-150">Xem</a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
-
-// Component: Nội Dung Tùy Chỉnh (Dựa trên tab được chọn)
-const DashboardContent = ({ activeTab }) => {
-  if (activeTab !== 'Dashboard') {
-    return (
-      <div className="p-8 bg-white rounded-xl shadow-lg min-h-[400px] flex items-center justify-center">
-        <p className="text-2xl font-bold text-gray-600">
-          Nội dung cho mục "{activeTab}" đang được phát triển...
+      {/* Main content */}
+      <main className="dish-main">
+        <h1 className="text-3xl font-extrabold text-gray-900">
+          Bảng Điều Khiển Thống Kê Bán Hàng
+        </h1>
+        <p className="text-gray-600 mt-1 mb-8">
+          <strong>“Thống kê”</strong>.
         </p>
-      </div>
-    );
-  }
 
-  return (
-    <div className="space-y-8">
-      {/* Hàng 1: Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {mockMetrics.map((metric, index) => (
-          <MetricCard key={index} {...metric} />
-        ))}
-      </div>
+        {/* 4 Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white p-5 rounded-xl border hover:shadow-md transition">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-medium text-gray-500 uppercase">
+                TỔNG DOANH THU (30 NGÀY)
+              </h3>
+              <Info className="text-green-500" size={16} />
+            </div>
+            <p className="text-3xl font-bold text-gray-900 mt-2">
+              819.216.408 đ
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Mục tiêu tháng: 1 tỷ
+            </p>
+          </div>
 
-      {/* Hàng 2: Recent Orders */}
-      <RecentOrders />
+          <div className="bg-white p-5 rounded-xl border hover:shadow-md transition">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-medium text-gray-500 uppercase">
+                TỔNG LƯỢT KHÁCH (30 NGÀY)
+              </h3>
+              <Users className="text-blue-500" size={16} />
+            </div>
+            <p className="text-3xl font-bold text-gray-900 mt-2">2.324 khách</p>
+            <p className="text-sm text-gray-500 mt-1">
+              Tăng 12% so với tháng trước
+            </p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border hover:shadow-md transition">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-medium text-gray-500 uppercase">
+                MÓN ĂN BÁN CHẠY NHẤT
+              </h3>
+              <Coffee className="text-orange-500" size={16} />
+            </div>
+            <p className="text-3xl font-bold text-gray-900 mt-2">Phở Bò</p>
+            <p className="text-sm text-gray-500 mt-1">Đã bán: 450 lần</p>
+          </div>
+
+          <div className="bg-white p-5 rounded-xl border hover:shadow-md transition">
+            <div className="flex justify-between items-center">
+              <h3 className="text-sm font-medium text-gray-500 uppercase">
+                KHÁCH HÀNG THÂN THIẾT (TOP 1)
+              </h3>
+              <User className="text-pink-500" size={16} />
+            </div>
+            <p className="text-3xl font-bold text-gray-900 mt-2">
+              Nguyễn Văn A
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Tổng chi tiêu: 7.500.000 đ
+            </p>
+          </div>
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Line chart */}
+          <div className="bg-white p-6 rounded-xl border shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              1. Doanh Thu 30 Ngày Gần Nhất
+            </h2>
+            <LineChart width={500} height={250} data={revenueData}>
+              <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="value"
+                stroke="#22c55e"
+                strokeWidth={2}
+                dot={{ r: 3 }}
+              />
+            </LineChart>
+            <p className="text-center text-green-500 text-sm mt-2">
+              • Doanh Thu
+            </p>
+          </div>
+
+          {/* Bar chart */}
+          <div className="bg-white p-6 rounded-xl border shadow-sm">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              2. Top 5 Món Ăn Bán Chạy (Đơn vị: Lần bán)
+            </h2>
+            <BarChart width={500} height={250} data={topFoods} layout="vertical">
+              <CartesianGrid stroke="#e5e7eb" />
+              <XAxis type="number" />
+              <YAxis dataKey="name" type="category" width={100} />
+              <Tooltip />
+              <Bar dataKey="sold" fill="#000" />
+            </BarChart>
+            <p className="text-center text-gray-600 text-sm mt-2">
+              ▪ Số Lượng Bán
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
 
-
-// Component Chính: App
-const App = () => {
-  const [activeTab, setActiveTab] = useState("Dashboard");
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // State cho mobile menu
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex font-inter">
-      {/* Sidebar (Mobile Menu & Desktop) */}
-      <Sidebar active={activeTab} setActive={setActiveTab} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col transition-all duration-300 lg:ml-64">
-
-        {/* Header/Navbar (Mobile) */}
-        <header className="sticky top-0 bg-white shadow-sm p-4 flex items-center justify-between lg:hidden z-20">
-          <button className="text-gray-600 hover:text-indigo-600" onClick={() => setIsMenuOpen(true)}>
-            <Menu size={24} />
-          </button>
-          <h1 className="text-xl font-bold text-gray-900">
-            {activeTab}
-          </h1>
-          <div className="w-8"></div> {/* Placeholder */}
-        </header>
-
-        {/* Content Area */}
-        <main className="p-4 sm:p-8 lg:p-10 w-full">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-2 hidden lg:block">{activeTab}</h1>
-          <p className="text-gray-500 mb-8 hidden lg:block">Tổng quan dữ liệu và quản lý hệ thống</p>
-          <DashboardContent activeTab={activeTab} />
-        </main>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+export default StatisticDashboard;

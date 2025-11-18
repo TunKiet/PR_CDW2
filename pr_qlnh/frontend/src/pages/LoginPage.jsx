@@ -71,10 +71,16 @@ export default function LoginPage() {
           "http://localhost:8000/api/login",
           payload
         );
+        // Lưu token vào localStorage
+        localStorage.setItem("token", res.data.token);
+        
+        const roles = res.data.roles || [];
 
         alert(res.data.message);
-        if (res.data.user.role === "admin") navigate("/admin/dashboard");
-        else navigate("/order-page");
+
+        if (roles.includes("ADMIN")) navigate("/admin/dashboard");
+        else if (roles.includes("Staff")) navigate("/user/dashboard");
+        else navigate("/user/homepage");
       } catch (err) {
         const msg = err.response?.data?.message || "Đăng nhập thất bại!";
         alert(msg);
@@ -141,7 +147,11 @@ export default function LoginPage() {
             <li>• Đặt bàn online nhanh chóng</li>
           </ul>
 
-          <button id="btn-home" className="mt-4 px-6 py-2 bg-500 hover:bg-600 transition-all rounded-full shadow-lg w-fit">
+          <button
+            id="btn-home"
+            className="mt-4 px-6 py-2 bg-500 hover:bg-600 transition-all rounded-full shadow-lg w-fit"
+            onClick={() => navigate("/user/homepage")}
+          >
             Trang chủ
           </button>
         </div>

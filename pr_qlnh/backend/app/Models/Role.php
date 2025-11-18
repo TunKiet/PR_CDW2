@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
-     use HasFactory;
+    use HasFactory;
 
     protected $fillable = ['name', 'description'];
 
@@ -21,34 +21,55 @@ class Role extends Model
         return $this->belongsToMany(Permission::class, 'role_permission'); // ham belongsToMany de thiet lap quan he nhieu-nhieu
     }
     // method
+    //assign permission to role
+    public function assignRole($roleName = 'customer')
+    {
+        $role = Role::where('name', $roleName)->first();
+
+        if ($role) {
+            $this->roles()->attach($role->id);
+        }
+
+        return $this;
+    }
+    public function givePermission($permissionName)
+    {
+        $permission = Permission::where('name', $permissionName)->first();
+
+        if ($permission) {
+            $this->permissions()->syncWithoutDetaching($permission->id);
+        }
+
+        return $this;
+    }
     // get all roles
-    public static function getAllRoles(){
+    public static function getAllRoles()
+    {
         return self::all();
     }
     // add role
-    public static function addRole(array $data){
+    public static function addRole(array $data)
+    {
         return self::create($data);
     }
     // update role
-    public static function updateRole($id, array $data){
+    public static function updateRole($id, array $data)
+    {
         $role = self::find($id);
-        if($role){
+        if ($role) {
             $role->update($data);
             return $role;
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
     // delete role
-    public static function deleteRole($id){
+    public static function deleteRole($id)
+    {
         $role = self::find($id);
-        if($role){
+        if ($role) {
             return $role->delete();
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
