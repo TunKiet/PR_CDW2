@@ -22,7 +22,7 @@ return new class extends Migration
     {
         Schema::table('menu_items', function (Blueprint $table) {
             // Hoàn tác: Quay về string(255) (nếu muốn)
-            $table->string('description', 255)->change();
+            $table->mediumText('description')->change();
         });
     }
 };

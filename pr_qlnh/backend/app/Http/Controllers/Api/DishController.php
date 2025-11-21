@@ -1,6 +1,4 @@
 <?php
-// D:\CDW2\PR_CDW2\pr_qlnh\backend\app\Http\Controllers\Api\DishController.php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -27,7 +25,6 @@ class DishController extends Controller
         ]);
     }
 
-    // ... (Các hàm store, show, update, destroy giữ nguyên nhưng sửa Model) ...
 
     public function store(Request $request)
     {
