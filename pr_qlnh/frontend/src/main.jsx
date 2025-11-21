@@ -7,6 +7,8 @@ import './App.css'
 import ConfirmProvider from './context/ConfirmProvider.jsx'
 import { Toaster } from 'react-hot-toast'
 
+console.log("SOCKET_HOST =", import.meta.env.VITE_SOCKET_HOST);
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ConfirmProvider>

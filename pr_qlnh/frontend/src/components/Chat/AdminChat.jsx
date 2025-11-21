@@ -8,60 +8,217 @@ import { SlLike } from "react-icons/sl";
 import Receiver from './Receiver';
 import Sender from './Sender';
 import axios from 'axios';
+import echo from '../../utils/echo';
+import { useRef } from "react";
 
-const endPoint = 'http://127.0.0.1:8000/api';
+const endPoint = 'http://localhost:8000/api';
 
 const AdminChat = () => {
     const [conversations, setConversations] = useState([]);
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
+    const messagesEndRef = useRef(null);
     const adminId = 1;
 
-    // Load conversations ban đầu
+    // Load danh sách conversations
     useEffect(() => {
+        console.log("🔄 Loading conversations...");
         axios.get(`${endPoint}/conversations`)
-            .then(res => setConversations(res.data))
-            .catch(err => console.error(err));
+            .then(res => {
+                console.log("✅ Conversations loaded:", res.data);
+                setConversations(res.data);
+            })
+            .catch(err => {
+                console.error("❌ Error loading conversations:", err);
+            });
     }, []);
 
-    // Load messages khi select conversation
+    // Load messages khi chọn conversation
     useEffect(() => {
-        if (selectedConversation) {
-            axios.get(`${endPoint}/messages/${selectedConversation.conversation_id}`)
-                .then(res => setMessages(res.data))
-                .catch(err => console.error(err));
-        }
+        if (!selectedConversation) return;
+        console.log("🔄 Loading messages for conversation:", selectedConversation.conversation_id);
+        axios.get(`${endPoint}/messages/${selectedConversation.conversation_id}`)
+            .then(res => {
+                console.log("✅ Messages loaded:", res.data);
+                setMessages(res.data);
+            })
+            .catch(err => {
+                console.error("❌ Error loading messages:", err);
+            });
     }, [selectedConversation]);
 
-    // Listen realtime events
+    // Scroll xuống cuối khi có tin nhắn mới
     useEffect(() => {
-        const channel = window.Echo.channel('chat');
-        channel.listen('message.sent', (e) => {
-            if (selectedConversation && e.message.conversation_id === selectedConversation.conversation_id) {
-                setMessages(prev => [...prev, e.message]);
-            }
-            // Update last message trong conversations list
-            setConversations(prev => prev.map(conv =>
-                conv.conversation_id === e.message.conversation_id
-                    ? { ...conv, lastMessage: e.message }
-                    : conv
-            ));
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+    // Lắng nghe realtime
+    // Lắng nghe realtime
+    useEffect(() => {
+        if (!selectedConversation) {
+            console.warn("⚠️ No conversation selected → skip real-time listener");
+            return;
+        }
+
+        console.log(
+            "🟢 Setting up Admin Echo listener for conversation:",
+            selectedConversation.conversation_id
+        );
+
+        // 1) Kiểm tra echo instance
+        if (!echo) {
+            console.error("❌ Echo instance is NULL → listener cancelled");
+            return;
+        }
+
+        // 2) Kiểm tra connector
+        if (!echo.connector) {
+            console.error("❌ Echo connector missing → Echo not initialized correctly");
+            return;
+        }
+
+        // 3) Kiểm tra socket
+        const socket = echo.connector.socket;
+
+        if (!socket) {
+            console.error("❌ Echo socket missing → Echo failed to connect");
+            return;
+        }
+
+        // 4) Kiểm tra socket đã kết nối chưa
+        if (!socket.connected) {
+            console.warn("⚠️ Echo socket NOT connected yet → waiting for connection...");
+
+            socket.on("connect", () => {
+                console.log("🟢 Socket connected LATE:", socket.id);
+            });
+        } else {
+            console.log("🟢 Socket already connected:", socket.id);
+        }
+
+        console.log("🟢 Emitting subscribe to channel:", `chat.${selectedConversation.conversation_id}`);
+        echo.connector.socket.emit("subscribe", {
+            channel: `chat.${selectedConversation.conversation_id}`,
         });
 
-        return () => channel.stopListening('message.sent');
+        // 5) Lấy kênh chat chung (public)
+        const channel = echo.channel(`chat.${selectedConversation.conversation_id}`);
+
+        if (!channel) {
+            console.error("❌ echo.channel('chat') returned NULL → check Echo config");
+            return;
+        }
+
+        // 6) Kiểm tra channel.listen tồn tại không
+        if (typeof channel.listen !== "function") {
+            console.error(
+                "❌ channel.listen is NOT a function → Echo is not ready\nChannel object:",
+                channel
+            );
+            return;
+        }
+
+        console.log("🟢 Channel 'chat' is READY → attaching debug listeners...");
+
+        // Debug thử tất cả event có thể Laravel broadcast ra
+        channel.listen("message.sent", (data) =>
+            console.log("📩 [DEBUG] Event message.sent received:", data)
+        );
+
+
+        // 7) Listener thực tế
+        const listener = (event) => {
+            console.log("📩 Raw realtime event:", event);
+
+            const msg = event.data || event.message || event;
+
+            console.log("📨 Extracted message:", msg);
+
+            if (!msg.conversation_id) {
+                console.warn("⚠️ Event does NOT contain conversation_id:", msg);
+                return;
+            }
+
+            // Lọc theo đúng conversation
+            if (msg.conversation_id !== selectedConversation.conversation_id) {
+                console.log(
+                    `⚠️ Message from conversation ${msg.conversation_id}, not ${selectedConversation.conversation_id} → ignore`
+                );
+                return;
+            }
+
+            console.log("✅ Message belongs to active conversation → updating state");
+
+            // Append message
+            setMessages((prev) => [...prev, msg]);
+
+            // Update danh sách conversation
+            setConversations((prev) =>
+                prev.map((conv) =>
+                    conv.conversation_id === msg.conversation_id
+                        ? { ...conv, lastMessage: msg }
+                        : conv
+                )
+            );
+        };
+
+        // Lắng nghe đúng tên broadcast của Laravel
+        channel.listen("message.sent", listener);
+
+        console.log("🟢 Admin Echo listener ATTACHED");
+
+        return () => {
+            console.log("🔴 Cleaning up Admin Echo listener...");
+            channel.stopListening("message.sent", listener);
+            echo.leave("chat"); // đảm bảo rời channel
+        };
     }, [selectedConversation]);
 
-    // Send message từ admin
+
+
+    // Gửi tin nhắn
     const sendMessage = () => {
-        if (!input.trim() || !selectedConversation) return;
+        if (!input.trim() || !selectedConversation) {
+            console.log("⚠️ Cannot send: input empty or no conversation selected");
+            return;
+        }
+
+        console.log("📤 Sending message:", { conversation_id: selectedConversation.conversation_id, user_id: adminId, sender_type: 'admin', message: input });
         axios.post(`${endPoint}/send-message`, {
             conversation_id: selectedConversation.conversation_id,
-            user_id: adminId,  // user_id của admin
+            user_id: adminId,
             sender_type: 'admin',
             message: input
-        }).then(() => setInput(''));
+        })
+            .then((response) => {
+                console.log("✅ Send message response:", response.data);
+                const newMessage = response.data.message || response.data;
+                console.log("📝 Adding new message to state:", newMessage);
+                setMessages(prev => {
+                    const updated = [...prev, newMessage];
+                    console.log("📝 Messages state after send:", updated);
+                    return updated;
+                });
+
+                // Cập nhật lastMessage của conversation
+                setConversations(prev => {
+                    const updated = prev.map(conv =>
+                        conv.conversation_id === selectedConversation.conversation_id
+                            ? { ...conv, lastMessage: newMessage }
+                            : conv
+                    );
+                    console.log("📝 Conversations state after send:", updated);
+                    return updated;
+                });
+
+                setInput('');
+            })
+            .catch(err => {
+                console.error('❌ Error sending message:', err);
+            });
     };
+
     return (
         <>
             <div className="section">
@@ -82,7 +239,7 @@ const AdminChat = () => {
                                         </div>
                                         <div className="wrapper-content flex flex-col justify-center flex-1">
                                             <div className="flex items-center">
-                                                <span className="text-[15px] font-medium">{conv.customer.username}</span>
+                                                <span className="text-[15px] font-medium">Đang soạn...</span>
                                                 <p className="ms-auto text-[13px] text-gray-600 mb-0">14 giờ</p>
                                             </div>
                                             <div className="text-[14px] text-gray-700 truncate">
@@ -116,6 +273,8 @@ const AdminChat = () => {
                                                 <Receiver key={msg.message_id} content={msg.message} time={msg.created_at} />
                                             )
                                         ))}
+                                        {/* Thêm ref để scroll */}
+                                        <div ref={messagesEndRef} />
                                     </div>
                                     <div className="chat-option flex items-center gap-2 p-2 border">
                                         <div className="flex gap-2">
@@ -158,7 +317,6 @@ const AdminChat = () => {
                     </div>
                 </div>
             </div>
-
         </>
     )
 }

@@ -31,20 +31,7 @@ import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
 import DishModal from "./components/08_hao-QLMonAn/DishModal";
 import UserChat from "./components/Chat/UserChat";
 import AdminChat from "./components/Chat/AdminChat";
-import Echo from 'laravel-echo';
-import io from 'socket.io-client';
 
-window.io = io;  // Cần cho Echo
-
-window.Echo = new Echo({
-  broadcaster: 'socket.io',
-  host: 'http://localhost:3001',  // Socket.io server
-  auth: {
-    headers: {
-      Authorization: 'Bearer ' + localStorage.getItem('token'),  // Nếu cần auth
-    },
-  },
-});
 function App() {
   return (
     <BrowserRouter>
@@ -67,7 +54,6 @@ function App() {
         <Route path="/chat" element={<UserChat />} />
         <Route path="/admin-chat" element={<AdminChat />} />
 
-
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path='/analytics' element={<UserDashboard />} />
@@ -86,7 +72,7 @@ function App() {
         {/* <Route path="/invoices" element={<InvoicePage />} /> */}
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
-        <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} />
+        {/* <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} /> */}
       </Routes>
 
     </BrowserRouter>

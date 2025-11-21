@@ -6,11 +6,16 @@ use App\Events\MessageSent;
 use App\Models\Conversation;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\Log;
+
 
 class MessageController extends Controller
 {
     public function sendMessage(Request $request)
     {
+        Log::info("▶ [API] sendMessage RECEIVED", $request->all());
+
         $request->validate([
             'conversation_id' => 'required|exists:conversations,conversation_id',
             'user_id' => 'required|exists:users,user_id',
@@ -32,8 +37,28 @@ class MessageController extends Controller
         Conversation::where('conversation_id', $request->conversation_id)
             ->update(['last_message_id' => $message->message_id]);
 
-        // Broadcast event
-        broadcast(new MessageSent($message))->toOthers();
+        // (TÙY CHỌN) Publish Redis thủ công TRƯỚC broadcast để custom payload
+        $payload = json_encode([
+            'event' => 'message.sent',
+            'data' => $message,
+            'channel' => 'chat.' . $request->conversation_id
+        ]);
+
+        try {
+            Redis::publish('laravel-database-chat', $payload);
+            Log::info("✅ Redis published successfully: " . $payload);
+        } catch (\Exception $e) {
+            Log::error("❌ Redis publish failed: " . $e->getMessage());
+            // TÙY CHỌN: Rollback message nếu cần (ví dụ: delete message và return error)
+            // $message->delete();
+            // return response()->json(['error' => 'Failed to send message'], 500);
+        }
+
+        // Broadcast event (Laravel sẽ publish vào Redis nếu driver=redis)
+        broadcast(new MessageSent($message));
+
+        // Debug log (di chuyển xuống đây nếu cần)
+        // info("📤 Published message to Redis: " . $payload);  // Dư thừa nếu đã log ở trên
 
         return response()->json(['status' => 'sent', 'message' => $message]);
     }
