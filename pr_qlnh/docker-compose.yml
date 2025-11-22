@@ -38,21 +38,6 @@ services:
       VITE_SOCKET_HOST: "http://localhost:3001" 
     command: npm run dev -- --host 0.0.0.0 --port 3000
 
-  # Socket.IO
-  socketio:
-    build:
-      context: ./socket-io
-      dockerfile: Dockerfile
-    container_name: socketio_io
-    restart: unless-stopped
-    volumes:
-      - ./socket-io:/app
-      - /app/node_modules 
-    ports:
-      - "3001:3001"
-    networks:
-      - app-network
-
   # MySQL
   mysql:
     image: mysql:8.0
