@@ -34,17 +34,6 @@ const mapApiDataToReact = (item) => ({
   description: item.description,
   statusKey: item.status,
 });
-
-// Hàm ánh xạ dữ liệu React sang API (cho POST/PUT)
-// const mapReactDataToApi = (dish) => ({
-//   category_id: parseInt(dish.categoryKey),
-//   menu_item_name: dish.name,
-//   description: dish.description,
-//   price: dish.price,
-//   image_url: dish.image,
-//   status: dish.statusKey,
-// });
-
 export default function DishCRUDTable() {
   // === STATES DỮ LIỆU ===
   const [dishes, setDishes] = useState([]);

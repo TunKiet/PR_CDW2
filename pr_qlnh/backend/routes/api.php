@@ -175,14 +175,29 @@ Route::prefix('payments')->group(function () {
     Route::post('/', [PaymentController::class, 'store']);
 });
 // Promotions
-Route::get('/promotions', [PromotionController::class, 'index']);
-Route::get('/promotions/{id}', [PromotionController::class, 'show']);
-Route::post('/promotions', [PromotionController::class, 'store']);
-Route::put('/promotions/{id}', [PromotionController::class, 'update']);
-Route::delete('/promotions/{id}', [PromotionController::class, 'destroy']);
-Route::post('/promotions/validate', [PromotionController::class, 'validateCode']);
+// use App\Http\Controllers\PromotionController;
+// Route::get('/promotions', [PromotionController::class, 'index']);
+// Route::get('/promotions/{id}', [PromotionController::class, 'show']);
+// Route::post('/promotions', [PromotionController::class, 'store']);
+// Route::put('/promotions/{id}', [PromotionController::class, 'update']);
+// Route::delete('/promotions/{id}', [PromotionController::class, 'destroy']);
+// Route::post('/promotions/validate', [PromotionController::class, 'validateCode']);
 
 
 Route::get('/tables', [TableController::class, 'index']);
 
 Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
+
+
+
+use App\Http\Controllers\Api\PromotionController;
+// Protected routes (cần authentication - thêm middleware 'auth:sanctum' khi đã setup)
+Route::prefix('v1')->group(function () {
+    
+    // CRUD Promotion routes
+    Route::apiResource('promotions', PromotionController::class);
+    
+    // Additional promotion routes
+    Route::post('/promotions/{id}/apply', [PromotionController::class, 'apply']);
+    
+});
