@@ -48,6 +48,9 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Models\Ingredient;
 use App\Http\Controllers\Api\PreOrderController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\PromotionController;
+
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
 // use App\Http\Controllers\Api\MenuItemController;
@@ -90,7 +93,7 @@ Route::get('/conversations', [MessageController::class, 'getConversations']);
 Route::get('/messages/{conversationId}', [MessageController::class, 'getMessages']);
 Route::post('/mark-read', [MessageController::class, 'markAsRead']);
 Route::get('/alert', [IngredientController::class, 'alertIngredient']);
-
+Route::post('/chat', [ChatController::class, 'message']);
 
 
 /*

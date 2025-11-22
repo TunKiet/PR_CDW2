@@ -32,6 +32,7 @@ import DishModal from "./components/08_hao-QLMonAn/DishModal";
 import UserChat from "./components/Chat/UserChat";
 import AdminChat from "./components/Chat/AdminChat";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
+// import RestaurantInforManage from "./components/08_hao-QLMonAn/RestaurantInforManage";
 
 
 function App() {
@@ -42,7 +43,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/dish-status-management" element={<DishStatusManagement />} />
         <Route path="/category-manager" element={<CategoryManager />} />
-        <Route path ="/" element={<LoginPage/>}/>
+        <Route path="/" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/user/homepage" element={<HomePage />} />
         <Route path="/dishtable" element={<DishTable />} />
@@ -55,14 +56,14 @@ function App() {
         <Route path="/inventory" element={<Invertory />} />
         <Route path="/export" element={<IngredientInOut />} />
         <Route path="/inventory-overview" element={<InventoryOverview />} />
-        <Route path="/restaurant-info" element={<RestaurantInforManage />} />
+        {/* <Route path="/restaurant-info" element={<RestaurantInforManage />} /> */}
         <Route path="/category-manager" element={<CategoryManager />} />
         <Route path="/table" element={<TableManagementAdmin />} />
         <Route path="/chat" element={<UserChat />} />
         <Route path="/admin-chat" element={<AdminChat />} />
-        <Route path="/restaurant-info" element={<RestaurantInfoManage/>} />
+        <Route path="/restaurant-info" element={<RestaurantInfoManage />} />
         <Route path="/export" element={<IngredientInOut />} />
-		<Route path="/tables" element={<TableManagementAdmin/>} />
+        <Route path="/tables" element={<TableManagementAdmin />} />
 
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
@@ -84,7 +85,6 @@ function App() {
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
         {/* <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} /> */}
       </Routes>
-
     </BrowserRouter>
   )
 }
