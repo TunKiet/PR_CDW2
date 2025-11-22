@@ -11,6 +11,7 @@ services:
     working_dir: /var/www
     volumes:
       - ./backend:/var/www
+      - /var/www/vendor
       - ./backend/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network
@@ -19,7 +20,6 @@ services:
     depends_on:
       - db
       - redis
-    command: php artisan serve --host=0.0.0.0 --port=8000
 
   # React Frontend
   frontend:
