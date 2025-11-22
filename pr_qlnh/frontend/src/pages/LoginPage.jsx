@@ -5,7 +5,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import axios from "axios";
 
 export default function LoginPage() {
@@ -15,21 +14,20 @@ export default function LoginPage() {
   const navigate = useNavigate();
 
   // Validate login
- const loginSchema = Yup.object({
-  phone: Yup.string()
-    .required("Vui lòng nhập email hoặc số điện thoại")
-    .test(
-      "is-valid-phone-or-email",
-      "Phải là số điện thoại (10–11 số) hoặc email hợp lệ",
-      (value) =>
-        /^[0-9]{10,11}$/.test(value) ||
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-    ),
-  password: Yup.string()
-    .required("Vui lòng nhập mật khẩu")
-    .min(6, "Mật khẩu ít nhất 6 ký tự"),
-});
-
+  const loginSchema = Yup.object({
+    phone: Yup.string()
+      .required("Vui lòng nhập email hoặc số điện thoại")
+      .test(
+        "is-valid-phone-or-email",
+        "Phải là số điện thoại (10–11 số) hoặc email hợp lệ",
+        (value) =>
+          /^[0-9]{10,11}$/.test(value) ||
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+      ),
+    password: Yup.string()
+      .required("Vui lòng nhập mật khẩu")
+      .min(6, "Mật khẩu ít nhất 6 ký tự"),
+  });
 
   // Validate register
   const registerSchema = Yup.object({
@@ -73,10 +71,16 @@ export default function LoginPage() {
           "http://localhost:8000/api/login",
           payload
         );
+        // Lưu token vào localStorage
+        localStorage.setItem("token", res.data.token);
+        
+        const roles = res.data.roles || [];
 
         alert(res.data.message);
-        if (res.data.user.role === "admin") navigate("/admin/dashboard");
-        else navigate("/order-page");
+
+        if (roles.includes("ADMIN")) navigate("/admin/dashboard");
+        else if (roles.includes("Staff")) navigate("/user/dashboard");
+        else navigate("/user/homepage");
       } catch (err) {
         const msg = err.response?.data?.message || "Đăng nhập thất bại!";
         alert(msg);
@@ -118,6 +122,41 @@ export default function LoginPage() {
 
   return (
     <div className="login-container">
+      {/* LEFT SIDE DESCRIPTION */}
+      <div
+        id="left-me"
+        className="hidden md:flex flex-col justify-center pl-10 pr-10 text-white space-y-5 
+             bg-cover bg-center relative overflow-hidden"
+      >
+        {/* Lớp mờ để đọc chữ dễ hơn */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+
+        {/* Nội dung */}
+        <div className="relative z-10 space-y-4 animate-fadeInUp">
+          <h2 className="text-3xl font-bold drop-shadow-lg">
+            Chào mừng đến với Nhà Hàng
+          </h2>
+
+          <p className="text-lg opacity-90">
+            Trải nghiệm ẩm thực cao cấp với phong cách phục vụ chuyên nghiệp.
+          </p>
+
+          <ul className="space-y-2 text-base">
+            <li>• Món ăn chuẩn 5 sao</li>
+            <li>• Không gian sang trọng – ấm cúng</li>
+            <li>• Đặt bàn online nhanh chóng</li>
+          </ul>
+
+          <button
+            id="btn-home"
+            className="mt-4 px-6 py-2 bg-500 hover:bg-600 transition-all rounded-full shadow-lg w-fit"
+            onClick={() => navigate("/user/homepage")}
+          >
+            Trang chủ
+          </button>
+        </div>
+      </div>
+
       <div className="login-card">
         {/* Tabs */}
         <div className="tabs">

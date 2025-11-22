@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Role;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 
@@ -22,25 +23,29 @@ class AuthController extends Controller
             'password' => 'required|min:6',
         ]);
 
-        $user = User::create([
-            'username' => explode('@', $request->email)[0],
+        // Tạo user mới
+        $user = User::addUser([
+            'full_name' => $request->full_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
-            'role' => 'user', // Mặc định user thường
             'status' => 1,
         ]);
 
-        // Sinh token JWT cho user sau khi đăng ký
+        // Gán role mặc định = customer
+        $user->assignRole('customer');
+
+        // Tạo token JWT
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
             'message' => 'Đăng ký thành công!',
             'user' => $user,
-            'role' => $user->role ?? 'user',
+            'roles' => $user->roles,
             'token' => $token
         ], 201);
     }
+
 
     /**
      * Đăng nhập người dùng
@@ -57,7 +62,8 @@ class AuthController extends Controller
         $loginField = $request->filled('email') ? 'email' : 'phone';
         $identifier = $request->input($loginField);
 
-        $user = User::where($loginField, $identifier)->first();
+        // Lấy user
+        $user = User::getUserbyEmailOrPhone($loginField, $identifier);
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Email/SĐT hoặc mật khẩu không đúng!'], 401);
@@ -69,13 +75,19 @@ class AuthController extends Controller
             return response()->json(['message' => 'Không thể tạo token!'], 500);
         }
 
+        // Lấy danh sách role và permission
+        $roles = $user->roles()->pluck('name');
+        $permissions = $user->getAllPermissions();
+
         return response()->json([
             'message' => 'Đăng nhập thành công!',
             'user' => $user,
-            'role' => $user->role ?? 'user',
+            'roles' => $roles,
+            'permissions' => $permissions,
             'token' => $token,
         ], 200);
     }
+
     /**
      * Lấy thông tin người dùng hiện tại (dành cho Frontend)
      */
@@ -83,12 +95,19 @@ class AuthController extends Controller
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-            return response()->json($user);
+
+            $roles = $user->roles()->pluck('name');
+            $permissions = $user->getAllPermissions();
+
+            return response()->json([
+                'user' => $user,
+                'roles' => $roles,
+                'permissions' => $permissions,
+            ]);
         } catch (JWTException $e) {
             return response()->json(['message' => 'Token không hợp lệ hoặc đã hết hạn!'], 401);
         }
     }
-
     /**
      * Đăng xuất (hủy token)
      */

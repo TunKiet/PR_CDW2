@@ -14,34 +14,41 @@ import TableManagementAdmin from './pages/TableManagementAdmin'
 import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 
 // Import các component trang của bạn
+import CartManagement from "./pages/CartManagement";
 import OrderPage from './pages/OrderPage';
 import OrderManagementPage from './pages/OrderManagementPage';
 import CustomerManagementPage from './pages/CustomerManagementPage';
 import UserDashboard from './pages/Dashboard/UserDashboard'
-import AdminDashboard from './pages/AdminDashboard'
+import AdminDashboard from './pages/Dashboard/AdminDashboard'
 import LoginPage from './pages/LoginPage';
 import ForgotPassword from "./pages/ForgotPasswordPage";
-
+import MenuItemDetailPage from "./pages/MenuItemDetailPage";
 //import  chức năng 08_hao
-import DishTable from './components/08_hao-QLMonAn/DishTable';
+import DishTable from './components/08_hao-QLMonAn/DishCRUDTable';
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
-import RestaurantInforManage from './components/08_hao-QLMonAn/RestaurantInforManage'
-import CategoryModal from "./components/08_hao-QLMonAn/CategoryModal";
+import RestaurantInfoManage from "./components/08_hao-QLMonAn/restaurant_infor_manage";
 import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
 import DishModal from "./components/08_hao-QLMonAn/DishModal";
 import UserChat from "./components/Chat/UserChat";
 import AdminChat from "./components/Chat/AdminChat";
+import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
+
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         <Route path="/" element={<LoginPage />} />
+        <Route path="/dish-status-management" element={<DishStatusManagement />} />
+        <Route path="/category-manager" element={<CategoryManager />} />
+        <Route path ="/" element={<LoginPage/>}/>
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/user/homepage" element={<HomePage />} />
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
-
+        <Route path="/cart-management" element={<CartManagement />} />
+        <Route path="/menu-item/:id" element={<MenuItemDetailPage />} />
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
@@ -53,6 +60,9 @@ function App() {
         <Route path="/table" element={<TableManagementAdmin />} />
         <Route path="/chat" element={<UserChat />} />
         <Route path="/admin-chat" element={<AdminChat />} />
+        <Route path="/restaurant-info" element={<RestaurantInfoManage/>} />
+        <Route path="/export" element={<IngredientInOut />} />
+		<Route path="/tables" element={<TableManagementAdmin/>} />
 
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />

@@ -2,45 +2,51 @@
 
 import React, { useState, useEffect } from 'react';
 
-// Giả định các map từ DishTable.jsx
+// === FIX LỖI: ĐỒNG BỘ MAPS VỚI DishCRUDTable.jsx ===
 const categoryMap = {
-    main: "Món Chính",
-    dessert: "Tráng Miệng",
-    drink: "Đồ Uống",
+    // Key API mong đợi (số dưới dạng chuỗi)
+    '1': "Món Chính",
+    '2': "Tráng Miệng",
+    '3': "Đồ Uống",
+    // Thêm các category khác nếu có
 };
 
 const statusMap = {
-    status_available: "Còn hàng",
-    status_unavailable: "Hết hàng",
+    // Key API mong đợi (active, inactive, draft)
+    'active': "Còn hàng",
+    'inactive': "Hết hàng",
+    'draft': "Nháp/Ẩn",
 };
+// ===========================================
 
 export default function DishModal({ isVisible, onClose, onSave, dish }) {
     const [formData, setFormData] = useState({
         id: '',
         name: '',
         price: 0,
-        categoryKey: 'main',
-        statusKey: 'status_available',
+        // FIX: Đặt giá trị mặc định mới
+        categoryKey: '1', 
+        statusKey: 'active',
         description: '',
-        image: '', // Thêm trường ảnh
+        image: '', 
     });
 
     const isEditMode = !!dish;
     const title = isEditMode ? 'Chỉnh Sửa Món Ăn' : 'Thêm Món Ăn Mới';
 
-    // Dùng useEffect để điền dữ liệu vào form khi component được mount hoặc 'dish' thay đổi
     useEffect(() => {
         if (dish) {
-            // Chế độ Chỉnh sửa
+            // Chế độ Chỉnh sửa: Dữ liệu từ DishCRUDTable đã đúng format
             setFormData(dish);
         } else {
-            // Chế độ Thêm mới
+            // Chế độ Thêm mới: Reset form
             setFormData({
                 id: '',
                 name: '',
                 price: 0,
-                categoryKey: 'main',
-                statusKey: 'status_available',
+                // FIX: Giá trị mặc định mới
+                categoryKey: '1', 
+                statusKey: 'active',
                 description: '',
                 image: 'https://placehold.co/40x40/e5e7eb/4b5563?text=N/A',
             });
@@ -48,12 +54,14 @@ export default function DishModal({ isVisible, onClose, onSave, dish }) {
     }, [dish]);
 
     const handleChange = (e) => {
-        const { id, value, type } = e.target;
+        // Loại bỏ 'type' khỏi destructuring để tránh lỗi linter
+        const { id, value } = e.target;
         
-        // Xử lý giá tiền (chỉ chấp nhận số)
         let finalValue = value;
         if (id === 'price') {
-            finalValue = parseInt(value) >= 0 ? parseInt(value) : 0;
+            const numValue = parseInt(value);
+            // Xử lý giá trị rỗng hoặc không hợp lệ
+            finalValue = (value === '' || isNaN(numValue) || numValue < 0) ? 0 : numValue;
         }
 
         setFormData(prev => ({ 
@@ -71,10 +79,13 @@ export default function DishModal({ isVisible, onClose, onSave, dish }) {
             return;
         }
         
+        // Đã FIX: Chỉ gọi onSave với formData (dữ liệu), để DishCRUDTable xác định POST/PUT
         onSave(formData);
     };
 
     if (!isVisible) return null;
+
+    // ... (Phần JSX giữ nguyên cấu trúc) ...
 
     return (
         // Modal Overlay
@@ -103,7 +114,7 @@ export default function DishModal({ isVisible, onClose, onSave, dish }) {
                         {/* Giá Bán */}
                         <div>
                             <label htmlFor="price" className="block text-sm font-medium text-gray-600">Giá Bán (VNĐ) (*)</label>
-                            <input type="number" id="price" required min="1000" className="dish-modal-input" value={formData.price} onChange={handleChange} placeholder="50000" />
+                            <input type="number" id="price" required min="0" className="dish-modal-input" value={formData.price} onChange={handleChange} placeholder="50000" />
                         </div>
                     </div>
                     
@@ -111,6 +122,7 @@ export default function DishModal({ isVisible, onClose, onSave, dish }) {
                         {/* Danh Mục */}
                         <div>
                             <label htmlFor="categoryKey" className="block text-sm font-medium text-gray-600">Danh Mục (*)</label>
+                            {/* Đã FIX: render từ map mới */}
                             <select id="categoryKey" required className="dish-modal-input" value={formData.categoryKey} onChange={handleChange}>
                                 {Object.entries(categoryMap).map(([key, value]) => (
                                     <option key={key} value={key}>{value}</option>
@@ -121,6 +133,7 @@ export default function DishModal({ isVisible, onClose, onSave, dish }) {
                         {/* Trạng Thái */}
                         <div>
                             <label htmlFor="statusKey" className="block text-sm font-medium text-gray-600">Trạng Thái (*)</label>
+                             {/* Đã FIX: render từ map mới */}
                             <select id="statusKey" required className="dish-modal-input" value={formData.statusKey} onChange={handleChange}>
                                 {Object.entries(statusMap).map(([key, value]) => (
                                     <option key={key} value={key}>{value}</option>

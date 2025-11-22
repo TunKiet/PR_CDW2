@@ -3,69 +3,84 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderDetail;
-use Illuminate\Http\Request;
+use App\Models\MenuItem;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    // ✅ POST /api/orders
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,user_id',
-            'table_id' => 'nullable|exists:tables,table_id',
-            'reservation_id' => 'nullable|exists:reservations,reservation_id',
-            'total_price' => 'required|numeric|min:0',
-            'payment_method' => 'nullable|string|max:20',
-            'payment_status' => 'nullable|string|max:20',
+        $request->validate([
+            'customer_id' => 'nullable|exists:customers,customer_id',
             'items' => 'required|array|min:1',
             'items.*.menu_item_id' => 'required|exists:menu_items,menu_item_id',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0',
+            'note' => 'nullable|string|max:255',
         ]);
 
         try {
-            $order = DB::transaction(function () use ($validated) {
-                // Tạo đơn hàng
-                $order = Order::create([
-                    'user_id' => $validated['user_id'],
-                    'table_id' => $validated['table_id'] ?? null,
-                    'reservation_id' => $validated['reservation_id'] ?? null,
-                    'total_price' => $validated['total_price'],
-                    'payment_method' => $validated['payment_method'] ?? 'cash',
-                    'payment_status' => $validated['payment_status'] ?? 'pending',
+            DB::beginTransaction();
+
+            $order = Order::create([
+                'customer_id' => $request->customer_id,
+                'total_price' => 0,
+                'note' => $request->note,
+            ]);
+
+            $total = 0;
+
+            foreach ($request->items as $item) {
+                $menu = MenuItem::findOrFail($item['menu_item_id']);
+                $lineTotal = $menu->price * $item['quantity'];
+
+                OrderDetail::create([
+                    'order_id' => $order->order_id,
+                    'menu_item_id' => $menu->menu_item_id,
+                    'quantity' => $item['quantity'],
+                    'price' => $menu->price,
                 ]);
 
-                // Thêm chi tiết đơn hàng
-                foreach ($validated['items'] as $item) {
-                    OrderDetail::create([
-                        'order_id' => $order->order_id,
-                        'menu_item_id' => $item['menu_item_id'],
-                        'quantity' => $item['quantity'],
-                        'price' => $item['price'],
-                    ]);
-                }
+                $total += $lineTotal;
+            }
 
-                return $order->load('details.menuItem');
-            });
+            $order->update(['total_price' => $total]);
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Đơn hàng tạo thành công!',
-                'data' => $order,
-            ], 201);
+                'message' => 'Đơn hàng tạo thành công',
+                'data' => $order->load(['customer', 'orderDetails.menuItem', 'payments'])
+            ]);
 
         } catch (\Throwable $e) {
-            Log::error('Lỗi tạo đơn hàng: ' . $e->getMessage());
-
+            DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'Không thể tạo đơn hàng!',
-                'error' => $e->getMessage(),
+                'message' => 'Lỗi khi tạo đơn hàng: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function index()
+    {
+        return Order::with(['customer', 'orderDetails.menuItem', 'payments'])
+            ->orderBy('order_id', 'desc')
+            ->get();
+    }
+
+    public function show($id)
+    {
+        return Order::with(['customer', 'orderDetails.menuItem', 'payments'])
+            ->findOrFail($id);
+    }
+
+    public function destroy($id)
+    {
+        Order::findOrFail($id)->delete();
+        return response()->json(['success' => true, 'message' => 'Đã xóa đơn hàng']);
     }
 }

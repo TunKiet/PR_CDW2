@@ -1,23 +1,31 @@
-import axios from "axios";
+import axiosClient from "../api/axiosClient";
 
-const API_BASE = "http://localhost:8000/api";
-
+// ✅ Tạo đơn hàng mới
 export const createOrder = async (orderData) => {
-  try {
-    const response = await axios.post(`${API_BASE}/orders`, orderData);
-    return response.data;
-  } catch (error) {
-    console.error("❌ Lỗi khi tạo đơn hàng:", error.response?.data || error.message);
-    throw error.response?.data || { message: "Lỗi không xác định" };
-  }
+  const res = await axiosClient.post("/orders", orderData);
+  return res.data;
 };
 
+// ✅ Lấy danh sách đơn hàng (nếu cần)
 export const getOrders = async () => {
-  try {
-    const response = await axios.get(`${API_BASE}/orders`);
-    return response.data;
-  } catch (error) {
-    console.error("❌ Lỗi khi lấy danh sách đơn hàng:", error);
-    throw error;
-  }
+  const res = await axiosClient.get("/orders");
+  return res.data;
+};
+
+// ✅ Lấy chi tiết đơn hàng
+export const getOrderById = async (orderId) => {
+  const res = await axiosClient.get(`/orders/${orderId}`);
+  return res.data;
+};
+
+// ✅ Cập nhật đơn hàng
+export const updateOrder = async (orderId, data) => {
+  const res = await axiosClient.put(`/orders/${orderId}`, data);
+  return res.data;
+};
+
+// ✅ Xoá đơn hàng
+export const deleteOrder = async (orderId) => {
+  const res = await axiosClient.delete(`/orders/${orderId}`);
+  return res.data;
 };

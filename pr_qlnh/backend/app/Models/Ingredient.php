@@ -109,7 +109,12 @@ class Ingredient extends Model
             ];
         }
     }
-
+    /**
+     * Summary of getIngredients
+     * @param mixed $categoryId
+     * @param mixed $perPage
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
     public static function getIngredients($categoryId = null, $perPage = 10)
     {
         $query = self::with('category_ingredient');
