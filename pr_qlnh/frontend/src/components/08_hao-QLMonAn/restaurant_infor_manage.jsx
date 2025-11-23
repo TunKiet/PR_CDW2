@@ -15,84 +15,8 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-const generateId = (prefix, dataArray) => {
-  const lastItem = [...dataArray]
-    .sort((a, b) => b.id.localeCompare(a.id))
-    .find((item) => item.id.startsWith(prefix));
-  const lastIdNumber = lastItem
-    ? parseInt(lastItem.id.substring(prefix.length))
-    : 0;
-  const newIdNumber = lastIdNumber + 1;
-  return prefix + newIdNumber.toString().padStart(3, "0");
-};
-
-// === DỮ LIỆU MẪU CHO MÓN ĂN ===
-const dishList_Init = [
-  {
-    id: "D001",
-    name: "Phở Bò Đặc Biệt",
-    price: 65000,
-    category: "main",
-    isFeatured: false,
-  },
-  {
-    id: "D002",
-    name: "Gỏi Cuốn Tôm Thịt",
-    price: 50000,
-    category: "appetizer",
-    isFeatured: true,
-  },
-  {
-    id: "D003",
-    name: "Cà Phê Sữa Đá",
-    price: 25000,
-    category: "drink",
-    isFeatured: false,
-  },
-  {
-    id: "D004",
-    name: "Bánh Lava Socola",
-    price: 120000,
-    category: "dessert",
-    isFeatured: true,
-  },
-  {
-    id: "D005",
-    name: "Lẩu Thái Tom Yum",
-    price: 390000,
-    category: "hotpot",
-    isFeatured: true,
-  },
-  {
-    id: "D006",
-    name: "Bún Chả Hà Nội",
-    price: 55000,
-    category: "main",
-    isFeatured: false,
-  },
-  {
-    id: "D007",
-    name: "Nước Ép Dứa Tươi",
-    price: 45000,
-    category: "drink",
-    isFeatured: false,
-  },
-  {
-    id: "D008",
-    name: "Kem Vani Sốt Dâu",
-    price: 35000,
-    category: "dessert",
-    isFeatured: false,
-  },
-];
-
 // === COMPONENT MODAL THÊM/SỬA PROMOTION ===
-const PromoEditModal = ({
-  isVisible,
-  onClose,
-  onSave,
-  promotion,
-}) => {
+const PromoEditModal = ({ isVisible, onClose, onSave, promotion }) => {
   const [formData, setFormData] = useState({
     code: "",
     title: "",
@@ -116,7 +40,9 @@ const PromoEditModal = ({
         discount_type: promotion.discount_type || "fixed",
         discount_value: promotion.discount_value || 0,
         max_uses: promotion.max_uses || 0,
-        expired_at: promotion.expired_at ? promotion.expired_at.slice(0, 16) : "",
+        expired_at: promotion.expired_at
+          ? promotion.expired_at.slice(0, 16)
+          : "",
         status: promotion.status || "active",
       });
     } else {
@@ -197,7 +123,10 @@ const PromoEditModal = ({
         <form className="space-y-4">
           {/* Mã Promotion */}
           <div>
-            <label htmlFor="promo-code" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="promo-code"
+              className="block text-sm font-medium text-gray-700"
+            >
               Mã Ưu đãi (*)
             </label>
             <input
@@ -214,7 +143,10 @@ const PromoEditModal = ({
 
           {/* Tiêu đề */}
           <div>
-            <label htmlFor="promo-title" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="promo-title"
+              className="block text-sm font-medium text-gray-700"
+            >
               Tiêu đề (*)
             </label>
             <input
@@ -230,7 +162,10 @@ const PromoEditModal = ({
 
           {/* Nội dung */}
           <div>
-            <label htmlFor="promo-description" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="promo-description"
+              className="block text-sm font-medium text-gray-700"
+            >
               Nội dung chi tiết (*)
             </label>
             <textarea
@@ -247,7 +182,10 @@ const PromoEditModal = ({
           {/* Loại giảm giá và Giá trị */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="promo-discount_type" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="promo-discount_type"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Loại giảm giá (*)
               </label>
               <select
@@ -261,7 +199,10 @@ const PromoEditModal = ({
               </select>
             </div>
             <div>
-              <label htmlFor="promo-discount_value" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="promo-discount_value"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Giá trị giảm (*)
               </label>
               <input
@@ -273,7 +214,9 @@ const PromoEditModal = ({
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 value={formData.discount_value}
                 onChange={handleChange}
-                placeholder={formData.discount_type === "percent" ? "0-100" : "Số tiền"}
+                placeholder={
+                  formData.discount_type === "percent" ? "0-100" : "Số tiền"
+                }
               />
             </div>
           </div>
@@ -281,7 +224,10 @@ const PromoEditModal = ({
           {/* Ngày hết hạn và Giới hạn sử dụng */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="promo-expired_at" className="block text-sm font-medium text-red-600">
+              <label
+                htmlFor="promo-expired_at"
+                className="block text-sm font-medium text-red-600"
+              >
                 Ngày và Giờ Hết hạn
               </label>
               <input
@@ -297,7 +243,10 @@ const PromoEditModal = ({
               </p>
             </div>
             <div>
-              <label htmlFor="promo-max_uses" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="promo-max_uses"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Giới hạn Lượt Dùng
               </label>
               <input
@@ -317,7 +266,10 @@ const PromoEditModal = ({
 
           {/* Trạng thái */}
           <div>
-            <label htmlFor="promo-status" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="promo-status"
+              className="block text-sm font-medium text-gray-700"
+            >
               Trạng thái (*)
             </label>
             <select
@@ -356,13 +308,7 @@ const PromoEditModal = ({
 };
 
 // === COMPONENT MODAL CHỌN MÓN ĂN NỔI BẬT ===
-const DishSelectorModal = ({
-  isVisible,
-  onClose,
-  dishList,
-  setDishList,
-  onSave,
-}) => {
+const DishSelectorModal = ({ isVisible, onClose, dishList, onSave }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [localDishList, setLocalDishList] = useState(dishList);
 
@@ -376,15 +322,15 @@ const DishSelectorModal = ({
   const toggleFeaturedDish = (dishId) => {
     setLocalDishList((prevList) => {
       const newList = prevList.map((dish) => {
-        if (dish.id === dishId) {
+        if (dish.menu_item_id === dishId) {
           const currentFeaturedCount = prevList.filter(
-            (d) => d.isFeatured
+            (d) => d.is_featured
           ).length;
 
-          if (dish.isFeatured) {
-            return { ...dish, isFeatured: false };
+          if (dish.is_featured) {
+            return { ...dish, is_featured: false };
           } else if (currentFeaturedCount < 3) {
-            return { ...dish, isFeatured: true };
+            return { ...dish, is_featured: true };
           } else {
             alert("Chỉ được chọn tối đa 3 món ăn nổi bật.");
             return dish;
@@ -397,7 +343,13 @@ const DishSelectorModal = ({
   };
 
   const handleSave = () => {
-    const featuredCount = localDishList.filter((d) => d.isFeatured).length;
+    const featuredCount = localDishList.filter((d) => d.is_featured).length;
+
+    console.log(
+      "Món được chọn:",
+      localDishList.filter((d) => d.is_featured)
+    ); // ← THÊM
+
     if (featuredCount === 0) {
       alert("Vui lòng chọn ít nhất 1 món ăn nổi bật.");
       return;
@@ -407,11 +359,11 @@ const DishSelectorModal = ({
 
   const filteredDishes = localDishList.filter(
     (dish) =>
-      dish.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      dish.id.toLowerCase().includes(searchTerm.toLowerCase())
+      dish.menu_item_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      dish.menu_item_id.toString().includes(searchTerm)
   );
 
-  const selectedCount = localDishList.filter((d) => d.isFeatured).length;
+  const selectedCount = localDishList.filter((d) => d.is_featured).length;
 
   return (
     <div
@@ -439,7 +391,7 @@ const DishSelectorModal = ({
 
         <div className="grid grid-cols-3 gap-4 h-96 overflow-y-auto border p-3 rounded-lg bg-gray-50">
           {filteredDishes.map((dish) => {
-            const isSelected = dish.isFeatured;
+            const isSelected = dish.is_featured;
             const cardClass = isSelected
               ? "bg-green-100 border-2 border-green-500"
               : "bg-gray-50 border-2 border-transparent hover:bg-gray-100";
@@ -460,12 +412,12 @@ const DishSelectorModal = ({
 
             return (
               <div
-                key={dish.id}
+                key={dish.menu_item_id}
                 className={`relative p-3 rounded-lg shadow-sm cursor-pointer ${cardClass}`}
-                onClick={() => toggleFeaturedDish(dish.id)}
+                onClick={() => toggleFeaturedDish(dish.menu_item_id)}
               >
                 {checkIcon}
-                <h4 className="font-bold text-base">{dish.name}</h4>
+                <h4 className="font-bold text-base">{dish.menu_item_name}</h4>
                 <p className="text-xs text-gray-600 mt-1">
                   {formatCurrency(dish.price)}
                 </p>
@@ -523,7 +475,8 @@ export default function QuanLyTrangThongTin() {
   const [isDishSelectorModalOpen, setIsDishSelectorModalOpen] = useState(false);
 
   // State cho Featured Dishes
-  const [dishList, setDishList] = useState(dishList_Init);
+  const [dishList, setDishList] = useState([]);
+  const [isLoadingDishes, setIsLoadingDishes] = useState(false);
 
   // === API FUNCTIONS ===
 
@@ -567,6 +520,33 @@ export default function QuanLyTrangThongTin() {
     fetchPromotions();
   }, []);
 
+  // Fetch Dishes từ API
+  const fetchDishes = async () => {
+    setIsLoadingDishes(true);
+    try {
+      const response = await fetch(`${API_URL}`);
+      const result = await response.json();
+
+      console.log("Dishes từ API:", result.data);
+
+      if (result.status === "success") {
+        setDishList(result.data);
+      } else {
+        alert("Không thể tải danh sách món ăn");
+      }
+    } catch (error) {
+      console.error("Error fetching dishes:", error);
+      alert("Có lỗi xảy ra khi tải món ăn");
+    } finally {
+      setIsLoadingDishes(false);
+    }
+  };
+
+  // Load dishes khi component mount
+  useEffect(() => {
+    fetchDishes();
+  }, []);
+
   // Search promotions
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -599,7 +579,7 @@ export default function QuanLyTrangThongTin() {
   const savePromotion = async (formData, promotionId) => {
     try {
       let response;
-      
+
       if (promotionId) {
         // Update existing promotion
         response = await fetch(`${API_BASE_URL}/promotions/${promotionId}`, {
@@ -643,9 +623,12 @@ export default function QuanLyTrangThongTin() {
   const handleDeletePromotion = async (promotionId) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa ưu đãi này không?")) {
       try {
-        const response = await fetch(`${API_BASE_URL}/promotions/${promotionId}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/promotions/${promotionId}`,
+          {
+            method: "DELETE",
+          }
+        );
 
         const result = await response.json();
 
@@ -676,14 +659,56 @@ export default function QuanLyTrangThongTin() {
     setIsDishSelectorModalOpen(false);
   };
 
-  const saveFeaturedDishes = (updatedDishList) => {
-    setDishList(updatedDishList);
-    const featuredCount = updatedDishList.filter((d) => d.isFeatured).length;
-    alert(`Đã lưu ${featuredCount} món ăn làm nổi bật.`);
-    closeDishSelectorModal();
-  };
+  const saveFeaturedDishes = async (updatedDishList) => {
+    try {
+      // BƯỚC 0: Reset TẤT CẢ món trong database về 0 (dùng vòng lặp qua dishList gốc)
+      console.log("Đang reset tất cả món về 0...");
+      const allResetPromises = dishList.map(async (dish) => {
+        await fetch(`${API_URL}/${dish.menu_item_id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ is_featured: 0 }),
+        });
+      });
+      await Promise.all(allResetPromises);
 
-  const featuredDishes = dishList.filter((dish) => dish.isFeatured);
+      // BƯỚC 1: Set 3 món được chọn = 1
+      console.log("Đang set món được chọn = 1...");
+      const featuredDishes = updatedDishList.filter((d) => d.is_featured);
+
+      const setFeaturedPromises = featuredDishes.map(async (dish) => {
+        console.log(`→ Gửi request món ${dish.menu_item_id}`); // ← THÊM
+
+        const response = await fetch(`${API_URL}/${dish.menu_item_id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ is_featured: 1 }),
+        });
+
+        const result = await response.json();
+        console.log(`← Response món ${dish.menu_item_id}:`, result); // ← THÊM
+        return result;
+      });
+
+      await Promise.all(setFeaturedPromises);
+      console.log("✅ Hoàn thành set featured"); // ← THÊM
+
+      alert(`Đã lưu ${featuredDishes.length} món ăn làm nổi bật.`);
+
+      await fetchDishes();
+      closeDishSelectorModal();
+    } catch (error) {
+      console.error("Error updating featured dishes:", error);
+      alert("Có lỗi xảy ra khi cập nhật món nổi bật");
+    }
+  };
+  const featuredDishes = React.useMemo(() => {
+    const filtered = dishList.filter(
+      (dish) => dish.is_featured == 1 || dish.is_featured === true
+    );
+    console.log("Featured dishes:", filtered);
+    return filtered;
+  }, [dishList]);
 
   const changeContentTab = (tabName) => {
     setActiveTab(tabName);
@@ -922,7 +947,9 @@ export default function QuanLyTrangThongTin() {
                 {!isLoadingPromotions && promotions.length > 0 && (
                   <div className="flex justify-between items-center mt-4 pt-4 border-t">
                     <div className="text-sm text-gray-700">
-                      Hiển thị {(pagination.current_page - 1) * pagination.per_page + 1} -{" "}
+                      Hiển thị{" "}
+                      {(pagination.current_page - 1) * pagination.per_page + 1}{" "}
+                      -{" "}
                       {Math.min(
                         pagination.current_page * pagination.per_page,
                         pagination.total
@@ -976,17 +1003,18 @@ export default function QuanLyTrangThongTin() {
                   ) : (
                     featuredDishes.map((dish) => (
                       <div
-                        key={dish.id}
+                        key={dish.menu_item_id}
                         className="bg-gray-50 p-4 rounded-lg shadow-sm border-l-4 border-indigo-500"
                       >
                         <h4 className="font-bold text-lg text-gray-800">
-                          {dish.name}
+                          {dish.menu_item_name}
                         </h4>
                         <p className="text-sm text-indigo-600 font-semibold">
                           {formatCurrency(dish.price)}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          Mã: {dish.id} | Danh mục: {dish.category}
+                          Mã: {dish.menu_item_id} | Danh mục:{" "}
+                          {dish.category?.category_name || "N/A"}
                         </p>
                       </div>
                     ))
@@ -1066,9 +1094,7 @@ export default function QuanLyTrangThongTin() {
         )}
 
         {activeView !== "settings" && (
-          <div className="p-6 text-gray-500">
-            Nội dung cho view khác
-          </div>
+          <div className="p-6 text-gray-500">Nội dung cho view khác</div>
         )}
       </div>
 
@@ -1085,7 +1111,6 @@ export default function QuanLyTrangThongTin() {
         isVisible={isDishSelectorModalOpen}
         onClose={closeDishSelectorModal}
         dishList={dishList}
-        setDishList={setDishList}
         onSave={saveFeaturedDishes}
       />
     </div>

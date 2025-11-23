@@ -80,6 +80,7 @@ class DishController extends Controller
             'price' => 'sometimes|numeric|min:0',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
             'status' => 'nullable|string|max:50',
+            'is_featured' => 'sometimes|integer|in:0,1',
             // Laravel sẽ tự xử lý _method, không cần validate
         ]);
 

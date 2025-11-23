@@ -24,6 +24,7 @@ class MenuItem extends Model
         'image_url',
         'description',
         'status',
+        'is_featured',
     ];
 
     public function category()
