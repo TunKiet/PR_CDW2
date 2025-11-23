@@ -8,6 +8,7 @@ import { SlLike } from "react-icons/sl";
 import Receiver from "./Receiver";
 import Sender from "./Sender";
 import axios from 'axios';
+import Pusher from 'pusher-js';
 
 const endPoint = 'http://localhost:8000/api';
 
@@ -20,20 +21,38 @@ const UserChat = () => {
     const conversationId = 1;
     const messagesEndRef = useRef(null);
 
-    // Load messages ban đầu
+    // UserChat.jsx
     useEffect(() => {
-        if (openChat) {
-            console.log("🔄 Loading messages for conversation:", conversationId);
-            axios.get(`${endPoint}/messages/${conversationId}`)
-                .then(res => {
-                    console.log("✅ Messages loaded:", res.data);
-                    setMessages(res.data);
-                })
-                .catch(err => {
-                    console.error("❌ Error loading messages:", err);
-                });
-        }
-    }, [openChat]);
+        if (!openChat) return;
+
+        // 1) Load messages first
+        axios.get(`${endPoint}/messages/${conversationId}`)
+            .then(res => {
+                setMessages(res.data);
+            });
+
+        // 2) Setup Pusher
+        const pusher = new Pusher("f923893c65fd2311c63c", {
+            cluster: "ap1",
+        });
+
+        const channelName = `conversation.${conversationId}`;
+        const channel = pusher.subscribe(channelName);
+
+        channel.bind("message", (data) => {
+            setMessages(prev => {
+                if (prev.some(msg => msg.message_id === data.message_id)) return prev;
+                return [...prev, data];
+            });
+        });
+
+        // 3) Cleanup
+        return () => {
+            pusher.unsubscribe(channelName);
+            pusher.disconnect();
+        };
+
+    }, [openChat]);  // chỉ chạy khi bật chat
 
     // Scroll
     useEffect(() => {
@@ -42,14 +61,19 @@ const UserChat = () => {
 
     // Send message
     const sendMessage = () => {
+
         if (!input.trim()) {
             console.log("⚠️ Cannot send: input empty");
             return;
         }
 
+        console.log("📤 Sending message:", {
+            conversation_id: conversationId,
+            user_id: userId,
+            sender_type: 'customer',
+            message: input
+        });
 
-
-        console.log("📤 Sending message:", { conversation_id: conversationId, user_id: userId, sender_type: 'customer', message: input });
         axios.post(`${endPoint}/send-message`, {
             conversation_id: conversationId,
             user_id: userId,
@@ -58,19 +82,14 @@ const UserChat = () => {
         })
             .then(res => {
                 console.log("✅ Send message response:", res.data);
-                const newMessage = res.data.message || res.data;
-                console.log("📝 Adding new message to state:", newMessage);
-                setMessages(prev => {
-                    const updated = [...prev, newMessage];
-                    console.log("📝 Messages state after send:", updated);
-                    return updated;
-                });
+
+                // ❗ Không thêm vào state nữa — đã có Pusher xử lý
                 setInput('');
             })
             .catch(err => console.error("❌ Send message error:", err));
     };
 
-    // ... (phần return JSX giữ nguyên)
+
 
 
     return (
@@ -105,11 +124,20 @@ const UserChat = () => {
                     <div className="flex flex-col flex-1 min-h-0 overflow-y-auto [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar-track]:bg-gray-200 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full p-2 space-y-2">
                         {messages.map((msg) =>
                             msg.user_id === userId ? (
-                                <Sender key={msg.message_id} content={msg.message} time={msg.created_at} />
+                                <Sender
+                                    key={`${msg.conversation_id}-${msg.message_id}`}
+                                    content={msg.message}
+                                    time={msg.created_at}
+                                />
                             ) : (
-                                <Receiver key={msg.message_id} content={msg.message} time={msg.created_at} />
+                                <Receiver
+                                    key={`${msg.conversation_id}-${msg.message_id}`}
+                                    content={msg.message}
+                                    time={msg.created_at}
+                                />
                             )
                         )}
+
                         <div ref={messagesEndRef} />
                     </div>
 

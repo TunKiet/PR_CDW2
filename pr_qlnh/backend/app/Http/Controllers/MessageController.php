@@ -37,28 +37,7 @@ class MessageController extends Controller
         Conversation::where('conversation_id', $request->conversation_id)
             ->update(['last_message_id' => $message->message_id]);
 
-        // (TÙY CHỌN) Publish Redis thủ công TRƯỚC broadcast để custom payload
-        $payload = json_encode([
-            'event' => 'message.sent',
-            'data' => $message,
-            'channel' => 'chat.' . $request->conversation_id
-        ]);
-
-        try {
-            Redis::publish('laravel-database-chat', $payload);
-            Log::info("✅ Redis published successfully: " . $payload);
-        } catch (\Exception $e) {
-            Log::error("❌ Redis publish failed: " . $e->getMessage());
-            // TÙY CHỌN: Rollback message nếu cần (ví dụ: delete message và return error)
-            // $message->delete();
-            // return response()->json(['error' => 'Failed to send message'], 500);
-        }
-
-        // Broadcast event (Laravel sẽ publish vào Redis nếu driver=redis)
         broadcast(new MessageSent($message));
-
-        // Debug log (di chuyển xuống đây nếu cần)
-        // info("📤 Published message to Redis: " . $payload);  // Dư thừa nếu đã log ở trên
 
         return response()->json(['status' => 'sent', 'message' => $message]);
     }

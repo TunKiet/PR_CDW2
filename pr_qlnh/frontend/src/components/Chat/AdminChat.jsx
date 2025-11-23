@@ -9,7 +9,7 @@ import Receiver from './Receiver';
 import Sender from './Sender';
 import axios from 'axios';
 import { useRef } from "react";
-
+import Pusher from 'pusher-js';
 const endPoint = 'http://localhost:8000/api';
 
 const AdminChat = () => {
@@ -34,8 +34,10 @@ const AdminChat = () => {
     }, []);
 
     // Load messages khi chọn conversation
+
     useEffect(() => {
         if (!selectedConversation) return;
+
         console.log("🔄 Loading messages for conversation:", selectedConversation.conversation_id);
         axios.get(`${endPoint}/messages/${selectedConversation.conversation_id}`)
             .then(res => {
@@ -45,65 +47,87 @@ const AdminChat = () => {
             .catch(err => {
                 console.error("❌ Error loading messages:", err);
             });
-    }, [selectedConversation]);
 
-    // Scroll xuống cuối khi có tin nhắn mới
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+        // Setup Pusher
+        Pusher.logToConsole = true;
+        const pusher = new Pusher('f923893c65fd2311c63c', { cluster: 'ap1' });
+        const channel = pusher.subscribe(`conversation.${selectedConversation.conversation_id}`);
+        console.log("📡 Subscribed to channel:", `conversation.${selectedConversation.conversation_id}`);
+
+        channel.bind('message', (data) => {
+            console.log("📨 Pusher received message:", data);
+            setMessages(prev => {
+                if (prev.some(msg => msg.message_id === data.message_id)) return prev;
+                return [...prev, data];
+            });
+        });
+
+        return () => {
+            console.log("❌ Unsubscribing Pusher channel:", `conversation.${selectedConversation.conversation_id}`);
+            pusher.unsubscribe(`conversation.${selectedConversation.conversation_id}`);
+        };
+    }, [selectedConversation]);
+    // AdminChat.jsx
 
 
     // Gửi tin nhắn
     const sendMessage = () => {
+
         if (!input.trim() || !selectedConversation) {
             console.log("⚠️ Cannot send: input empty or no conversation selected");
             return;
         }
 
-        console.log("📤 Sending message:", { conversation_id: selectedConversation.conversation_id, user_id: adminId, sender_type: 'admin', message: input });
+        console.log("📤 Sending message:", {
+            conversation_id: selectedConversation.conversation_id,
+            user_id: adminId,
+            sender_type: 'admin',
+            message: input
+        });
+
         axios.post(`${endPoint}/send-message`, {
             conversation_id: selectedConversation.conversation_id,
             user_id: adminId,
             sender_type: 'admin',
             message: input
         })
-            .then((response) => {
+            .then(response => {
                 console.log("✅ Send message response:", response.data);
-                const newMessage = response.data.message || response.data;
-                console.log("📝 Adding new message to state:", newMessage);
-                setMessages(prev => {
-                    const updated = [...prev, newMessage];
-                    console.log("📝 Messages state after send:", updated);
-                    return updated;
-                });
 
-                // Cập nhật lastMessage của conversation
-                setConversations(prev => {
-                    const updated = prev.map(conv =>
+                const newMessage = response.data.message || response.data;
+
+                setConversations(prev =>
+                    prev.map(conv =>
                         conv.conversation_id === selectedConversation.conversation_id
                             ? { ...conv, lastMessage: newMessage }
                             : conv
-                    );
-                    console.log("📝 Conversations state after send:", updated);
-                    return updated;
-                });
+                    )
+                );
 
                 setInput('');
             })
-            .catch(err => {
-                console.error('❌ Error sending message:', err);
-            });
+            .catch(err => console.error("❌ Error sending message:", err));
     };
+
+
+
 
     return (
         <>
             <div className="section">
                 <div className="flex min-h-screen">
                     <Sidebar />
+
                     <div className="w-[85%] bg-gray-100 p-6 flex h-screen">
+                        {/* Sidebar danh sách hội thoại */}
                         <div className="w-[20%] h-full flex flex-col">
                             <div className="w-full h-[100px] bg-gray-200"></div> {/* header */}
-                            <div className="overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-200 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full">
+
+                            <div className="overflow-y-auto flex-1 
+              [&::-webkit-scrollbar]:w-1 
+              [&::-webkit-scrollbar-track]:bg-gray-200 
+              [&::-webkit-scrollbar-thumb]:bg-gray-400 
+              [&::-webkit-scrollbar-thumb]:rounded-full">
                                 {conversations.map(conv => (
                                     <div
                                         key={conv.conversation_id}
@@ -111,7 +135,7 @@ const AdminChat = () => {
                                         className="wrapper-chat p-2 flex bg-blue-100 gap-2 cursor-pointer mb-1"
                                     >
                                         <div className="w-[45px] h-[45px] bg-amber-400 flex justify-center items-center rounded-full text-lg font-bold">
-                                            {conv.customer.username[0]}
+                                            {conv.customer.full_name[0]}
                                         </div>
                                         <div className="wrapper-content flex flex-col justify-center flex-1">
                                             <div className="flex items-center">
@@ -127,31 +151,53 @@ const AdminChat = () => {
                             </div>
                         </div>
 
+                        {/* Khung chat chính */}
                         <div className="w-[80%] h-full flex flex-col flex-1">
                             {selectedConversation && (
                                 <>
+                                    {/* Header hội thoại */}
                                     <div className="w-full h-auto bg-gray-300 p-2">
                                         <div className="flex gap-2">
-                                            <div className="w-[45px] h-[45px] bg-amber-400 flex justify-center items-center rounded-full text-lg font-bold">{selectedConversation.customer.username[0]}</div>
+                                            <div className="w-[45px] h-[45px] bg-amber-400 flex justify-center items-center rounded-full text-lg font-bold">
+                                                {selectedConversation.customer.full_name[0]}
+                                            </div>
                                             <div>
-                                                <div className="name">{selectedConversation.customer.username}</div>
-                                                <div className="status relative text-[13px] text-green-400 ps-3 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green-400 before:rounded-full">
+                                                <div className="name">{selectedConversation.customer.full_name}</div>
+                                                <div className="status relative text-[13px] text-green-400 ps-3 
+                        before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 
+                        before:w-3 before:h-3 before:bg-green-400 before:rounded-full">
                                                     Đang hoạt động
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col flex-1 bg-gray-200 p-2 overflow-y-auto [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-track]:bg-gray-200 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full">
-                                        {messages.map(msg => (
+
+                                    {/* Danh sách tin nhắn */}
+                                    <div className="flex flex-col flex-1 bg-gray-200 p-2 overflow-y-auto 
+                  [&::-webkit-scrollbar]:w-1 
+                  [&::-webkit-scrollbar-track]:bg-gray-200 
+                  [&::-webkit-scrollbar-thumb]:bg-gray-400 
+                  [&::-webkit-scrollbar-thumb]:rounded-full">
+                                        {messages.map(msg =>
                                             msg.user_id === adminId ? (
-                                                <Sender key={msg.message_id} content={msg.message} time={msg.created_at} />
+                                                <Sender
+                                                    key={`${msg.conversation_id}-${msg.message_id}`}
+                                                    content={msg.message}
+                                                    time={msg.created_at}
+                                                />
                                             ) : (
-                                                <Receiver key={msg.message_id} content={msg.message} time={msg.created_at} />
+                                                <Receiver
+                                                    key={`${msg.conversation_id}-${msg.message_id}`}
+                                                    content={msg.message}
+                                                    time={msg.created_at}
+                                                />
                                             )
-                                        ))}
+                                        )}
                                         {/* Thêm ref để scroll */}
                                         <div ref={messagesEndRef} />
                                     </div>
+
+                                    {/* Input gửi tin nhắn */}
                                     <div className="chat-option flex items-center gap-2 p-2 border">
                                         <div className="flex gap-2">
                                             <div className="icon-attach cursor-pointer">
@@ -161,12 +207,13 @@ const AdminChat = () => {
                                                 <FaImage size={23} />
                                             </div>
                                         </div>
+
                                         <div className="flex flex-1">
                                             <div className="input-message flex relative w-full">
                                                 <input
                                                     value={input}
                                                     onChange={(e) => setInput(e.target.value)}
-                                                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                                                    onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
                                                     type="text"
                                                     className="w-full rounded-full border border-gray-300 px-4 py-2 outline-none"
                                                     placeholder="Nhập tin nhắn..."
@@ -178,6 +225,7 @@ const AdminChat = () => {
                                                 />
                                             </div>
                                         </div>
+
                                         <div className="flex gap-2">
                                             <div className="icon-emoji cursor-pointer">
                                                 <BsEmojiSmile size={23} />
@@ -194,7 +242,8 @@ const AdminChat = () => {
                 </div>
             </div>
         </>
-    )
+    );
+
 }
 
 export default AdminChat
