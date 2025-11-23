@@ -15565,3 +15565,11 @@ Did you mean one of these?
 [2025-11-23 12:28:13] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":32,"user_id":1,"message":"hey user có khỏe không"} 
 [2025-11-23 12:28:13] local.INFO: Broadcasting as {"event":"message"} 
 [2025-11-23 12:28:13] local.INFO: 🟢 Broadcasting on channel: conversation.1  
+[2025-11-23 12:32:51] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":1,"user_id":1,"sender_type":"admin","message":"alo"} 
+[2025-11-23 12:32:52] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":33,"user_id":1,"message":"alo"} 
+[2025-11-23 12:32:53] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-23 12:32:53] local.INFO: 🟢 Broadcasting on channel: conversation.1  
+[2025-11-23 12:34:52] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":1,"user_id":2,"sender_type":"customer","message":"how old are you"} 
+[2025-11-23 12:34:53] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":34,"user_id":2,"message":"how old are you"} 
+[2025-11-23 12:34:54] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-23 12:34:54] local.INFO: 🟢 Broadcasting on channel: conversation.1  

@@ -139,7 +139,7 @@ const AdminChat = () => {
                                         </div>
                                         <div className="wrapper-content flex flex-col justify-center flex-1">
                                             <div className="flex items-center">
-                                                <span className="text-[15px] font-medium">Đang soạn...</span>
+                                                <span className="text-[15px] font-medium">{conv.customer.full_name}</span>
                                                 <p className="ms-auto text-[13px] text-gray-600 mb-0">14 giờ</p>
                                             </div>
                                             <div className="text-[14px] text-gray-700 truncate">

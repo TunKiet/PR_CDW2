@@ -9,6 +9,7 @@ import Receiver from "./Receiver";
 import Sender from "./Sender";
 import axios from 'axios';
 import Pusher from 'pusher-js';
+import EmojiPicker from 'emoji-picker-react';
 
 const endPoint = 'http://localhost:8000/api';
 
@@ -17,11 +18,13 @@ const UserChat = () => {
     const [openChat, setOpenChat] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
+
     const userId = 2;
     const conversationId = 1;
     const messagesEndRef = useRef(null);
+    const fileInputRef = useRef(null);
 
-    // UserChat.jsx
+    // Load conversation
     useEffect(() => {
         if (!openChat) return;
 
@@ -52,7 +55,7 @@ const UserChat = () => {
             pusher.disconnect();
         };
 
-    }, [openChat]);  // chỉ chạy khi bật chat
+    }, [openChat]);
 
     // Scroll
     useEffect(() => {
@@ -89,8 +92,19 @@ const UserChat = () => {
             .catch(err => console.error("❌ Send message error:", err));
     };
 
+    //Open select file image
+    const handleImage = () => {
+        fileInputRef.current.click();
+    }
 
+    //Process sent file image
+    const handleFileChange = (event) => {
+        const selectedFile = event.target.files[0];
 
+        if (selectedFile) {
+            console.log('File đã chọn:', selectedFile.name);
+        }
+    }
 
     return (
         <>
@@ -104,7 +118,7 @@ const UserChat = () => {
 
             {/* Box chat */}
             {openChat && (
-                <div className="box-chat fixed right-3 bottom-20 w-[400px] h-[500px]! shadow-lg rounded-l-sm flex flex-col bg-white">
+                <div className="box-chat fixed right-3 bottom-20 w-[400px] h-[500px] !important shadow-lg rounded-l-sm flex flex-col bg-white">
                     {/* Header */}
                     <div className="chat-title flex justify-start items-center gap-2 p-2 border-b border-gray-300">
                         <div className="avatar w-10 h-10 rounded-full p-3 bg-red-600 flex justify-center items-center text-white font-bold text-2xl">
@@ -145,7 +159,14 @@ const UserChat = () => {
                     <div className="chat-option flex items-center gap-2 p-2 border-t border-gray-300">
                         <div className="flex gap-2">
                             <ImAttachment size={23} className="cursor-pointer" />
-                            <FaImage size={23} className="cursor-pointer" />
+                            <FaImage onClick={handleImage} size={23} className="cursor-pointer" />
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                style={{ display: 'none' }}
+                                accept="image/*"
+                            />
                         </div>
 
                         <div className="flex flex-1 relative">
@@ -167,6 +188,7 @@ const UserChat = () => {
 
                         <div className="flex gap-2">
                             <BsEmojiSmile size={23} className="cursor-pointer" />
+                            <EmojiPicker />
                             <SlLike size={23} className="cursor-pointer" />
                         </div>
                     </div>
