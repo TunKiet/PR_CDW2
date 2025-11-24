@@ -2,41 +2,54 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         $this->call([
+            // 1️⃣ Dữ liệu gốc - người dùng, nhóm quyền
             UserSeeder::class,
-            CategorySeeder::class,       
+
+            // 2️⃣ Danh mục và thực đơn
+            CategorySeeder::class,
             MenuItemSeeder::class,
-            IngredientSeeder::class,
-            TableSeeder::class,  
+
+            // 3️⃣ Khách hàng và bàn ăn
+            CustomerSeeder::class,
+            TableSeeder::class,
+
+            // 4️⃣ Đặt bàn (phụ thuộc customer, table, user)
             ReservationSeeder::class,
-            PurchaseOrderSeeder::class,
-            PurchaseOrderItemSeeder::class,
+
+            // 5️⃣ Đơn hàng & chi tiết đơn hàng
             OrderSeeder::class,
             OrderDetailSeeder::class,
+
+            // 6️⃣ Thanh toán (phụ thuộc orders)
+            PaymentSeeder::class,
+
+            // 7️⃣ Điểm thưởng (phụ thuộc customers)
             PointSeeder::class,
+
+            // 8️⃣ Các phần phụ (review, công thức, tin nhắn, v.v.)
             MessageSeeder::class,
             CookingRecipeSeeder::class,
             ReviewSeeder::class,
             ReviewReplySeeder::class,
+
+            // 9️⃣ Phiếu nhập hàng
+            PurchaseOrderSeeder::class,
+            PurchaseOrderItemSeeder::class,
+
+            // 🔟 Phiên làm việc, dữ liệu tạm
             SessionSeeder::class,
         ]);
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

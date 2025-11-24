@@ -5,6 +5,7 @@ import { AiOutlineLike } from "react-icons/ai";
 import { AiOutlineDislike } from "react-icons/ai";
 import Tooltip from '@mui/material/Tooltip';
 import { MdAccessTime } from "react-icons/md";
+import Star from './Star';
 import Feedback from './Feedback';
 import AdminFeedback from './AdminFeedback';
 import UserFeedback from './UserFeedback';
@@ -15,35 +16,20 @@ import Box from '@mui/material/Box';
 import NoReview from '../../assets/icon/no-review.svg';
 import axios from "axios";
 
-const endPoint = 'http://127.0.0.1:8000/api';
 
-const BoxReview = () => {
-    const menuItemId = 1;
-
+const BoxReview = ({ menuItemId }) => {
+    const [showFeedback, setShowFeedback] = useState(false); //close or hide feedback
     const [likes, setLikes] = useState(0);
     const [disLikes, setDisLikes] = useState(0);
-    // const [showReply, setShowReply] = useState(false);
-    // const [showFeedback, setShowFeedback] = useState(false); //close or hide feedback
+    const [showReply, setShowReply] = useState(false);
 
     //set review
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const [activeReplyId, setActiveReplyId] = useState(null);
-
-    const handleToggleReply = (reviewId) => {
-        // nếu đang mở review này → đóng lại, nếu khác → mở review đó
-        setActiveReplyId(activeReplyId === reviewId ? null : reviewId);
-    };
-
-    // 👉 ID của review đang mở phản hồi
-    const [activeFeedbackId, setActiveFeedbackId] = useState(null);
-
-    // 👉 Toggle mở/đóng phản hồi của 1 review
-    const handleToggleFeedback = (reviewId) => {
-        setActiveFeedbackId((prev) => (prev === reviewId ? null : reviewId));
-    };
-
+    const handToggle = () => {
+        setShowFeedback(!showFeedback);
+    }
     const handleLike = () => {
         setLikes(likes + 1)
     }
@@ -52,16 +38,16 @@ const BoxReview = () => {
         setDisLikes(disLikes + 1)
     }
 
-    // const handleOpenReply = () => {
-    //     setShowReply(!showReply);
-    // }
+    const handleOpenReply = () => {
+        setShowReply(!showReply);
+    }
 
     useEffect(() => {
         const fetchReview = async () => {
             try {
-                const res = await axios.get(`${endPoint}/reviews/${menuItemId}`);
-
-                console.log(res.data.data);
+                const res = await axios.get(`http://localhost:8000/api/reviews/${menuItemId}`);
+                console.log("✅ API called:", `http://localhost:8000/api/reviews/${menuItemId}`);
+                console.log("📦 API response:", res.data);
                 setReviews(res.data);
             } catch (error) {
                 console.error("Error fetching reviews:", error);
@@ -105,21 +91,18 @@ const BoxReview = () => {
     return (
         <>
             {
-                reviews.map((review) => {
-                    const isOpenFeedback = activeFeedbackId === review.review_id;
-                    return (
-                        <div>
-                            <div key={review.review_id} className="boxReview-comment flex mb-1 p-1">
-                                <div className="boxReview-comment-titel w-[200px] flex items-start mb-2">
-                                    <div className="flex">
-                                        <p className='w-10 h-10 flex items-center justify-center text-white text-2xl font-bold bg-blue-700 rounded-full m-0'>A</p>
-                                    </div>
-                                    <div className="block-infor flex ms-2 mt-1">
-                                        <div className="block-infor-name">
-                                            <span className='font-bold text-2xl'>{review.user.username}</span>
-                                        </div>
-                                    </div>
+                reviews.map((review) => (
+                    <div key={review.review_id} className="boxReview-comment flex mb-1 p-1">
+                        <div className="boxReview-comment-titel w-[200px] flex items-start mb-2">
+                            <div className="flex">
+                                <p className='w-10 h-10 flex items-center justify-center text-white text-2xl font-bold bg-blue-700 rounded-full m-0'>A</p>
+                            </div>
+                            <div className="block-infor flex ms-2 mt-1">
+                                <div className="block-infor-name">
+                                    <span className='font-bold text-2xl'>{review.user.username}</span>
                                 </div>
+                            </div>
+                        </div>
 
                                 <div className="boxReview-comment-item">
                                     <div className="comment-item-rating flex items-center">

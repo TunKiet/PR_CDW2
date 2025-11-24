@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Table extends Model 
+class Table extends Model
 {
-protected $table = 'tables';
-    protected $primaryKey = 'table_id';
-    public $timestamps = true;
+    use HasFactory;
 
-    protected $fillable = [
-        'table_name',
-        'table_type',
-        'capacity',
-        'note',
-        'status'
-    ];
+    protected $table = 'tables';
+    protected $primaryKey = 'table_id';
+    protected $fillable = ['table_name', 'table_type', 'capacity', 'note', 'status'];
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'table_id', 'table_id');
+    }
 }

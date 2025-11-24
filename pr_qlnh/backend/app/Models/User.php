@@ -6,11 +6,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    // Khai báo khóa chính là 'user_id' thay vì 'id'
+    protected $primaryKey = 'user_id';
 
     /**
      * The attributes that are mass assignable.
@@ -18,36 +22,109 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $table = 'users';
-    protected $primaryKey = 'user_id';
+
+    // Nếu khóa chính khác "id", ví dụ "user_id"
+    // protected $primaryKey = 'id';
+
+    //Các cột có thể gán hàng loạt (mass assignment)
     protected $fillable = [
-        'username',
+        'username', // Đã thay thế 'name' bằng 'username'
         'email',
         'password',
+        'full_name',
         'phone',
-        'role',
-        'is_active'
+        'status',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    // Ẩn password khi trả về JSON
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public $timestamps = true;
+    // function
+    public function getJWTIdentifier()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return $this->getKey();
     }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+    }
+    // Gán role cho user
+    public function assignRole($roleName = 'customer')
+    {
+        $role = Role::firstOrCreate(['name' => $roleName]);
+        $this->roles()->syncWithoutDetaching($role->id);
+        return $this;
+    }
+
+    public function hasPermission($permissionName)
+    {
+        foreach ($this->roles as $role) {
+            if ($role->permissions->contains('name', $permissionName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public function getAllPermissions()
+    {
+        return Permission::whereIn('id', function ($query) {
+            $query->select('permission_id')
+                ->from('role_permissions')
+                ->whereIn('role_id', $this->roles()->pluck('id'));
+        })->pluck('name');
+    }
+
+    public function getAuthIdentifierName()
+    {
+        return 'user_id';
+    }
+    //lay nguoi dung theo email hoac phone
+    public static function getUserbyEmailOrPhone(string $field, string $value)
+    {
+        return self::where($field, $value)->first();
+    }
+    // get all users
+    public static function getAllUsers()
+    {
+        return self::all();
+    }
+    // add user
+    public static function addUser($data)
+    {
+        return self::create([
+            'full_name' => $data['username'] ?? null,
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'phone' => $data['phone'],
+            'status' => $data['status'] ?? 1,
+        ]);
+    }
+
+    // update user
+    public static function updateUser($id, array $data)
+    {
+        $user = self::find($id);
+        if ($user) {
+            $user->update($data);
+            return $user;
+        }
+    }
+    // delete user
+    public static function deleteUser($id)
+    {
+        $user = self::find($id);
+        if ($user) {
+            return $user->delete();
+        }
+    }
+
 }

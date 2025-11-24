@@ -5,22 +5,15 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class CategorySeeder extends Seeder
-{
-    const MAX_RECORDS = 10; // số lượng bản ghi muốn tạo
+class CategorySeeder extends Seeder {
+    public function run(): void {
+        DB::table('categories')->truncate();
 
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
-    {
-        for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
-            DB::table('categories')->insert([
-                'category_name' => 'Category ' . $i,
-                'description' => 'Description for category ' . $i,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        DB::table('categories')->insert([
+            ['category_name' => 'Món chính', 'description' => 'Các món ăn chính trong bữa ăn'],
+            ['category_name' => 'Món khai vị', 'description' => 'Các món ăn khai vị'],
+            ['category_name' => 'Đồ uống', 'description' => 'Cà phê, trà, nước ép...'],
+            ['category_name' => 'Tráng miệng', 'description' => 'Các món ngọt sau bữa chính'],
+        ]);
     }
 }

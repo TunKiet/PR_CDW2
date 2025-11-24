@@ -5,26 +5,18 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class MenuItemSeeder extends Seeder
-{
-    const MAX_RECORDS = 20; // số lượng món ăn muốn tạo
+class MenuItemSeeder extends Seeder {
+    public function run(): void {
+        DB::table('menu_items')->truncate();
 
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
-    {
-        for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
-            DB::table('menu_items')->insert([
-                'category_id' => rand(1, 10), // giả sử có 10 category
-                'menu_item_name' => 'Menu Item ' . $i,
-                'price' => rand(20000, 100000), // giá ngẫu nhiên 20k–100k
-                'image_url' => null,
-                'description' => 'Description for menu item ' . $i,
-                'status' => 'active',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        DB::table('menu_items')->insert([
+            ['category_id' => 1, 'menu_item_name' => 'Cơm gà Hải Nam', 'price' => 55000, 'status' => 'active'],
+            ['category_id' => 1, 'menu_item_name' => 'Bún bò Huế', 'price' => 60000, 'status' => 'active'],
+            ['category_id' => 2, 'menu_item_name' => 'Soup cua', 'price' => 45000, 'status' => 'active'],
+            ['category_id' => 3, 'menu_item_name' => 'Trà đào cam sả', 'price' => 35000, 'status' => 'active'],
+            ['category_id' => 3, 'menu_item_name' => 'Cà phê sữa đá', 'price' => 25000, 'status' => 'active'],
+            ['category_id' => 4, 'menu_item_name' => 'Bánh flan caramel', 'price' => 20000, 'status' => 'active'],
+        ]);
     }
 }
+
