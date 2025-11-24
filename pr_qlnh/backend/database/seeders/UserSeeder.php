@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
     {
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             DB::table('users')->insert([
-                'username' => 'user' . $i,
+                'full_name' => 'user' . $i,
                 'email' => 'user' . $i . '@example.com',
                 'password' => Hash::make('123456'),
                 'phone' => '090' . str_pad($i, 7, '0', STR_PAD_LEFT),
@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
 
         // ✅ Thêm 1 tài khoản admin riêng biệt
         DB::table('users')->insert([
-            'username' => 'admin',
+            'full_name' => 'admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('admin123'),
             'phone' => '0999999999',

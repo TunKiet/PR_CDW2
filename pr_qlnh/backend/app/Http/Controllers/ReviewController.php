@@ -8,69 +8,57 @@ use Illuminate\Support\Facades\Log;
 
 class ReviewController extends Controller
 {
+    public function getDataReview($menuItemId)
+    {
+        $reviews = Review::getReviewByMenuItemId($menuItemId, 5);
+
+        $totalReviews = Review::totalReviewOfOneMenuItem($menuItemId);
+
+        $avgRating = Review::averageRating($menuItemId);
+
+        $ratingCounts = Review::ratingCounts($menuItemId);
+
+        return response()->json([
+            'reviews' => $reviews,
+            'total' => $totalReviews,
+            'average' => round($avgRating, 1),
+            'rating_counts' => $ratingCounts
+        ]);
+    }
+
+    //Request send review
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'menu_item_id' => 'required|exists:menu_items,menu_item_id',
+        $request->validate([
+            'menu_item_id' => 'required|integer',
+            'user_id' => 'required|integer',
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string',
-            'image_url' => 'nullable|image|max:2048',
+            'comment' => 'required|string',
+            'image_url' => 'nullable|string',
+            'status' => 'required|string|in:approved,pending,rejected'
         ]);
 
-        $path = null;
-        if ($request->hasFile('image_url')) {
-            $path = $request->file('image_url')->store('reviews', 'public');
+        $review = Review::created($request->all());
+
+        return response()->json([
+            'data' => $review,
+        ]);
+    }
+
+    //Request button like, dislike
+    public function toggleLike($reviewId, Request $request)
+    {
+        $review = Review::findOrFail($reviewId);
+        $type = $request->type;
+
+        if ($type === 'like') {
+            $review->like = $review->like == 0 ? 1 : 0;
+        } else {
+            $review->dislike = $review->dislike == 0 ? 1 : 0;
         }
 
+        $review->save();
 
-        $review = Review::create([
-            'user_id' => 1,
-            'menu_item_id' => 1,
-            'rating' => $validated['rating'],
-            'comment' => $validated['comment'] ?? null,
-            'image_url' => $path,
-        ]);
-
-        $reviewWithUser = Review::with('user:user_id,username')->find($review->review_id);
-
-        return response()->json([
-            'message' => 'Đánh giá đã được lưu thành công!',
-            'data' => $reviewWithUser
-        ]);
-    }
-
-    //get review
-    public function index($menuItemId)
-    {
-        Log::info("🟢 Fetching reviews for menu_item_id = $menuItemId");
-
-        // 🟢 Lấy danh sách review kèm username
-        $reviews = Review::where('menu_item_id', $menuItemId)
-            ->with('user:user_id,username') // chỉ lấy 2 cột cần thiết
-            ->get();
-
-        Log::info("🟢 Found " . $reviews->count() . " reviews");
-
-        return response()->json($reviews);
-    }
-
-    //get average rating
-    public function getAverageRating($menuItemId)
-    {
-        $averageRating = Review::where('menu_item_id', $menuItemId)
-            ->where('status', 'pending')
-            ->average('rating');
-
-        // Nếu chưa có đánh giá thì trả 0
-        $averageRating = round($averageRating ?? 0, 1);
-
-        $count = Review::where('menu_item_id', $menuItemId)
-            ->where('status', 'approved')
-            ->count();
-
-        return response()->json([
-            'average_rating' => $averageRating,
-            'total_reviews' => $count
-        ]);
+        return response()->json($review);
     }
 }

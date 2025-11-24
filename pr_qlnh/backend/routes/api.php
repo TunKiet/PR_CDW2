@@ -50,6 +50,9 @@ use App\Models\Ingredient;
 use App\Http\Controllers\Api\PreOrderController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ReviewReplyController;
+use App\Models\Review;
+use App\Models\ReviewReply;
 
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
@@ -77,7 +80,7 @@ Route::get('/test', function () {
 Route::apiResource('dishes', DishController::class);
 
 Route::post('/reviews', [ReviewController::class, 'store']);
-Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
+// Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
 Route::get('/reviews/{menuItemId}/average', [ReviewController::class, 'averageRating']);
 Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
 Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
@@ -95,6 +98,11 @@ Route::post('/mark-read', [MessageController::class, 'markAsRead']);
 Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::post('/chat', [ChatController::class, 'message']);
 
+//Review
+Route::get('/reviews/{menuItemId}', [ReviewController::class, 'getDataReview']);
+Route::get('/menu-items/{menuItemId}/reviews', [ReviewReplyController::class, 'getDataReply']);
+Route::post('/review', [ReviewController::class, 'store']);
+Route::post('/reviews/${reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
 
 /*
 |--------------------------------------------------------------------------

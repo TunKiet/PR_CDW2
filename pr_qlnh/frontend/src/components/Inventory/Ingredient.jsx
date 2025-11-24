@@ -17,8 +17,6 @@ import axios from "axios";
 import CategoryIngredient from './CategoryIngredient';
 
 const Ingredient = () => {
-
-
     //Open dialog add ingredient
     const [openAdd, setOpenAdd] = useState(false);
 

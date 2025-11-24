@@ -28,7 +28,7 @@ class User extends Authenticatable implements JWTSubject
 
     //Các cột có thể gán hàng loạt (mass assignment)
     protected $fillable = [
-        'username', // Đã thay thế 'name' bằng 'username'
+        'full_name', // Đã thay thế 'name' bằng 'username'
         'email',
         'password',
         'full_name',
