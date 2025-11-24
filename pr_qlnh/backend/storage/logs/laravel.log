@@ -15573,3 +15573,31 @@ Did you mean one of these?
 [2025-11-23 12:34:53] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":34,"user_id":2,"message":"how old are you"} 
 [2025-11-23 12:34:54] local.INFO: Broadcasting as {"event":"message"} 
 [2025-11-23 12:34:54] local.INFO: 🟢 Broadcasting on channel: conversation.1  
+[2025-11-23 14:20:17] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":1,"user_id":2,"sender_type":"customer","message":"😚☺️😉"} 
+[2025-11-23 14:20:19] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":35,"user_id":2,"message":"😚☺️😉"} 
+[2025-11-23 14:20:22] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-23 14:20:22] local.INFO: 🟢 Broadcasting on channel: conversation.1  
+[2025-11-23 14:20:40] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":1,"user_id":1,"sender_type":"admin","message":"hay"} 
+[2025-11-23 14:20:41] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":36,"user_id":1,"message":"hay"} 
+[2025-11-23 14:20:41] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-23 14:20:41] local.INFO: 🟢 Broadcasting on channel: conversation.1  
+[2025-11-23 14:21:30] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":1,"user_id":2,"sender_type":"customer","message":"haha😄😄"} 
+[2025-11-23 14:21:30] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":37,"user_id":2,"message":"haha😄😄"} 
+[2025-11-23 14:21:31] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-23 14:21:31] local.INFO: 🟢 Broadcasting on channel: conversation.1  
+[2025-11-23 14:22:00] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":1,"user_id":2,"sender_type":"customer","message":"=))😅😅"} 
+[2025-11-23 14:22:00] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":38,"user_id":2,"message":"=))😅😅"} 
+[2025-11-23 14:22:00] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-23 14:22:00] local.INFO: 🟢 Broadcasting on channel: conversation.1  
+[2025-11-23 14:34:32] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":1,"user_id":2,"sender_type":"customer","message":"👍"} 
+[2025-11-23 14:34:32] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":39,"user_id":2,"message":"👍"} 
+[2025-11-23 14:34:33] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-23 14:34:33] local.INFO: 🟢 Broadcasting on channel: conversation.1  
+[2025-11-23 14:38:19] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":1,"user_id":1,"sender_type":"admin","message":"👍"} 
+[2025-11-23 14:38:19] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":40,"user_id":1,"message":"👍"} 
+[2025-11-23 14:38:20] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-23 14:38:20] local.INFO: 🟢 Broadcasting on channel: conversation.1  
+[2025-11-24 03:23:01] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":1,"user_id":1,"sender_type":"admin","message":"aloo"} 
+[2025-11-24 03:23:03] local.INFO: 🟢 Event MessageSent created: {"conversation_id":1,"message_id":41,"user_id":1,"message":"aloo"} 
+[2025-11-24 03:23:07] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-24 03:23:07] local.INFO: 🟢 Broadcasting on channel: conversation.1  

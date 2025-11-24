@@ -12,7 +12,7 @@ use App\Models\OrderDetail;
 use App\Models\Payment;
 use App\Models\Point;
 
-class OrderController extends Controller
+class OrderWebController extends Controller
 {
     public function create()
     {

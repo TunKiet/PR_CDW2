@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./HomePage.css";
 import "./ReservationForm.css";
 import MenuItemModal from "../MenuItemModal";
+import UserChat from "../Chat/UserChat"
 
 // =========================
 // FORMAT TIỀN
@@ -333,6 +334,7 @@ export default function HomePage() {
             </p>
           )}
         </div>
+        <UserChat />
 
         {/* PAGINATION */}
         <div className="flex justify-center items-center gap-4 mt-6">

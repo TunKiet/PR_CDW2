@@ -10,6 +10,8 @@ import Sender from "./Sender";
 import axios from 'axios';
 import Pusher from 'pusher-js';
 import EmojiPicker from 'emoji-picker-react';
+import { Popover } from '@headlessui/react';
+
 
 const endPoint = 'http://localhost:8000/api';
 
@@ -91,6 +93,31 @@ const UserChat = () => {
             })
             .catch(err => console.error("❌ Send message error:", err));
     };
+
+    const handleEmojiClick = (emojiData) => {
+        setInput(prev => prev + emojiData.emoji);
+    };
+
+
+    // Trong component UserChat
+    const sendEmoji = (emoji) => {
+        if (!conversationId) return;
+
+        console.log("📤 Sending emoji:", emoji);
+
+        axios.post(`${endPoint}/send-message`, {
+            conversation_id: conversationId,
+            user_id: userId,
+            sender_type: 'customer',
+            message: emoji
+        })
+            .then(res => {
+                console.log("✅ Emoji sent:", res.data);
+                // Không cần thêm vào state, Pusher sẽ xử lý
+            })
+            .catch(err => console.error("❌ Send emoji error:", err));
+    };
+
 
     //Open select file image
     const handleImage = () => {
@@ -187,9 +214,21 @@ const UserChat = () => {
                         </div>
 
                         <div className="flex gap-2">
-                            <BsEmojiSmile size={23} className="cursor-pointer" />
-                            <EmojiPicker />
-                            <SlLike size={23} className="cursor-pointer" />
+                            <div>
+                                <Popover className="relative">
+                                    <Popover.Button>
+                                        <BsEmojiSmile size={23} className="cursor-pointer" />
+                                    </Popover.Button>
+
+                                    <Popover.Panel className="absolute z-10 right-0 bottom-full mb-2">
+                                        <EmojiPicker
+                                            theme="dark"
+                                            onEmojiClick={handleEmojiClick}
+                                        />
+                                    </Popover.Panel>
+                                </Popover>
+                            </div>
+                            <SlLike onClick={() => sendEmoji("👍")} size={23} className="cursor-pointer" />
                         </div>
                     </div>
                 </div>
