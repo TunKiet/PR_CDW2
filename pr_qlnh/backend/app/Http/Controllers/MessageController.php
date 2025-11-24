@@ -19,7 +19,7 @@ class MessageController extends Controller
         $request->validate([
             'conversation_id' => 'required|exists:conversations,conversation_id',
             'user_id' => 'required|exists:users,user_id',
-            'sender_type' => 'required|in:customer,admin',
+            'sender_type' => 'required|in:user,admin',
             'message' => 'required|string',
         ]);
 

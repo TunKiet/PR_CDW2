@@ -11,6 +11,7 @@ services:
     working_dir: /var/www
     volumes:
       - ./backend:/var/www
+      - /var/www/vendor
       - ./backend/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network
@@ -54,7 +55,7 @@ services:
       MYSQL_ROOT_PASSWORD: root 
       MYSQL_PASSWORD: password
       MYSQL_USER: laravel
-      # MYSQL_PASSWORD: laravel
+    # MYSQL_PASSWORD: laravel
     ports:
       - "3306:3306"
     volumes:

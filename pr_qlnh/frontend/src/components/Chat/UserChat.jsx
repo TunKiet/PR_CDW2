@@ -12,7 +12,6 @@ import Pusher from 'pusher-js';
 import EmojiPicker from 'emoji-picker-react';
 import { Popover } from '@headlessui/react';
 
-
 const endPoint = 'http://localhost:8000/api';
 
 const UserChat = () => {
@@ -75,14 +74,14 @@ const UserChat = () => {
         console.log("📤 Sending message:", {
             conversation_id: conversationId,
             user_id: userId,
-            sender_type: 'customer',
+            sender_type: 'user',
             message: input
         });
 
         axios.post(`${endPoint}/send-message`, {
             conversation_id: conversationId,
             user_id: userId,
-            sender_type: 'customer',
+            sender_type: 'user',
             message: input
         })
             .then(res => {
@@ -108,7 +107,7 @@ const UserChat = () => {
         axios.post(`${endPoint}/send-message`, {
             conversation_id: conversationId,
             user_id: userId,
-            sender_type: 'customer',
+            sender_type: 'user',
             message: emoji
         })
             .then(res => {
