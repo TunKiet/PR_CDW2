@@ -1,0 +1,329 @@
+/* ============================
+   LAYOUT
+============================ */
+.admin-layout {
+  display: flex;
+  background: #f5f6fa;
+  min-height: 100vh;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 25px 35px;
+}
+
+/* ============================
+   TITLE
+============================ */
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* ============================
+   FILTERS
+============================ */
+.filter-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filter-row input {
+  width: 220px;
+  padding: 8px 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+}
+
+.filter-row button {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.filter-row button:hover {
+  background: #4f46e5;
+}
+
+.filter-row select {
+  padding: 8px 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+}
+
+/* ============================
+   ORDER TABLE
+============================ */
+.order-table {
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  border-collapse: collapse;
+  border: 1px solid #e0e0e0;
+}
+
+.order-table th {
+  background: #eef2ff;
+  padding: 14px 10px;
+  font-size: 14px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.order-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.order-table tr:hover {
+  background: #f8f9ff;
+}
+
+.order-table button {
+  padding: 6px 10px;
+  background: #2563eb;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.order-table button:hover {
+  background: #1d4ed8;
+}
+
+/* ============================
+   STATUS BADGES
+============================ */
+.status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status.pending {
+  background: #fff7e6;
+  color: #b45309;
+}
+
+.status.confirmed {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.status.delivering {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status.done {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* ============================
+   PAGINATION
+============================ */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.pagination button {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+/* ============================
+   MODAL
+============================ */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+
+.modal-box {
+  background: white;
+  width: 520px;
+  max-height: 90vh;
+  padding: 25px;
+  border-radius: 12px;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-box h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+/* ============================
+   MODAL CONTENT
+============================ */
+.modal-box p {
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.item-list {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+  list-style: none;
+}
+
+.item-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+}
+
+.item-list li:last-child {
+  border-bottom: none;
+}
+
+/* ============================
+   MODAL ACTIONS
+============================ */
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.modal-actions button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+.modal-actions .close {
+  background: #6b7280;
+}
+
+.modal-actions button:nth-child(1) {
+  background: #3b82f6;
+}
+
+.modal-actions button:nth-child(2) {
+  background: #f59e0b;
+}
+
+.modal-actions button:nth-child(3) {
+  background: #10b981;
+}
+
+.modal-actions button:nth-child(4) {
+  background: #ef4444;
+}
+
+/* ============================
+   ANIMATIONS
+============================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ================================
+   DANH SÁCH MÓN ĂN TRONG MODAL
+================================ */
+.item-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  border: 1px solid #e6e9ef;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* header */
+.item-list-header {
+  display: grid;
+  grid-template-columns: 1.5fr 0.5fr 0.7fr;
+  background: #f8f9fc;
+  padding: 10px 14px;
+  font-weight: bold;
+  border-bottom: 1px solid #e6e9ef;
+  font-size: 15px;
+  color: #333;
+}
+
+.item-row {
+  display: grid;
+  grid-template-columns: 1.5fr 0.5fr 0.7fr;
+  padding: 12px 14px;
+  align-items: center;
+  border-bottom: 1px solid #f1f1f1;
+  background: white;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-weight: 500;
+  color: #222;
+}
+
+.item-qty {
+  text-align: center;
+  font-weight: 500;
+  color: #444;
+}
+
+.item-price {
+  text-align: right;
+  font-weight: bold;
+  color: #d32f2f;
+}
+.price{
+  text-align: center;
+  margin-left: 20px;
+}
