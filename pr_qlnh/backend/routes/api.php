@@ -22,7 +22,7 @@ use App\Http\Controllers\CategoryIngredientController;
 use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\TableController;
-use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\PaymentController;
 
 use App\Http\Controllers\Api\PreOrderController;
@@ -188,4 +188,3 @@ Route::put('/order-online/{id}', [OrderOnlineController::class, 'update']);
 Route::get('/admin/order-online', [OrderOnlineAdminController::class, 'index']);
 Route::get('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'show']);
 Route::put('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'updateStatus']);
-
