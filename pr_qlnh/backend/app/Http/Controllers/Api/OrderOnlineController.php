@@ -52,12 +52,29 @@ class OrderOnlineController extends Controller
         ]);
     }
 
-    public function index()
-    {
-        return OnlineOrder::withCount('items')
-            ->orderBy('id', 'desc')
-            ->paginate(10);
+    public function index(Request $request)
+{
+    $query = OnlineOrder::query();
+
+    // Tìm kiếm
+    if ($request->q) {
+        $query->where(function ($q) use ($request) {
+            $q->where('customer_name', 'like', "%{$request->q}%")
+              ->orWhere('phone', 'like', "%{$request->q}%")
+              ->orWhere('id', $request->q);
+        });
     }
+
+    // Lọc trạng thái
+    if ($request->status && $request->status !== "") {
+        $query->where('status', $request->status);
+    }
+
+    return response()->json(
+        $query->orderBy('id', 'desc')->paginate(10)
+    );
+}
+
 
     public function show($id)
     {
