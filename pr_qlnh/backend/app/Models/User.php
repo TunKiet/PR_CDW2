@@ -74,6 +74,7 @@ class User extends Authenticatable implements JWTSubject
         }
         return false;
     }
+    // lay tat ca quyen
     public function getAllPermissions()
     {
         return Permission::whereIn('id', function ($query) {

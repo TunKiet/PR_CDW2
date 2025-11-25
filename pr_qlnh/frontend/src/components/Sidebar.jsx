@@ -49,7 +49,6 @@ const Sidebar = () => {
 
   const toggleSubMenu = (title) =>
     setOpenSubMenu(openSubMenu === title ? null : title);
-
   return (
     <div className="w-64 h-screen bg-white border-r flex flex-col">
       
