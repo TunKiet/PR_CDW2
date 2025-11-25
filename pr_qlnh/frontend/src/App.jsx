@@ -11,6 +11,8 @@ import ReviewModerator from './components/ReviewModerator/ReviewModerator'
 import Invertory from './components/Inventory/Inventory'
 import IngredientInOut from './components/Inventory/IngredientInOut'
 import TableManagementAdmin from './pages/TableManagementAdmin'
+import Reservation from './pages/Reservations/ReservationCenter'
+import ReservationCreate from './pages/ReservationCreate'
 import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 // Import các component trang của bạn
 import CartManagement from "./pages/CartManagement";
@@ -54,8 +56,10 @@ function App() {
         <Route path="/export" element={<IngredientInOut/>} />
         <Route path="/inventory-overview" element={<InventoryOverview/>} />
         <Route path="/category-manager" element={<CategoryManager/>} />
+
 		    <Route path="/tables" element={<TableManagementAdmin/>} />
-        
+        <Route path="/reservation" element={<Reservation/>} />
+        <Route path="/reservationcreate" element={<ReservationCreate/>} />
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path='/analytics' element={<UserDashboard />} />  

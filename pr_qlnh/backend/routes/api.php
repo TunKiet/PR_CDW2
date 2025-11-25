@@ -62,7 +62,10 @@ Route::get('/reviews/{menuItemId}/average', [ReviewController::class, 'averageRa
 Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
 Route::post('/ingredients', [IngredientController::class, 'store']);
 Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
-Route::delete('/ingredients/delete/{id}', [IngredientController::class, 'destroy']);
+Route::post('/add', [IngredientController::class, 'store']);
+Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
+Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
+Route::get('/export', [IngredientController::class, 'exportPDF']);
 Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
 Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::get('/export', [IngredientController::class, 'exportPDF']);
@@ -157,34 +160,13 @@ Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']
 Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
 
 
-/*
-|--------------------------------------------------------------------------
-| 💳 Payments
-|--------------------------------------------------------------------------
-*/
-Route::prefix('payments')->group(function () {
-    Route::get('/', [PaymentController::class, 'index']);
-    Route::get('/{id}', [PaymentController::class, 'show']);
-    Route::post('/', [PaymentController::class, 'store']);
-});
+//Table
+Route::apiResource('tables', TableController::class);
+Route::post('/reservations', [ReservationController::class, 'store']);
+//login mới được đặt bàn
+//Route::middleware('auth:sanctum')->post('/reservations', [ReservationController::class, 'store']);
 
-
-/*
-|--------------------------------------------------------------------------
-| 🛍️ ORDER ONLINE (Frontend Website)
-|--------------------------------------------------------------------------
-*/
-Route::post('/order-online', [OrderOnlineController::class, 'store']);
-Route::get('/order-online', [OrderOnlineController::class, 'index']);
-Route::get('/order-online/{id}', [OrderOnlineController::class, 'show']);
-Route::put('/order-online/{id}', [OrderOnlineController::class, 'update']);
-
-
-/*
-|--------------------------------------------------------------------------
-| 🛒 ORDER ONLINE ADMIN
-|--------------------------------------------------------------------------
-*/
-Route::get('/admin/order-online', [OrderOnlineAdminController::class, 'index']);
-Route::get('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'show']);
-Route::put('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'updateStatus']);
+// Route::get('/tables', [TableController::class, 'index']);
+// Route::post('/tables', [TableController::class, 'store']);
+// Route::put('/tables/{id}', [TableController::class, 'update']);
+// Route::delete('/tables/{id}', [TableController::class, 'destroy']);
