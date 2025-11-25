@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./HomePage.css";
 import "./ReservationForm.css";
 import MenuItemModal from "../MenuItemModal";
+import OrderOnlineForm from "../OrderOnlineForm"; // <-- đảm bảo đường dẫn đúng
 
 // =========================
 // FORMAT TIỀN
@@ -29,6 +30,7 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deposit = total * 0.5;
+const [showOrderOnline, setShowOrderOnline] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -134,6 +136,8 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
 export default function HomePage() {
 
   // ================= HOOKS =================
+  const [showOrderOnline, setShowOrderOnline] = useState(false);
+
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
@@ -432,11 +436,19 @@ export default function HomePage() {
                 </p>
 
                 <div className="cart-actions">
-                  <button className="checkout-btn">Thanh toán</button>
-                  <button className="book-btn" onClick={() => {
-                    setShowCart(false);
-                    setShowReservation(true);
-                  }}>Đặt bàn</button>
+                  <button
+  className="checkout-btn"
+  onClick={() => {
+    setShowCart(false);
+    setShowOrderOnline(true);
+  }}
+>
+  Thanh toán
+</button>
+
+
+
+                  
                 </div>
               </>
             )}
@@ -444,11 +456,14 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Modal xem chi tiết món */}
-      {showModal && (
-        <MenuItemModal item={selectedItem} onClose={() => setShowModal(false)} />
-      )}
-
+      
+{showModal && (
+  <MenuItemModal
+    item={selectedItem}
+    onClose={() => setShowModal(false)}
+    onAddToCart={onAddToCart}   // <-- thêm dòng này
+  />
+)}
       {/* Form đặt bàn */}
       {showReservation && (
         <ReservationForm
@@ -457,6 +472,24 @@ export default function HomePage() {
           formatCurrency={formatCurrency}
         />
       )}
+       {/* Form đặt hàng online */}
+      {showOrderOnline && (
+  <div className="order-online-overlay" onClick={() => setShowOrderOnline(false)}>
+    <div className="order-online-box" onClick={(e) => e.stopPropagation()}>
+      <OrderOnlineForm
+        cart={cart}
+        onClose={() => setShowOrderOnline(false)}
+        formatCurrency={formatCurrency}
+      />
+    </div>
+  </div>
+)}
+
+      
+      
+
+
+
 
       {/* Toast */}
       {toast && <div className="toast">{toast}</div>}

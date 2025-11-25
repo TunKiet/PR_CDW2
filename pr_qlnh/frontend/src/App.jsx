@@ -12,7 +12,6 @@ import Invertory from './components/Inventory/Inventory'
 import IngredientInOut from './components/Inventory/IngredientInOut'
 import TableManagementAdmin from './pages/TableManagementAdmin'
 import InventoryOverview from './components/InventoryOverview/InventoryOverview'
-
 // Import các component trang của bạn
 import CartManagement from "./pages/CartManagement";
 import OrderPage from './pages/OrderPage';
@@ -29,7 +28,7 @@ import HomePage from "./components/08_hao-QLMonAn/HomePage";
 import RestaurantInfoManage from "./components/08_hao-QLMonAn/restaurant_infor_manage";
 import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
-
+import OrderOnlineAdmin from "./pages/OrderOnlineAdmin";
 function App() {
   return (
     <BrowserRouter> 
@@ -43,6 +42,8 @@ function App() {
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/cart-management" element={<CartManagement />} />
         <Route path="/menu-item/:id" element={<MenuItemDetailPage />} />
+        <Route path="/order-online" element={<OrderOnlineAdmin />} />
+
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
