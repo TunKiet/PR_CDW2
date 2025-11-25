@@ -97,6 +97,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return self::all();
     }
+    //get user by id
+    public static function getUserById($id)
+    {
+        return self::find($id);
+    }
     // add user
     public static function addUser($data)
     {

@@ -137,73 +137,6 @@ Route::prefix('customers')->group(function () {
 | 🧾 Orders (Ăn tại nhà hàng)
 |--------------------------------------------------------------------------
 */
-<<<<<<< HEAD
-
-// ✅ Test route kiểm tra API hoạt động
-Route::get('/test', function () {
-    return response()->json(['message' => 'API file is loaded']);
-});
-
-/*
-|--------------------------------------------------------------------------
-| 🍽️ Dish & Review Routes
-|--------------------------------------------------------------------------
-*/
-Route::apiResource('dishes', DishController::class);
-
-Route::post('/reviews', [ReviewController::class, 'store']);
-Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
-Route::get('/reviews/{menuItemId}/average', [ReviewController::class, 'averageRating']);
-Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
-Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
-Route::post('/add', [IngredientController::class, 'store']);
-Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
-Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
-Route::get('/export', [IngredientController::class, 'exportPDF']);
-Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
-Route::get('/alert', [IngredientController::class, 'alertIngredient']);
-
-
-/*
-|--------------------------------------------------------------------------
-| 👤 Auth Routes (JWT)
-|--------------------------------------------------------------------------
-*/
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-
-Route::middleware(['jwt.auth'])->group(function () {
-    Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-});
-
-/*
-|--------------------------------------------------------------------------
-| 🛡️ Role & Permission Routes
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['jwt.auth'])->group(function () {
-    Route::apiResource('/roles', RoleController::class);
-    Route::apiResource('/permissions', PermissionController::class);
-});
-
-Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
-Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
-Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);
-
-Route::get('/categories', [CategoryController::class, 'index']);
-
-
-Route::get('/pre-orders', [PreOrderController::class, 'index']);
-Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
-Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
-
-
-Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
-Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
-
-=======
->>>>>>> origin/Loc/f3/PreOrder
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']);
     Route::get('/{id}', [OrderController::class, 'show']);
@@ -211,11 +144,6 @@ Route::prefix('orders')->group(function () {
     Route::delete('/{id}', [OrderController::class, 'destroy']);
 });
 
-<<<<<<< HEAD
-//Menu
-Route::get('/menu', [OrderController::class, 'menu']); // lấy menu
-// Payments
-=======
 Route::get('/menu', [OrderController::class, 'menu']);
 
 
@@ -234,7 +162,6 @@ Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus'
 | 💳 Payments
 |--------------------------------------------------------------------------
 */
->>>>>>> origin/Loc/f3/PreOrder
 Route::prefix('payments')->group(function () {
     Route::get('/', [PaymentController::class, 'index']);
     Route::get('/{id}', [PaymentController::class, 'show']);

@@ -42,10 +42,8 @@ function App() {
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/cart-management" element={<CartManagement />} />
         <Route path="/menu-item/:id" element={<MenuItemDetailPage />} />
-<<<<<<< HEAD
-=======
         <Route path="/order-online" element={<OrderOnlineAdmin />} />
->>>>>>> origin/Loc/f3/PreOrder
+
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
