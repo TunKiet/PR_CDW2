@@ -3,19 +3,18 @@ import "./HomePage.css";
 import "./ReservationForm.css";
 import MenuItemModal from "../MenuItemModal";
 
-// =========================
-// FORMAT TIỀN
-// =========================
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+
+// Format tiền
 const formatCurrency = (amount) =>
   new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
   }).format(amount);
 
-// ===================================================================
-// ReservationForm Component
-// ===================================================================
+// ReservationForm Component (giữ nguyên)
 function ReservationForm({ cart, onClose, formatCurrency }) {
+  // ... code cũ giữ nguyên
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -50,158 +49,129 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
   return (
     <div className="reservation-overlay" onClick={onClose}>
       <div className="reservation-box" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>
-          &times;
-        </button>
-
+        <button className="close-btn" onClick={onClose}>&times;</button>
         <h2 className="reservation-title">Đặt Bàn Ngay</h2>
-
         <form onSubmit={handleSubmit}>
+          {/* Form fields giữ nguyên */}
           <div className="form-grid">
             <div>
               <label>Tên *</label>
-              <input
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
+              <input name="name" value={formData.name} onChange={handleChange} required />
             </div>
-
             <div>
               <label>Số điện thoại *</label>
-              <input
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-              />
+              <input name="phone" value={formData.phone} onChange={handleChange} required />
             </div>
-
             <div className="full">
               <label>Email</label>
-              <input
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
+              <input name="email" value={formData.email} onChange={handleChange} />
             </div>
-
             <div>
               <label>Ngày *</label>
-              <input
-                type="date"
-                min={today}
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-              />
+              <input type="date" min={today} name="date" value={formData.date} onChange={handleChange} required />
             </div>
-
             <div>
               <label>Giờ *</label>
-              <input
-                type="time"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-                required
-              />
+              <input type="time" name="time" value={formData.time} onChange={handleChange} required />
             </div>
-
             <div className="full">
               <label>Số lượng khách *</label>
-              <input
-                type="number"
-                min="1"
-                name="guests"
-                value={formData.guests}
-                onChange={handleChange}
-                required
-              />
+              <input type="number" min="1" name="guests" value={formData.guests} onChange={handleChange} required />
             </div>
           </div>
-
           <fieldset className="seating">
             <legend>Khu vực chỗ ngồi *</legend>
             <div className="seating-options">
               {["Trong nhà", "Ngoài trời", "Phòng VIP"].map((area) => (
                 <label key={area}>
-                  <input
-                    type="radio"
-                    name="seating_area"
-                    value={area}
-                    checked={formData.seating_area === area}
-                    onChange={handleChange}
-                    required
-                  />
+                  <input type="radio" name="seating_area" value={area} checked={formData.seating_area === area} onChange={handleChange} required />
                   <span>{area}</span>
                 </label>
               ))}
             </div>
           </fieldset>
-
           {cart.length > 0 && (
             <div className="preorder-summary">
               <h3>🍽️ Tóm Tắt Đặt Món Trước</h3>
-              <p>
-                Tổng: <strong>{formatCurrency(total)}</strong>
-              </p>
-              <p>
-                Cọc 50%:{" "}
-                <strong className="text-red">{formatCurrency(deposit)}</strong>
-              </p>
+              <p>Tổng: <strong>{formatCurrency(total)}</strong></p>
+              <p>Cọc 50%: <strong className="text-red">{formatCurrency(deposit)}</strong></p>
             </div>
           )}
-
           <div className="notes">
             <label>Ghi chú</label>
-            <textarea
-              rows="3"
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-            />
+            <textarea rows="3" name="notes" value={formData.notes} onChange={handleChange} />
           </div>
-
-          <button type="submit" className="submit-btn">
-            Gửi Yêu Cầu Đặt Bàn
-          </button>
+          <button type="submit" className="submit-btn">Gửi Yêu Cầu Đặt Bàn</button>
         </form>
       </div>
     </div>
   );
 }
 
-// ===================================================================
 // HomePage Component
-// ===================================================================
 export default function HomePage() {
-  // ================= HOOKS =================
+  // States
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
   const [toast, setToast] = useState(null);
-
-  // Modal xem món
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // Menu Items
+  // Data từ API
+  const [featuredDishes, setFeaturedDishes] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [promotions, setPromotions] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
 
-  // Category filter
+  // Filter & Pagination
   const [selectedCategory, setSelectedCategory] = useState("all");
-
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
+  // Loading states
+  const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [isLoadingPromotions, setIsLoadingPromotions] = useState(true);
+
   // ================= FETCH DATA =================
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/menu-items")
+    // Fetch Featured Dishes
+    fetch(`${API_BASE_URL}/v1/featured-dishes`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === 'success') {
+          setFeaturedDishes(data.data);
+        }
+      })
+      .catch((err) => console.error("Lỗi tải món nổi bật:", err))
+      .finally(() => setIsLoadingFeatured(false));
+
+    // Fetch Categories
+    fetch(`${API_BASE_URL}/categories`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === 'success') {
+          setCategories(data.data);
+        }
+      })
+      .catch((err) => console.error("Lỗi tải danh mục:", err))
+      .finally(() => setIsLoadingCategories(false));
+
+    // Fetch Active Promotions
+    fetch(`${API_BASE_URL}/v1/active-promotions`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setPromotions(data.data);
+        }
+      })
+      .catch((err) => console.error("Lỗi tải ưu đãi:", err))
+      .finally(() => setIsLoadingPromotions(false));
+
+    // Fetch All Menu Items
+    fetch(`${API_BASE_URL}/menu-items`)
       .then((res) => res.json())
       .then((data) => {
         setMenuItems(data);
@@ -210,28 +180,27 @@ export default function HomePage() {
       .catch((err) => console.error("Lỗi tải menu:", err));
   }, []);
 
-  // ================= FILTER BY CATEGORY =================
-  const filterByCategory = (cat) => {
-    setSelectedCategory(cat);
-    if (cat === "all") {
+  // Filter by category
+  const filterByCategory = (catId) => {
+    setSelectedCategory(catId);
+    if (catId === "all") {
       setFilteredItems(menuItems);
     } else {
-      setFilteredItems(menuItems.filter((i) => i.category_id === cat));
+      setFilteredItems(menuItems.filter((i) => i.category_id === catId));
     }
     setCurrentPage(1);
   };
 
-  // ================= PAGINATION =================
+  // Pagination
   const lastIndex = currentPage * itemsPerPage;
   const firstIndex = lastIndex - itemsPerPage;
   const currentItems = filteredItems.slice(firstIndex, lastIndex);
-
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-  const nextPage = () =>
-    currentPage < totalPages && setCurrentPage(currentPage + 1);
+
+  const nextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
   const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
 
-  // ================= CART =================
+  // Cart functions
   const onAddToCart = (item) => {
     setCart((prev) => {
       const exists = prev.find((x) => x.menu_item_id === item.menu_item_id);
@@ -274,20 +243,12 @@ export default function HomePage() {
         <nav className="home-navbar">
           <div className="nav-logo">🍜 Nhà Hàng Nhóm D</div>
           <ul className="nav-links">
-            <li>
-              <a href="#home">Trang chủ</a>
-            </li>
-            <li>
-              <a href="#menu">Thực đơn</a>
-            </li>
-            <li>
-              <a href="#promotions">Ưu đãi</a>
-            </li>
-            <li>
-              <a href="#reservation">Đặt bàn</a>
-            </li>
+            <li><a href="#home">Trang chủ</a></li>
+            <li><a href="#featured">Món nổi bật</a></li>
+            <li><a href="#menu">Thực đơn</a></li>
+            <li><a href="#promotions">Ưu đãi</a></li>
+            <li><a href="#reservation">Đặt bàn</a></li>
           </ul>
-
           <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
             🛒 <span>{cart.reduce((s, i) => s + i.quantity, 0)}</span>
           </div>
@@ -302,44 +263,117 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* MENU SECTION */}
-      <section id="menu" className="menu-section">
-        <h2 className="text-2xl font-bold text-center mb-6">
-          🍽️ Danh Sách Món
+      {/* ===== FEATURED DISHES SECTION ===== */}
+      <section id="featured" className="featured-section py-12 bg-gray-50">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          ⭐ Món Ăn Nổi Bật
         </h2>
 
-        {/* CATEGORY FILTER */}
-        <div className="flex flex-wrap justify-center gap-3 mb-6">
-          {[
-            { id: "all", name: "Tất cả" },
-            { id: 1, name: "Món chính" },
-            { id: 2, name: "Món phụ" },
-            { id: 3, name: "Món khai vị" },
-            { id: 4, name: "Đồ uống" },
-          ].map((cat) => (
-            <button
-              key={cat.id}
-              className={`px-4 py-2 rounded-full ${
-                selectedCategory === cat.id
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-200 hover:bg-gray-300"
-              }`}
-              onClick={() => filterByCategory(cat.id)}
-            >
-              {cat.name}
-            </button>
-          ))}
+        {isLoadingFeatured ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Đang tải...</p>
+          </div>
+        ) : featuredDishes.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Chưa có món nổi bật nào</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-6xl mx-auto">
+            {featuredDishes.map((dish) => (
+              <div
+                key={dish.menu_item_id}
+                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition duration-300 transform hover:-translate-y-2"
+              >
+                <div className="h-48 overflow-hidden">
+                  <img
+                    src={dish.image_url || 'https://placehold.co/600x400'}
+                    alt={dish.menu_item_name}
+                    className="w-full h-full object-cover cursor-pointer hover:scale-110 transition duration-300"
+                    onClick={() => {
+                      setSelectedItem(dish);
+                      setShowModal(true);
+                    }}
+                  />
+                </div>
+                <div className="p-5">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-xl font-bold text-gray-800">{dish.menu_item_name}</h3>
+                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">⭐ Nổi bật</span>
+                  </div>
+                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                    {dish.description || 'Món ăn đặc biệt của nhà hàng'}
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-2xl font-bold text-indigo-600">
+                      {formatCurrency(dish.price)}
+                    </span>
+                    <button
+                      onClick={() => onAddToCart(dish)}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                    >
+                      Thêm vào giỏ
+                    </button>
+                  </div>
+                  {dish.category && (
+                    <div className="mt-3">
+                      <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                        {dish.category.category_name}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ===== MENU SECTION ===== */}
+      <section id="menu" className="menu-section py-12">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          🍽️ Thực Đơn Đầy Đủ
+        </h2>
+
+        {/* CATEGORY FILTER - DYNAMIC FROM API */}
+        <div className="flex flex-wrap justify-center gap-3 mb-8 px-4">
+          <button
+            className={`px-5 py-2 rounded-full transition ${
+              selectedCategory === "all"
+                ? "bg-indigo-600 text-white shadow-lg"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+            onClick={() => filterByCategory("all")}
+          >
+            Tất cả
+          </button>
+
+          {isLoadingCategories ? (
+            <span className="text-gray-500">Đang tải danh mục...</span>
+          ) : (
+            categories.map((cat) => (
+              <button
+                key={cat.category_id}
+                className={`px-5 py-2 rounded-full transition ${
+                  selectedCategory === cat.category_id
+                    ? "bg-indigo-600 text-white shadow-lg"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+                onClick={() => filterByCategory(cat.category_id)}
+              >
+                {cat.category_name}
+              </button>
+            ))
+          )}
         </div>
 
         {/* MENU GRID */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5 px-2 py-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5 px-4 max-w-7xl mx-auto">
           {currentItems.length > 0 ? (
             currentItems.map((item) => (
               <div
                 key={item.menu_item_id}
-                className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-gray-100 hover:border-indigo-400 transition"
+                className="bg-white rounded-2xl p-4 shadow-lg border hover:border-indigo-400 transition"
               >
-                {/* CLICK VÀO HÌNH → MỞ MODAL */}
                 {item.image_url && (
                   <img
                     src={item.image_url}
@@ -348,13 +382,11 @@ export default function HomePage() {
                       setSelectedItem(item);
                       setShowModal(true);
                     }}
-                    className="rounded-xl mb-3 w-full h-36 object-cover cursor-pointer"
+                    className="rounded-xl mb-3 w-full h-36 object-cover cursor-pointer hover:opacity-90 transition"
                   />
                 )}
-
-                {/* CLICK VÀO TÊN → MỞ MODAL */}
                 <h5
-                  className="font-semibold text-gray-800 truncate cursor-pointer"
+                  className="font-semibold text-gray-800 truncate cursor-pointer hover:text-indigo-600 transition"
                   onClick={() => {
                     setSelectedItem(item);
                     setShowModal(true);
@@ -362,18 +394,14 @@ export default function HomePage() {
                 >
                   {item.menu_item_name}
                 </h5>
-
-                {/* GIÁ */}
                 <p className="text-indigo-600 font-semibold mt-1">
-                  {new Intl.NumberFormat("vi-VN").format(item.price)}đ
+                  {formatCurrency(item.price)}
                 </p>
-
-                {/* NÚT THÊM VÀO GIỎ HÀNG */}
                 <button
                   onClick={() => onAddToCart(item)}
                   className="mt-3 w-full bg-indigo-600 text-white py-2 rounded-xl hover:bg-indigo-700 transition"
                 >
-                  ➕ Thêm vào giỏ hàng
+                  ➕ Thêm vào giỏ
                 </button>
               </div>
             ))
@@ -385,87 +413,103 @@ export default function HomePage() {
         </div>
 
         {/* PAGINATION */}
-        <div className="flex justify-center items-center gap-4 mt-6">
-          <button
-            onClick={prevPage}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-lg ${
-              currentPage === 1
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-indigo-600 text-white"
-            }`}
-          >
-            ◀ Trang trước
-          </button>
-
-          <span className="font-semibold text-lg">
-            {currentPage} / {totalPages}
-          </span>
-
-          <button
-            onClick={nextPage}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-lg ${
-              currentPage === totalPages
-                ? "bg-gray-300 cursor-not-allowed"
-                : "bg-indigo-600 text-white"
-            }`}
-          >
-            Trang sau ▶
-          </button>
-        </div>
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-lg transition ${
+                currentPage === 1
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700"
+              }`}
+            >
+              ◀ Trước
+            </button>
+            <span className="font-semibold text-lg">
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              onClick={nextPage}
+              disabled={currentPage === totalPages}
+              className={`px-4 py-2 rounded-lg transition ${
+                currentPage === totalPages
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700"
+              }`}
+            >
+              Sau ▶
+            </button>
+          </div>
+        )}
       </section>
 
-      {/* Promotion Section */}
-      <section id="promotions" className="promo-section">
-        <h2 className="text-2xl font-bold mb-4 text-center">
+      {/* ===== PROMOTIONS SECTION - DYNAMIC FROM API ===== */}
+      <section id="promotions" className="promo-section py-12 bg-gradient-to-r from-purple-50 to-pink-50">
+        <h2 className="text-3xl font-bold mb-8 text-center">
           🎁 Ưu Đãi Đặc Biệt
         </h2>
 
-        <div className="promo-grid">
-          {[
-            {
-              id: 1,
-              title: "Giảm 20% Thứ Ba",
-              desc: "Áp dụng cho đặt bàn online.",
-              color: "#3b82f6",
-            },
-            {
-              id: 2,
-              title: "Tặng Cocktail",
-              desc: "Cho nhóm từ 4 người trở lên.",
-              color: "#10b981",
-            },
-            {
-              id: 3,
-              title: "Miễn phí phòng VIP",
-              desc: "Cho hóa đơn từ 5.000.000đ.",
-              color: "#f97316",
-            },
-          ].map((promo) => (
-            <div
-              key={promo.id}
-              className="promo-item"
-              style={{ borderTopColor: promo.color }}
-            >
-              <h3>{promo.title}</h3>
-              <p>{promo.desc}</p>
-              <a href="#reservation" className="btn-promo">
-                Đặt ngay
-              </a>
-            </div>
-          ))}
-        </div>
+        {isLoadingPromotions ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Đang tải ưu đãi...</p>
+          </div>
+        ) : promotions.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">Hiện chưa có ưu đãi nào</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-6xl mx-auto">
+            {promotions.map((promo) => (
+              <div
+                key={promo.promotion_id}
+                className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 border-t-4"
+                style={{ borderTopColor: '#3b82f6' }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span className="px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">
+                    {promo.discount_type === 'percent' 
+                      ? `-${promo.discount_value}%` 
+                      : `-${formatCurrency(promo.discount_value)}`}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    Mã: {promo.code}
+                  </span>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  {promo.title}
+                </h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  {promo.description}
+                </p>
+                <div className="text-xs text-gray-500 mb-4">
+                  {promo.expired_at && (
+                    <p>⏰ Hết hạn: {new Date(promo.expired_at).toLocaleDateString('vi-VN')}</p>
+                  )}
+                  {promo.max_uses > 0 && (
+                    <p>📊 Còn: {promo.max_uses - promo.used_count} lượt</p>
+                  )}
+                </div>
+                <a
+                  href="#reservation"
+                  className="block text-center py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                >
+                  Đặt ngay
+                </a>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Reservation Section */}
-      <section id="reservation" className="reservation-anchor mt-10">
-        <h2 className="text-2xl font-bold text-center mb-3">
+      <section id="reservation" className="reservation-anchor py-12">
+        <h2 className="text-3xl font-bold text-center mb-6">
           Sẵn sàng thưởng thức?
         </h2>
         <div className="flex justify-center">
           <button
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg text-lg transition"
+            className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg text-xl transition transform hover:scale-105"
             onClick={() => setShowReservation(true)}
           >
             Đặt bàn ngay 🍽️
@@ -473,15 +517,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Cart */}
+      {/* Cart Popup */}
       {showCart && (
         <div className="cart-popup">
           <div className="cart-box">
             <h3>🛍️ Giỏ hàng</h3>
-            <button className="close-btn" onClick={() => setShowCart(false)}>
-              &times;
-            </button>
-
+            <button className="close-btn" onClick={() => setShowCart(false)}>&times;</button>
             {cart.length === 0 ? (
               <p>Chưa có món nào.</p>
             ) : (
@@ -490,30 +531,16 @@ export default function HomePage() {
                   {cart.map((item) => (
                     <li key={item.menu_item_id}>
                       <span>{item.menu_item_name}</span>
-
                       <div className="quantity-control">
-                        <button
-                          onClick={() => updateQuantity(item.menu_item_id, -1)}
-                        >
-                          -
-                        </button>
+                        <button onClick={() => updateQuantity(item.menu_item_id, -1)}>-</button>
                         <span>{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.menu_item_id, +1)}
-                        >
-                          +
-                        </button>
+                        <button onClick={() => updateQuantity(item.menu_item_id, +1)}>+</button>
                       </div>
-
                       <span>{formatCurrency(item.price * item.quantity)}</span>
                     </li>
                   ))}
                 </ul>
-
-                <p className="cart-total">
-                  Tổng cộng: {formatCurrency(totalAmount)}
-                </p>
-
+                <p className="cart-total">Tổng cộng: {formatCurrency(totalAmount)}</p>
                 <div className="cart-actions">
                   <button className="checkout-btn">Thanh toán</button>
                   <button
@@ -532,7 +559,7 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Modal xem chi tiết món */}
+      {/* Modal */}
       {showModal && (
         <MenuItemModal
           item={selectedItem}
@@ -540,7 +567,7 @@ export default function HomePage() {
         />
       )}
 
-      {/* Form đặt bàn */}
+      {/* Reservation Form */}
       {showReservation && (
         <ReservationForm
           cart={cart}

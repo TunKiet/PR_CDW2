@@ -273,4 +273,24 @@ class PromotionController extends Controller
             'data' => $promotion
         ], 200);
     }
+
+    public function getActive()
+{
+    $promotions = Promotion::where('status', 'active')
+        ->where(function($query) {
+            $query->whereNull('expired_at')
+                  ->orWhere('expired_at', '>', now());
+        })
+        ->where(function($query) {
+            $query->where('max_uses', 0)
+                  ->orWhereRaw('used_count < max_uses');
+        })
+        ->limit(3)
+        ->get();
+
+    return response()->json([
+        'success' => true,
+        'data' => $promotions
+    ]);
+}
 }

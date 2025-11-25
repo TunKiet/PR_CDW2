@@ -35,7 +35,7 @@ class DishController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             // QUAN TRỌNG: 'image_file' phải khớp với tên field trong FormData ở Frontend
-            'image_file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', 
+            'image_file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'nullable|string|max:50',
         ]);
 
@@ -44,15 +44,15 @@ class DishController extends Controller
             // Lưu file vào thư mục public/images/dishes
             // 'public' là tên của đĩa (disk) đã được cấu hình trong config/filesystems.php
             $path = $request->file('image_file')->store('images/dishes', 'public');
-            
+
             // Gán URL công khai vào trường image_url
             $validated['image_url'] = Storage::disk('public')->url($path);
         }
 
         // 3. Tạo món ăn
         // Loại bỏ trường file khỏi $validated trước khi tạo, nếu không sẽ bị lỗi
-        unset($validated['image_file']); 
-        
+        unset($validated['image_file']);
+
         $dish = MenuItem::create($validated);
 
         return response()->json([
@@ -78,7 +78,7 @@ class DishController extends Controller
             'menu_item_name' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
             'price' => 'sometimes|numeric|min:0',
-            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'nullable|string|max:50',
             'is_featured' => 'sometimes|integer|in:0,1',
             // Laravel sẽ tự xử lý _method, không cần validate
@@ -86,28 +86,28 @@ class DishController extends Controller
 
         // 2. XỬ LÝ UPLOAD FILE MỚI
         if ($request->hasFile('image_file')) {
-            
+
             // XÓA ẢNH CŨ (Tùy chọn)
             if ($dish->image_url) {
                 // Tách path file ra khỏi URL công khai (ví dụ: 'http://.../storage/images/dishes/xyz.jpg' -> 'images/dishes/xyz.jpg')
                 $pathSegments = parse_url($dish->image_url, PHP_URL_PATH);
                 $oldPath = str_replace('/storage/', '', $pathSegments);
-                
+
                 // Kiểm tra và xóa file cũ
                 if (Storage::disk('public')->exists($oldPath)) {
                     Storage::disk('public')->delete($oldPath);
                 }
             }
-            
+
             // Lưu file mới và lấy URL
             $path = $request->file('image_file')->store('images/dishes', 'public');
             $validated['image_url'] = Storage::disk('public')->url($path);
         }
-        
+
         // 3. Cập nhật món ăn
         // Loại bỏ trường file khỏi $validated trước khi update
         unset($validated['image_file']);
-        
+
         $dish->update($validated);
 
         return response()->json([
@@ -143,5 +143,20 @@ class DishController extends Controller
             'message' => 'Xóa món ăn thành công!'
         ], 200);
         // Lưu ý: Có thể dùng status 204 (No Content) nếu không cần trả về body
+    }
+
+    public function getFeatured()
+    {
+        $featuredDishes = MenuItem::with('category')
+            ->where('is_featured', 1)
+            ->where('status', 'active')
+            ->limit(3)
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'count' => $featuredDishes->count(),
+            'data' => $featuredDishes
+        ]);
     }
 }

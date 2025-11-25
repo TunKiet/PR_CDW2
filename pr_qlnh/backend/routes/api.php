@@ -199,5 +199,8 @@ Route::prefix('v1')->group(function () {
     
     // Additional promotion routes
     Route::post('/promotions/{id}/apply', [PromotionController::class, 'apply']);
+    // Public routes for homepage
+    Route::get('/featured-dishes', [DishController::class, 'getFeatured']);
+    Route::get('/active-promotions', [PromotionController::class, 'getActive']);
     
 });
