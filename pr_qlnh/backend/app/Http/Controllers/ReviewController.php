@@ -35,10 +35,9 @@ class ReviewController extends Controller
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string',
             'image_url' => 'nullable|string',
-            'status' => 'required|string|in:approved,pending,rejected'
         ]);
 
-        $review = Review::created($request->all());
+        $review = Review::create($request->all());
 
         return response()->json([
             'data' => $review,

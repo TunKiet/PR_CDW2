@@ -17,6 +17,7 @@ const endPoint = 'http://localhost:8000/api';
 const Review = () => {
 
     const menuItemId = 1;
+    const userId = 1;
 
     const [activeFilter, setActiveFilter] = useState(1);
     const [openFormReview, setOpenFormReview] = useState(false);
@@ -27,14 +28,16 @@ const Review = () => {
     const [total, setTotal] = useState(0);
     const [average, setAverage] = useState(0);
     const [ratingCounts, setRatingCounts] = useState({});
-    // const [reply, setReply] = useState([]);
+
+    // Process add review
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
     const [preview, setPreview] = useState(null);
-    const [image, setImage] = useState(null);
+    const [image, setImage] = useState("");
     const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
 
+    //Reply
 
     const filters = [
         { id: 1, label: "Tất cả" },
@@ -66,21 +69,6 @@ const Review = () => {
     }, [menuItemId]);
 
 
-    //Fetch api reply review
-    // useEffect(() => {
-    //     const fetchReply = async (reviewId) => {
-    //         try {
-    //             const res = await axios.get(`${endPoint}/reviews/${reviewId}/replies`);
-    //             setReply(res.data.reply);
-    //         } catch (error) {
-    //             console.log(error);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-    //     fetchReply();
-    // })
-
     const handleClose = () => {
         setOpenFormReview(false);
     }
@@ -91,10 +79,25 @@ const Review = () => {
     }
 
     //Handle change file
-    const handleChangeFile = (e) => {
+    const handleChangeFile = async (e) => {
         const file = e.target.files[0];
-        setImage(file);
         setPreview(URL.createObjectURL(file));
+
+        const data = new FormData();
+        data.append("file", file);
+        data.append("upload_preset", "image_review");
+        data.append("cloud_name", "dpq6tyosc");
+
+        try {
+            const res = await axios.post(
+                "https://api.cloudinary.com/v1_1/dpq6tyosc/image/upload",
+                data
+            );
+
+            setImage(res.data.secure_url);
+        } catch (error) {
+            console.log("Upload error:", error.response?.data);
+        }
     };
 
     //Handle button submit
@@ -106,36 +109,35 @@ const Review = () => {
 
         setLoading(true);
 
-        const formData = new FormData();
-        formData.append("menu_item_id", menuItemId);
-        formData.append("rating", rating);
-        formData.append("comment", comment);
-
-        if (image) {
-            formData.append("image_url", image);
-        }
-
-        for (let pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        }
-
         try {
-            const res = await axios.post("http://localhost:8000/api/reviews", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+            const res = await axios.post(
+                `${endPoint}/review`,
+                {
+                    user_id: userId,
+                    menu_item_id: menuItemId,
+                    rating,
+                    comment,
+                    image_url: image
                 },
-            });
-            alert(res.data.message);
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+
+            console.log(res.data);
+            notify.success('Gửi đánh giá thành công')
             handleClose();
+
         } catch (error) {
-            console.log(error);
-            notify.error('Gửi đánh giá thất bại')
-        }
-        finally {
+            console.log(error.response?.data);
+            notify.error('Gửi đánh giá thất bại');
+        } finally {
             setLoading(false);
         }
-    }
+    };
+
 
 
     return (
@@ -254,16 +256,12 @@ const Review = () => {
                         </div>
                     </div>
 
-                    {/* Info review */}
-                    <BoxReview reviews={reviews} />
-                    {/* <Feedback /> */}
-                    <hr />
-                    {/* <Feedback /> */}
+                    <BoxReview reviews={reviews} userId={userId} />
 
-                    <div className="flex justify-center">
+
+                    <div className="flex justify-center mt-3">
                         <Button variant='contained'>Xem tất cả đánh giá <FaChevronRight /> </Button>
                     </div>
-
                 </div>
             </div>
         </>

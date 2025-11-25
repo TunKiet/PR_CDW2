@@ -28,15 +28,19 @@ class Review extends Model
     }
     public function replies()
     {
-        return $this->hasMany(ReviewReply::class, 'review_id', 'review_id')->where('status', 'approved');
+        return $this->hasMany(ReviewReply::class, 'review_id', 'review_id')
+            ->where('status', 'approved')
+            ->with('user')
+            ->orderBy('created_at', 'asc');
     }
+
 
     //Input menuItemId, limit = 5 review
     //Get review with user, cache Redis
     public static function getReviewByMenuItemId($menuItemId, $limit = 5)
     {
         return Cache::remember("reviews:$menuItemId", 60, function () use ($menuItemId, $limit) {
-            return self::with('user')
+            return self::with(['user', 'replies'])
                 ->where('menu_item_id', $menuItemId)
                 ->orderBy('created_at', 'desc')
                 ->take($limit)

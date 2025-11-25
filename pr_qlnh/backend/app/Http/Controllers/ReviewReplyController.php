@@ -15,4 +15,19 @@ class ReviewReplyController extends Controller
             'reply' => $reply
         ]);
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'review_id' => 'required|integer',
+            'user_id' => 'required|integer',
+            'reply_text' => 'required|string',
+        ]);
+
+        $reply = ReviewReply::create($request->all());
+
+        return response()->json([
+            'data' => $reply,
+        ]);
+    }
 }

@@ -100,9 +100,10 @@ Route::post('/chat', [ChatController::class, 'message']);
 
 //Review
 Route::get('/reviews/{menuItemId}', [ReviewController::class, 'getDataReview']);
-Route::get('/menu-items/{menuItemId}/reviews', [ReviewReplyController::class, 'getDataReply']);
+Route::get('/reviews/{reviewId}/reply', [ReviewReplyController::class, 'getDataReply']);
 Route::post('/review', [ReviewController::class, 'store']);
 Route::post('/reviews/${reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
+Route::post('/reply', [ReviewReplyController::class, 'store']);
 
 /*
 |--------------------------------------------------------------------------
