@@ -12,7 +12,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ForgotPasswordController;
-
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\DishController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Api\CategoryController;
@@ -93,7 +93,15 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::apiResource('roles', RoleController::class);
     Route::apiResource('permissions', PermissionController::class);
 });
-
+/**
+ * User Management
+ */
+Route::prefix('users')->group(function () {
+    Route::get('/', [UserController::class, 'index']);
+    Route::get('/{id}', [UserController::class, 'show']);
+    Route::post('/', [UserController::class, 'store']);
+    Route::delete('/{id}', [UserController::class, 'destroy']);
+});
 
 /*
 |--------------------------------------------------------------------------

@@ -22,6 +22,7 @@ import AdminDashboard from './pages/Dashboard/AdminDashboard'
 import LoginPage from './pages/LoginPage';
 import ForgotPassword from "./pages/ForgotPasswordPage";
 import MenuItemDetailPage from "./pages/MenuItemDetailPage";
+import UserManager from "./components/UserManager";
 //import  chức năng 08_hao
 import DishTable from './components/08_hao-QLMonAn/DishCRUDTable';
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
@@ -44,7 +45,6 @@ function App() {
         <Route path="/menu-item/:id" element={<MenuItemDetailPage />} />
         <Route path="/order-online" element={<OrderOnlineAdmin />} />
 
-
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
         <Route path="/restaurant-info" element={<RestaurantInfoManage/>} />
@@ -63,7 +63,8 @@ function App() {
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}
         <Route path="/order-page" element={<OrderPage />} />
 
-
+        {/*User*/}
+        <Route path="/user-management" element={<UserManager />} />
         {/* Route cho trang Quản Lý Đơn Hàng (bảng danh sách) */}
         <Route path="/order-management" element={<OrderManagementPage />} />
 

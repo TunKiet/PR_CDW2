@@ -1,37 +1,38 @@
+
 // src/pages/CustomerManagementPage.jsx
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
-import CustomerTable from "../components/CustomerTable";
-import CustomerDetailsModal from "../components/CustomerDetailsModal";
+import UserTable from "../components/UserTable";
+import UserDetailsModal from "../components/UserDetailsModal";
 import { Search } from "lucide-react";
 
 import {
-  getCustomers,
-  addCustomer,
-  updateCustomer,
-  deleteCustomer,
-  searchCustomers,
-} from "../data/customerData";
+  getAllUser,
+  addUser,
+  updateUser,
+  deleteUser,
+  searchUser,
+} from "../data/UserData";
 
-const CustomerManagementPage = () => {
-  const [customers, setCustomers] = useState([]);
+const UserManagementPage = () => {
+  const [User, setUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadCustomers();
+    loadUser();
   }, []);
 
-  const loadCustomers = async () => {
+  const loadUser = async () => {
     setLoading(true);
     try {
-      const res = await getCustomers();
+      const res = await getAllUser();
       // res might be array or res.data
       const data = Array.isArray(res) ? res : res?.data ?? res;
-      setCustomers(data || []);
+      setUser(data || []);
     } catch (err) {
-      console.error("Lỗi tải khách hàng:", err);
+      console.error("Lỗi tải nhân viên:", err);
     } finally {
       setLoading(false);
     }
@@ -39,17 +40,17 @@ const CustomerManagementPage = () => {
 
   const handleAddCustomer = async () => {
     try {
-      const payload = { name: "Khách hàng mới", phone: "" };
-      const res = await addCustomer(payload);
+      const payload = { name: "nhân viên mới", phone: "" };
+      const res = await addUser(payload);
       // support different shapes
       const newCustomer = res?.data ?? res;
       // if wrapper { data: customer }:
       const item = newCustomer?.data ?? newCustomer;
-      setCustomers((prev) => [item, ...prev]);
+      setUser((prev) => [item, ...prev]);
       setSelectedCustomer(item);
     } catch (err) {
-      console.error("Lỗi thêm khách hàng:", err);
-      alert("Thêm khách hàng lỗi. Kiểm tra console.");
+      console.error("Lỗi thêm nhân viên:", err);
+      alert("Thêm nhân viên lỗi. Kiểm tra console.");
     }
   };
 
@@ -61,22 +62,22 @@ const CustomerManagementPage = () => {
         console.error("Không có customer_id để update");
         return;
       }
-      await updateCustomer(id, updatedFields);
+      await updateUser(id, updatedFields);
       setSelectedCustomer(null);
-      await loadCustomers();
+      await loadUser();
     } catch (err) {
-      console.error("Lỗi cập nhật khách hàng:", err);
+      console.error("Lỗi cập nhật nhân viên:", err);
       alert("Cập nhật lỗi. Kiểm tra console.");
     }
   };
 
   const handleDeleteCustomer = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa khách hàng này không?")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa nhân viên này không?")) return;
     try {
-      await deleteCustomer(id);
-      await loadCustomers();
+      await deleteUser(id);
+      await loadUser();
     } catch (err) {
-      console.error("Lỗi xóa khách hàng:", err);
+      console.error("Lỗi xóa nhân viên:", err);
       alert("Xóa lỗi. Kiểm tra console.");
     }
   };
@@ -89,12 +90,11 @@ const CustomerManagementPage = () => {
     const digits = trimmed.replace(/\D/g, "");
     if (digits.length >= 6) {
       try {
-        const res = await searchCustomers(digits);
+        const res = await searchUser(digits);
         const data = res?.data ?? res;
-        const item = data?.data ?? data; // support payload shapes
-        // If backend returns single customer object, display that single one
+        const item = data?.data ?? data;
         if (item && !Array.isArray(item)) {
-          setCustomers([item]);
+          setUser([item]);
           return;
         }
       } catch (err) {
@@ -103,17 +103,17 @@ const CustomerManagementPage = () => {
       }
     }
 
-    // fallback client-side filter on loaded customers
+    // fallback client-side filter on loaded User
     if (!trimmed) {
-      loadCustomers();
+      loadUser();
     } else {
       const lower = trimmed.toLowerCase();
-      setCustomers((prev) =>
+      setUser((prev) =>
         prev.filter(
           (c) =>
             (c.name || "").toLowerCase().includes(lower) ||
             (c.phone || "").includes(trimmed) ||
-            (String(c.customer_id || c.id || "") || "").includes(trimmed)
+            (String(c.user_id || c.id || "") || "").includes(trimmed)
         )
       );
     }
@@ -121,11 +121,11 @@ const CustomerManagementPage = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-    <Sidebar />
+      <Sidebar />
 
       <div className="flex-1 ml-64 p-6">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-          Quản Lý Khách Hàng & Tích Điểm
+          Quản Lý nhân viên
         </h1>
 
         <div className="flex justify-between items-center mb-6 space-x-4">
@@ -133,7 +133,7 @@ const CustomerManagementPage = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
             <input class = "ps-5"
               type="text"
-              placeholder=" Tìm khách hàng theo tên hoặc SĐT..." 
+              placeholder=" Tìm nhân viên theo tên hoặc SĐT..." 
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-3 px-5 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700"
@@ -143,7 +143,7 @@ const CustomerManagementPage = () => {
 
           <div className="flex gap-3">
             <button
-              onClick={loadCustomers}
+              onClick={loadUser}
               className="bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50"
             >
               Tải lại
@@ -153,13 +153,13 @@ const CustomerManagementPage = () => {
               onClick={handleAddCustomer}
               className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg shadow-md transition"
             >
-              + Thêm Khách Hàng
+              + Thêm nhân viên
             </button>
           </div>
         </div>
 
-        <CustomerTable
-          customers={customers}
+        <UserTable
+          User={User}
           onViewDetails={(c) => setSelectedCustomer(c)}
           onDelete={handleDeleteCustomer}
           loading={loading}
@@ -167,7 +167,7 @@ const CustomerManagementPage = () => {
       </div>
 
       {selectedCustomer && (
-        <CustomerDetailsModal
+        <UserDetailsModal
           customer={selectedCustomer}
           onClose={() => setSelectedCustomer(null)}
           onSave={handleSaveCustomer}
@@ -177,4 +177,4 @@ const CustomerManagementPage = () => {
   );
 };
 
-export default CustomerManagementPage;
+export default UserManagementPage;
