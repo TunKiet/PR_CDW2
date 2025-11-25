@@ -29,6 +29,7 @@ use App\Models\Ingredient;
 use App\Http\Controllers\Api\PreOrderController;
 //Table
 use App\Http\Controllers\API\TableController;
+use App\Http\Controllers\API\ReservationController;
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
 // use App\Http\Controllers\Api\MenuItemController;
@@ -124,6 +125,10 @@ Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus'
 
 //Table
 Route::apiResource('tables', TableController::class);
+Route::post('/reservations', [ReservationController::class, 'store']);
+//login mới được đặt bàn
+//Route::middleware('auth:sanctum')->post('/reservations', [ReservationController::class, 'store']);
+
 // Route::get('/tables', [TableController::class, 'index']);
 // Route::post('/tables', [TableController::class, 'store']);
 // Route::put('/tables/{id}', [TableController::class, 'update']);
