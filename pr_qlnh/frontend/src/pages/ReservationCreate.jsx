@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axiosClient from "../api/axiosClient";
-
+import { notify } from "../utils/notify";
 export default function ReservationCreate() {
     const [tables, setTables] = useState([]);
 
@@ -29,14 +29,64 @@ export default function ReservationCreate() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Tắt toast cũ trước
+        notify.dismiss();
+
         try {
+            // Hiện loading
+            notify.info("Đang gửi yêu cầu...");
+
             await axiosClient.post("/reservations", form);
-            alert("Đặt bàn thành công!");
+
+            // Xóa loading
+            notify.dismiss();
+
+            notify.success("Đặt bàn thành công!");
+
+            // Reset form
+            setForm({
+                table_id: "",
+                reservation_date: "",
+                reservation_time: "",
+                num_guests: 1,
+                deposit_amount: 0,
+                note: "",
+                status: "pending"
+            });
+
         } catch (err) {
-            console.log(err);
-            alert("Có lỗi xảy ra!");
+
+            notify.dismiss(); // tắt loading nếu có
+
+            console.log("ERRRR", err);
+
+            // --- LỖI VALIDATE (422) có nhiều lỗi ---
+            if (err.response && err.response.status === 422) {
+
+                if (err.response.data.errors) {
+                    const errors = err.response.data.errors;
+
+                    Object.values(errors).forEach(msgArr => {
+                        msgArr.forEach(msg => {
+                            notify.error(msg);
+                        });
+                    });
+                    return;
+                }
+
+                // --- Lỗi custom từ backend (dạng message) ---
+                if (err.response.data.message) {
+                    notify.error(err.response.data.message);
+                    return;
+                }
+            }
+
+            // --- Lỗi khác ---
+            notify.error("Có lỗi xảy ra. Vui lòng thử lại.");
         }
     };
+
 
     useEffect(() => {
         fetchTables();
