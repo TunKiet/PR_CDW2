@@ -22,6 +22,11 @@ export const updateUser = async (id, usersData) => {
 };
 
 export const deleteUser = async (id) => {
-  const res = await axios.delete(`${API_BASE_URL}/${id}`);
+  const res = await axios.delete(`${API_BASE_URL}/del/${id}`);
   return res.data;
 };
+
+export const getRoleByUserId = async (userId) => {
+  const res = await axios.get(`${API_BASE_URL}/role-names/${userId}`);
+  return res.data;
+}

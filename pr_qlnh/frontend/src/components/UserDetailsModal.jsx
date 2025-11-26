@@ -1,18 +1,19 @@
-// src/components/CustomerDetailsModal.jsx
+// src/components/UserDetailsModal.jsx
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { formatCurrency, getRankColor } from "../data/customerData";
 
 /**
  * Props:
- * - customer: object returned from API (customer_id, name, phone, total_spent, points, rank)
+ * - user: object returned from API (user_id, full_name, email, phone, status, roles)
  * - onClose: fn
- * - onSave: fn(updatedFields)  // should only receive { name, phone }
+ * - onSave: fn(updatedFields)  // { full_name, email, phone }
+ * - onDelete: fn() // delete this user
  */
-const CustomerDetailsModal = ({ customer, onClose, onSave }) => {
+const UserDetailsModal = ({ user, onClose, onSave, onDelete }) => {
   const [edited, setEdited] = useState({
-    name: customer?.name ?? "",
-    phone: customer?.phone ?? "",
+    full_name: user?.full_name ?? "",
+    email: user?.email ?? "",
+    phone: user?.phone ?? "",
   });
 
   const handleChange = (e) => {
@@ -21,24 +22,26 @@ const CustomerDetailsModal = ({ customer, onClose, onSave }) => {
   };
 
   const handleSave = () => {
-    // Only send fields we intend to update (avoid sending total_spent or points)
-    const payload = {
-      name: edited.name,
+    onSave({
+      full_name: edited.full_name,
+      email: edited.email,
       phone: edited.phone,
-    };
-    onSave(payload);
+    });
   };
 
-  const totalSpent = customer?.total_spent ?? customer?.totalSpent ?? 0;
-  const points = customer?.points ?? 0;
-  const rank = customer?.rank ?? (points >= 15000 ? "Kim Cương" : points >= 5000 ? "Vàng" : points >= 1500 ? "Bạc" : "Đồng");
-  const rankColor = getRankColor(rank);
+  const handleDelete = () => {
+    if (window.confirm(`Bạn có chắc chắn muốn xóa nhân viên có mã ${user.user_id} không?`)) {
+      onDelete();
+    }
+  };
 
   return (
-<div className="fixed inset-0 bg-gray-200/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 space-y-6 px-4 py-4">
-        <div className="flex justify-between items-center border-b mb-4">
-          <h2 className="text-xl font-bold text-gray-800">Mã KH{customer.customer_id}</h2>
+    <div className="fixed inset-0 bg-gray-200/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+        <div className="flex justify-between items-center border-b pb-2">
+          <h2 className="text-xl font-bold text-gray-800">
+            Mã Nhân Viên: {user.user_id}
+          </h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
             <X size={22} />
           </button>
@@ -46,43 +49,82 @@ const CustomerDetailsModal = ({ customer, onClose, onSave }) => {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Tên khách hàng</label>
-            <input type="text" name="name" value={edited.name} onChange={handleChange} className="w-full mt-1 border rounded-md p-2" />
+            <label className="block text-sm font-medium text-gray-700">Họ và tên</label>
+            <input
+              type="text"
+              name="full_name"
+              value={edited.full_name}
+              onChange={handleChange}
+              className="w-full mt-1 border rounded-md p-2"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={edited.email}
+              onChange={handleChange}
+              className="w-full mt-1 border rounded-md p-2"
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">Số điện thoại</label>
-            <input type="text" name="phone" value={edited.phone} onChange={handleChange} className="w-full mt-1 border rounded-md p-2" />
+            <input
+              type="text"
+              name="phone"
+              value={edited.phone}
+              onChange={handleChange}
+              className="w-full mt-1 border rounded-md p-2"
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Tổng chi tiêu</label>
-            <input disabled value={formatCurrency(totalSpent)} className="w-full mt-1 border rounded-md p-2 bg-gray-100" />
+            <label className="block text-sm font-medium text-gray-700">Trạng thái</label>
+            <input
+              type="text"
+              value={user.status === 1 ? "Đang hoạt động" : "Vô hiệu hóa"}
+              disabled
+              className="w-full mt-1 border rounded-md p-2 bg-gray-100"
+            />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Điểm tích lũy</label>
-            <input disabled value={`${points} điểm`} className="w-full mt-1 border rounded-md p-2 bg-gray-100 text-orange-600 font-bold" />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Hạng thành viên</label>
-            <div className="mt-2">
-              <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${rankColor}`}>
-                {rank}
-              </span>
-            </div>
-            <p className="text-xs text-gray-500 mt-1">Hạng tự động dựa trên điểm tích lũy (1.000đ = 1 điểm).</p>
+            <label className="block text-sm font-medium text-gray-700">Vai trò</label>
+            <input
+              type="text"
+              value={user.roles || "—"}
+              disabled
+              className="w-full mt-1 border rounded-md p-2 bg-gray-100"
+            />
           </div>
         </div>
 
         <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Đóng</button>
-          <button onClick={handleSave} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Lưu thay đổi</button>
+          <button
+            onClick={handleDelete}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          >
+            Xóa
+          </button>
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            Lưu thay đổi
+          </button>
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+          >
+            Đóng
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default CustomerDetailsModal;
+export default UserDetailsModal;

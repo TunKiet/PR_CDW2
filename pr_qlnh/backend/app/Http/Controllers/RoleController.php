@@ -84,4 +84,5 @@ class RoleController extends Controller
             return response()->json(['message' => 'Xóa vai trò thất bại!'], 400);
         }
     }
+
 }

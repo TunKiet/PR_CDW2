@@ -96,8 +96,20 @@ class User extends Authenticatable implements JWTSubject
     // get all users
     public static function getAllUsers()
     {
-        return self::all();
+        return self::with('roles')
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'user_id' => $user->user_id,
+                    'full_name' => $user->full_name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'status' => $user->status,
+                    'roles' => $user->roles->pluck('name')->join(', '),
+                ];
+            });
     }
+
     //get user by id
     public static function getUserById($id)
     {
@@ -131,6 +143,11 @@ class User extends Authenticatable implements JWTSubject
         if ($user) {
             return $user->delete();
         }
+    }
+    //lay ten vai tro cua nguoi dung
+    public function getRoleNames()
+    {
+        return $this->roles()->pluck('name');
     }
 
 }

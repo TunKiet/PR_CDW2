@@ -23,8 +23,7 @@ class UserController extends Controller
         $user = User::getUserById($id);
         if (!$user) {
             return response()->json(['message' => 'Người dùng không tồn tại!'], 404);
-        }
-        else {
+        } else {
             return response()->json($user);
         }
     }
@@ -32,7 +31,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-           'full_name' => 'required|string|max:255',
+            'full_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'required|unique:users,phone',
             'password' => 'required|min:6',
@@ -47,7 +46,7 @@ class UserController extends Controller
             'status' => 1,
         ]);
 
-          // Gán role mặc định = customer
+        // Gán role mặc định = customer
         $user->assignRole('customer');
 
         // Tạo token JWT
@@ -71,11 +70,10 @@ class UserController extends Controller
         $request->validate([
             'full_name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|email|unique:users,email,' . $id,
-            'phone' => 'sometimes|required|unique:users,phone,' . $id,
-            'password' => 'sometimes|required|min:6',
+            'phone' => 'sometimes|required|unique:users,phone,' . $id
         ]);
 
-        $user = User::updateUser($id, $request ->all());
+        $user = User::updateUser($id, $request->all());
 
         return response()->json([
             'message' => 'Cập nhật người dùng thành công!',
@@ -94,4 +92,18 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Xóa người dùng thành công!']);
     }
+    // Lấy tên vai trò của người dùng theo ID
+    public function getRoleByUserId($userId)
+    {
+        $user = User::find($userId);
+        if (!$user) {
+            return response()->json(['message' => 'Người dùng không tồn tại!'], 404);
+        }
+
+        // Lấy tên role, nối thành chuỗi nếu nhiều role
+        $roleNames = $user->roles->pluck('name')->join(', ');
+
+        return response()->json($roleNames); // Trả về string, ví dụ "Admin, Manager"
+    }
+
 }
