@@ -66,23 +66,6 @@ const Sidebar = () => {
 
   const toggleSubMenu = (title) => {
     setOpenSubMenu(openSubMenu === title ? null : title);
-
-  const handleLogout = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      if (token) {
-        await axios.post(
-          "http://localhost:8000/api/logout",
-          {},
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      }
-    } catch (err) {
-      console.error("Logout error:", err);
-    } finally {
-      localStorage.removeItem("token");
-      navigate("/");
-    }
   };
 
   return (
@@ -95,7 +78,7 @@ const Sidebar = () => {
         <h1 className="ml-3 text-lg font-bold text-gray-800">Admin</h1>
       </div>
 
-      <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+      <div className="flex-1 p-4 space-y-2  overflow-y-auto">
         {menuItems.map((item, index) => {
             const currentItemActive = isActive(item.path) && !item.isParent;
             const isParentActiveState = isParentActive(item);
