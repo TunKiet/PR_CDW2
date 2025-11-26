@@ -163,52 +163,52 @@ export default function OrderOnlineForm({ cart, onClose, formatCurrency }) {
     e.preventDefault();
 
     const payload = {
-        customer_name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        province: formData.province,
-        district: formData.district,
-        ward: formData.ward,
-        address_detail: formData.address,
-        payment_method: formData.payment_method,
-        ship_fee: shippingFee,
-        discount: discountAmount,
-        subtotal,
-        total,
-        items: cart.map(item => ({
-            menu_item_id: item.menu_item_id,
-            quantity: item.quantity,
-            price: item.price,
-            note: notes[item.menu_item_id] || null
-        }))
+      customer_name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      province: formData.province,
+      district: formData.district,
+      ward: formData.ward,
+      address_detail: formData.address,
+      payment_method: formData.payment_method,
+      ship_fee: shippingFee,
+      discount: discountAmount,
+      subtotal,
+      total,
+      items: cart.map(item => ({
+        menu_item_id: item.menu_item_id,
+        quantity: item.quantity,
+        price: item.price,
+        note: notes[item.menu_item_id] || null
+      }))
     };
 
     try {
-        const res = await fetch("http://127.0.0.1:8000/api/order-online", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json"
-            },
-            body: JSON.stringify(payload)
-        });
+      const res = await fetch("http://127.0.0.1:8000/api/order-online", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
 
-        const data = await res.json();
-        console.log("ORDER RESPONSE:", data);
+      const data = await res.json();
+      console.log("ORDER RESPONSE:", data);
 
-        if (!res.ok) {
-            alert("❌ Lỗi: " + JSON.stringify(data));
-            return;
-        }
+      if (!res.ok) {
+        alert("❌ Lỗi: " + JSON.stringify(data));
+        return;
+      }
 
-        alert("🎉 Đặt hàng thành công!");
-        onClose();
+      alert("🎉 Đặt hàng thành công!");
+      onClose();
 
     } catch (error) {
-        console.error("ORDER ERROR:", error);
-        alert("❌ Không thể gửi đơn hàng (CORS hoặc server down)");
+      console.error("ORDER ERROR:", error);
+      alert("❌ Không thể gửi đơn hàng (CORS hoặc server down)");
     }
-};
+  };
 
 
   // Khóa scroll
@@ -230,13 +230,52 @@ export default function OrderOnlineForm({ cart, onClose, formatCurrency }) {
         <div className="order-grid">
           {/* ================= LEFT FORM ================= */}
           <form className="order-left" onSubmit={handleSubmit}>
-            <input name="name" placeholder="Họ và tên" required onChange={handleChange} />
+            <input
+              name="name"
+              placeholder="Họ và tên"
+              required
+              maxLength={64}
+              pattern="^[A-Za-zÀ-ỹ\s]+$"
+              title="Họ tên chỉ được chứa chữ và khoảng trắng"
+              onChange={handleChange}
+            />
+
             <div className="row-2">
-              <input name="email" placeholder="Email" onChange={handleChange} />
-              <input name="phone" placeholder="Số điện thoại" required onChange={handleChange} />
+              <input
+                name="email"
+                placeholder="Email"
+                maxLength={50}
+                onChange={handleChange}
+              />
+
+              <input
+  name="phone"
+  placeholder="Số điện thoại"
+  required
+  maxLength={11}
+  value={formData.phone}
+  onChange={(e) => {
+    const val = e.target.value;
+
+    // Chỉ cho phép số
+    if (/^[0-9]*$/.test(val)) {
+      setFormData({ ...formData, phone: val });
+    }
+  }}
+/>
+
+
+
             </div>
 
-            <input name="address" placeholder="Địa chỉ (Số nhà, đường…)" required onChange={handleChange} />
+            <input
+              name="address"
+              placeholder="Địa chỉ (Số nhà, đường…)"
+              required
+              maxLength={120}
+              onChange={handleChange}
+            />
+
 
             {/* Tỉnh */}
             <select name="province" value={formData.province} onChange={handleChange} required>
@@ -276,41 +315,41 @@ export default function OrderOnlineForm({ cart, onClose, formatCurrency }) {
 
             <h3 className="section-title">Phương thức thanh toán</h3>
 
-<div className="payment-methods">
+            <div className="payment-methods">
 
-  {/* COD */}
-  <label className={`payment-option ${formData.payment_method === "cod" ? "active" : ""}`}>
-    <input
-      type="radio"
-      name="payment_method"
-      value="cod"
-      checked={formData.payment_method === "cod"}
-      onChange={handleChange}
-    />
+              {/* COD */}
+              <label className={`payment-option ${formData.payment_method === "cod" ? "active" : ""}`}>
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="cod"
+                  checked={formData.payment_method === "cod"}
+                  onChange={handleChange}
+                />
 
-    <div className="payment-content">
-      {/* <img src="/cod-icon.png" alt="COD" className="payment-icon" /> */}
-      <span>Thanh toán khi giao hàng (COD)</span>
-    </div>
-  </label>
+                <div className="payment-content">
+                  {/* <img src="/cod-icon.png" alt="COD" className="payment-icon" /> */}
+                  <span>Thanh toán khi giao hàng (COD)</span>
+                </div>
+              </label>
 
-  {/* BANK TRANSFER */}
-  <label className={`payment-option ${formData.payment_method === "bank" ? "active" : ""}`}>
-    <input
-      type="radio"
-      name="payment_method"
-      value="bank"
-      checked={formData.payment_method === "bank"}
-      onChange={handleChange}
-    />
+              {/* BANK TRANSFER */}
+              <label className={`payment-option ${formData.payment_method === "bank" ? "active" : ""}`}>
+                <input
+                  type="radio"
+                  name="payment_method"
+                  value="bank"
+                  checked={formData.payment_method === "bank"}
+                  onChange={handleChange}
+                />
 
-    <div className="payment-content">
-      {/* <img src="/bank-icon.png" alt="BANK" className="payment-icon" /> */}
-      <span>Chuyển khoản qua ngân hàng</span>
-    </div>
-  </label>
+                <div className="payment-content">
+                  {/* <img src="/bank-icon.png" alt="BANK" className="payment-icon" /> */}
+                  <span>Chuyển khoản qua ngân hàng</span>
+                </div>
+              </label>
 
-</div>
+            </div>
 
 
             <button type="submit" className="submit-order-btn">HOÀN TẤT ĐƠN HÀNG</button>
@@ -331,9 +370,11 @@ export default function OrderOnlineForm({ cart, onClose, formatCurrency }) {
                   <textarea
                     className="note-box"
                     placeholder="Ghi chú món..."
+                    maxLength={100}
                     value={notes[item.menu_item_id] || ""}
                     onChange={(e) => handleNoteChange(item.menu_item_id, e.target.value)}
                   />
+
                 </div>
 
                 <strong className="item-total">{formatCurrency(item.price * item.quantity)}</strong>

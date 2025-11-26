@@ -127,12 +127,13 @@ Route::get('/tables', [TableController::class, 'index']);
 |--------------------------------------------------------------------------
 */
 Route::prefix('customers')->group(function () {
+    Route::get('/search', [CustomerController::class, 'search']);
     Route::get('/', [CustomerController::class, 'index']);
     Route::post('/', [CustomerController::class, 'store']);
     Route::put('/{id}', [CustomerController::class, 'update']);
     Route::delete('/{id}', [CustomerController::class, 'destroy']);
-    Route::get('/search', [CustomerController::class, 'search']);
 });
+
 
 
 /*
@@ -150,14 +151,14 @@ Route::prefix('orders')->group(function () {
 Route::get('/menu', [OrderController::class, 'menu']);
 
 
-/*
-|--------------------------------------------------------------------------
-| 📦 Pre-Order (Đặt trước)
-|--------------------------------------------------------------------------
-*/
-Route::get('/pre-orders', [PreOrderController::class, 'index']);
-Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
-Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
+// /*
+// |--------------------------------------------------------------------------
+// | 📦 Pre-Order (Đặt trước)
+// |--------------------------------------------------------------------------
+// */
+// Route::get('/pre-orders', [PreOrderController::class, 'index']);
+// Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
+// Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
 
 
 //Table
@@ -170,3 +171,16 @@ Route::post('/reservations', [ReservationController::class, 'store']);
 // Route::post('/tables', [TableController::class, 'store']);
 // Route::put('/tables/{id}', [TableController::class, 'update']);
 // Route::delete('/tables/{id}', [TableController::class, 'destroy']);
+
+//Payments
+Route::post('/payments', [PaymentController::class, 'store']);
+
+
+Route::post('/order-online', [OrderOnlineController::class, 'store']);
+Route::get('/order-online', [OrderOnlineController::class, 'index']);
+Route::get('/order-online/{id}', [OrderOnlineController::class, 'show']);
+Route::put('/order-online/{id}', [OrderOnlineController::class, 'update']);
+
+Route::get('/admin/order-online', [OrderOnlineAdminController::class, 'index']);
+Route::get('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'show']);
+Route::put('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'updateStatus']);

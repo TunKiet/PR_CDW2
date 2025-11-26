@@ -69,7 +69,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-64 h-screen bg-white border-r flex flex-col">
+    <div className="w-64 shadow-lg border bg-white rounded-2xl flex flex-col">
       {/* Header */}
       <div className="flex items-center p-4 border-b">
         <div className="bg-indigo-600 text-white w-10 h-10 flex items-center justify-center rounded-full font-semibold">

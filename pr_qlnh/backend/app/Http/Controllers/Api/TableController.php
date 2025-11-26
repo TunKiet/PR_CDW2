@@ -11,19 +11,33 @@ use Illuminate\Support\Facades\Log;
 
 class TableController extends Controller
 {
+    // Danh sách khu vực chuẩn
+    private $allowedTypes = [
+        'Sảnh máy lạnh',
+        'Ngoài trời',
+        'Phòng VIP'
+    ];
+
+    // Danh sách trạng thái chuẩn
+    private $allowedStatus = [
+        'Trống',
+        'Đang sử dụng',
+        'Đã đặt'
+    ];
+
+    /**
+     * Lấy toàn bộ danh sách bàn (không phân trang)
+     */
     public function index(Request $request)
     {
         try {
-            $perPage = $request->get('per_page', 10);
-            $tables = Table::orderBy('table_id', 'desc')->paginate($perPage);
+            $tables = Table::orderBy('table_id', 'asc')->get();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Lấy danh sách bàn thành công',
-                'data' => $tables->items(),
-                'current_page' => $tables->currentPage(),
-                'last_page' => $tables->lastPage(),
-                'total_tables' => $tables->total(),
+                'data' => $tables,
+                'total_tables' => $tables->count(),
             ]);
         } catch (\Exception $e) {
             Log::error("Error index tables: ".$e->getMessage());
@@ -31,16 +45,22 @@ class TableController extends Controller
         }
     }
 
+    /**
+     * Thêm bàn mới
+     */
     public function store(Request $request)
     {
         try {
             $data = $request->validate([
                 'table_name' => 'required|string|max:255|unique:tables,table_name',
-                'table_type' => 'nullable|string|max:255',
+                'table_type' => ['required', Rule::in($this->allowedTypes)],
                 'capacity'   => 'required|integer|min:1',
                 'note'       => 'nullable|string|max:255',
-                'status'     => ['required', Rule::in(['Trống','Đang sử dụng','Đã đặt'])],
+                'status'     => ['required', Rule::in($this->allowedStatus)],
             ]);
+
+            // Trim dữ liệu tránh khoảng trắng
+            $data = array_map(fn($v) => is_string($v) ? trim($v) : $v, $data);
 
             $table = Table::create($data);
 
@@ -53,6 +73,9 @@ class TableController extends Controller
         }
     }
 
+    /**
+     * Lấy chi tiết 1 bàn
+     */
     public function show($id)
     {
         try {
@@ -66,6 +89,9 @@ class TableController extends Controller
         }
     }
 
+    /**
+     * Cập nhật bàn
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -78,11 +104,14 @@ class TableController extends Controller
                     'max:255',
                     Rule::unique('tables','table_name')->ignore($id,'table_id'),
                 ],
-                'table_type' => 'nullable|string|max:255',
+                'table_type' => ['required', Rule::in($this->allowedTypes)],
                 'capacity'   => 'required|integer|min:1',
                 'note'       => 'nullable|string|max:255',
-                'status'     => ['required', Rule::in(['Trống','Đang sử dụng','Đã đặt'])],
+                'status'     => ['required', Rule::in($this->allowedStatus)],
             ]);
+
+            // Trim dữ liệu
+            $data = array_map(fn($v) => is_string($v) ? trim($v) : $v, $data);
 
             $table->update($data);
 
@@ -97,6 +126,9 @@ class TableController extends Controller
         }
     }
 
+    /**
+     * Xóa bàn
+     */
     public function destroy($id)
     {
         try {

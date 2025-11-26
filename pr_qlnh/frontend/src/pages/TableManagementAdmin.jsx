@@ -16,26 +16,30 @@ export default function TableManagementAdmin() {
   const [editingTable, setEditingTable] = useState(null);
 
   const fetchTables = async (page = 1) => {
-    try {
-      setLoading(true);
-      const res = await axiosClient.get(`/tables?page=${page}`);
+  try {
+    setLoading(true);
 
-      if (res.data?.success === false) {
-        notify.error(res.data.error || "Lỗi khi tải danh sách!");
-        setLoading(false);
-        return;
-      }
+    const res = await axiosClient.get(`/tables?page=${page}`);
+    console.log("TABLES API =>", res.data);
 
-      setTables(res.data.data);
-      setCurrentPage(res.data.current_page);
-      setLastPage(res.data.last_page);
-      setTotalTables(res.data.total_tables);
-    } catch (err) {
-      notify.error("Lỗi kết nối tới server");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const payload = res.data;
+
+    setTables(payload.data || []);
+    setTotalTables(payload.total_tables || 0);
+
+    // API không có phân trang → set default:
+    setCurrentPage(1);
+    setLastPage(1);
+  } 
+  catch (err) {
+    notify.error("Lỗi kết nối tới server");
+  } 
+  finally {
+    setLoading(false);
+  }
+};
+
+
 
   useEffect(() => {
     fetchTables();

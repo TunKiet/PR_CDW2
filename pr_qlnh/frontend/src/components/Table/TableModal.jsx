@@ -107,13 +107,18 @@ export default function TableModal({ isOpen, onClose, editingTable, onSaved }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium">Loại bàn</label>
-                <input
-                  value={tableType}
-                  onChange={(e) => setTableType(e.target.value)}
-                  className="w-full p-2 border rounded mt-1"
-                />
-              </div>
+  <label className="block text-sm font-medium">Loại bàn</label>
+  <select
+    value={tableType}
+    onChange={(e) => setTableType(e.target.value)}
+    className="w-full p-2 border rounded mt-1"
+  >
+    <option value="Sảnh máy lạnh">Sảnh máy lạnh</option>
+    <option value="Ngoài trời">Ngoài trời</option>
+    <option value="Phòng VIP">Phòng VIP</option>
+  </select>
+</div>
+
 
               <div>
                 <label className="block text-sm font-medium flex items-center gap-2">
