@@ -12,7 +12,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ForgotPasswordController;
-
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\Api\DishController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Api\CategoryController;
@@ -76,7 +76,7 @@ Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAll
 |--------------------------------------------------------------------------
 */
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login',    [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
@@ -90,19 +90,34 @@ Route::middleware(['jwt.auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['jwt.auth'])->group(function () {
-    Route::apiResource('roles', RoleController::class);
+    Route::prefix('roles')->group(function () {
+        Route::get('/', [RoleController::class, 'index']);
+        Route::get('/{id}', [RoleController::class, 'show']);
+        Route::post('/', [RoleController::class, 'store']);
+        Route::delete('/{id}', [RoleController::class, 'destroy']);
+    });
+
     Route::apiResource('permissions', PermissionController::class);
 });
-
+/**
+ * User Management
+ */
+Route::prefix('users')->group(function () {
+    Route::get('/', [UserController::class, 'index']);
+    Route::get('/{id}', [UserController::class, 'show']);
+    Route::post('/', [UserController::class, 'store']);
+    Route::delete('/del/{id}', [UserController::class, 'destroy']);
+    Route::get('/role-names/{id}', [UserController::class, 'getRoleNames']);
+});
 
 /*
 |--------------------------------------------------------------------------
 | 🔐 Password Reset
 |--------------------------------------------------------------------------
 */
-Route::post('/password/forgot',      [ForgotPasswordController::class, 'sendOtp']);
-Route::post('/password/verify-otp',  [ForgotPasswordController::class, 'verifyOtp']);
-Route::post('/password/reset',       [ForgotPasswordController::class, 'resetPassword']);
+Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
+Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);
 
 
 /*

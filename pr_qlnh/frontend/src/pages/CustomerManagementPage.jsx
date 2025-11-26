@@ -1,6 +1,6 @@
 // src/pages/CustomerManagementPage.jsx
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar/Sidebar";
+import Sidebar from "../components/Sidebar";
 import CustomerTable from "../components/CustomerTable";
 import CustomerDetailsModal from "../components/CustomerDetailsModal";
 import { Search } from "lucide-react";
@@ -121,7 +121,7 @@ const CustomerManagementPage = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
+    <Sidebar />
 
       <div className="flex-1 ml-64 p-6">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">
