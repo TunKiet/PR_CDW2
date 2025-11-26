@@ -34,26 +34,32 @@ export const formatCurrency = (value) => {
   return number.toLocaleString("vi-VN") + "đ";
 };
 
-
-// 🧮 Hàm xác định hạng thành viên dựa trên điểm
-export const getRankName = (points) => {
-  if (points >= 15000) return "Kim Cương";
-  if (points >= 5000) return "Vàng";
-  if (points >= 1500) return "Bạc";
+// 🎖️ Tính hạng theo điểm
+export const getRankByPoints = (points = 0) => {
+  if (points >= 50000) return "Kim Cương";
+  if (points >= 15000) return "Vàng";
+  if (points >= 5000) return "Bạc";
   return "Đồng";
 };
 
 
-// 🎨 Màu hiển thị tương ứng với hạng
-export const getRankColor = (rank) => {
+// 🎨 Màu sắc theo hạng
+export const getRankColor = (rankOrPoints) => {
+  let rank = rankOrPoints;
+
+  // Nếu truyền vào là điểm (số) → tự tính rank
+  if (typeof rankOrPoints === "number") {
+    rank = getRankByPoints(rankOrPoints);
+  }
+
   switch (rank) {
     case "Kim Cương":
-      return "bg-gradient-to-r from-cyan-400 to-blue-600 text-white";
+      return "bg-cyan-100 text-cyan-700 border border-cyan-300";
     case "Vàng":
-      return "bg-yellow-400 text-white";
+      return "bg-yellow-100 text-yellow-700 border border-yellow-300";
     case "Bạc":
-      return "bg-gray-300 text-gray-800";
+      return "bg-gray-100 text-gray-700 border border-gray-300";
     default:
-      return "bg-orange-300 text-white";
+      return "bg-amber-100 text-amber-700 border border-amber-300"; // Đồng
   }
 };
