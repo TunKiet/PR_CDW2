@@ -1,15 +1,7 @@
-<<<<<<< HEAD
-// src/components/Sidebar.jsx (ĐÃ CẬP NHẬT để tạo hiệu ứng ĐỘNG)
-import React, { useState, useEffect, useRef } from 'react'; // IMPORT useRef
-import { Link, useLocation } from 'react-router-dom';
-import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, User, Users, Settings, Building, ChevronDown, ChevronUp } from "lucide-react";
-=======
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import UserData from '../data/UserData';
 import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, Users, Settings, Building, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import axios from 'axios';
->>>>>>> 18-kiet/RE-Role
 
 const menuItems = [
    { title: "Đơn hàng mới", icon: <ClipboardList size={20} />, path: '/order-page' },
@@ -27,12 +19,31 @@ const menuItems = [
         { title: "Quản lý tình trạng món ăn", path: '/dish-status-management' },
       ] 
     },
+    { 
+      title: "Người dùng", 
+      icon: <Users size={20} />, 
+      path: '/users-management-placeholder', 
+      isParent: true,
+      subItems: [
+        { title: "Nhân viên", path: '/user-management' },
+        { title: "Khách hàng", path: '/customers' },
+      ] 
+    },
+    { 
+      title: "Bảo mật", 
+      icon: <Users size={20} />, 
+      path: '/fa-management-placeholder', 
+      isParent: true,
+      subItems: [
+        { title: "Vai trò", path: '/user-management' },
+        { title: "Quyền", path: '/customers' },
+      ] 
+    },
     { title: "Quản lý đơn online", icon: <ShoppingCart size={20} />, path: '/order-online' },
     { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
-    { title: "Nhân viên", icon: <User size={20} />, path: '/staff' },
-    { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },
     { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },
     { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/restaurant-info' },
+    { title: "Đăng xuất", icon: <Settings size={20} />, path: '/' },
 ];
 
 const Sidebar = () => {
