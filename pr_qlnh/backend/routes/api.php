@@ -90,15 +90,16 @@ Route::middleware(['jwt.auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['jwt.auth'])->group(function () {
-    Route::prefix('roles')->group(function () {
+
+
+    Route::apiResource('permissions', PermissionController::class);
+});
+ Route::prefix('roles')->group(function () {
         Route::get('/', [RoleController::class, 'index']);
         Route::get('/{id}', [RoleController::class, 'show']);
         Route::post('/', [RoleController::class, 'store']);
         Route::delete('/{id}', [RoleController::class, 'destroy']);
     });
-
-    Route::apiResource('permissions', PermissionController::class);
-});
 /**
  * User Management
  */

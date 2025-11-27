@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import UserData from '../data/UserData';
 import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, Users, Settings, Building, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import axios from 'axios';
 
@@ -26,6 +25,15 @@ const menuItems = [
     subItems: [
       { title: "Nhân viên", path: '/user-management' },
       { title: "Khách hàng", path: '/customers' },
+    ]
+  },
+   {
+    title: "Bảo mật & quyền hạn",
+    icon: <Users size={20} />,
+    isParent: true,
+    subItems: [
+      { title: "Vai trò", path: '/role-management' },
+      { title: "Quyền", path: '/permission-management' },
     ]
   },
   { title: "Quản lý đơn online", icon: <ShoppingCart size={20} />, path: '/order-online' },
