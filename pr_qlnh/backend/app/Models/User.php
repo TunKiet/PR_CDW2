@@ -53,25 +53,101 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-    public function role()
+    public function roles()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+    }
+    // Gán role cho user
+    public function assignRole($roleName = 'customer')
+    {
+        $role = Role::firstOrCreate(['name' => $roleName]);
+        $this->roles()->syncWithoutDetaching($role->id);
+        return $this;
     }
 
     public function hasPermission($permissionName)
     {
-        return $this->role
-            ? $this->role->permissions->contains('name', $permissionName)
-            : false;
+        foreach ($this->roles as $role) {
+            if ($role->permissions->contains('name', $permissionName)) {
+                return true;
+            }
+        }
+        return false;
     }
+    // lay tat ca quyen
+    public function getAllPermissions()
+    {
+        return Permission::whereIn('id', function ($query) {
+            $query->select('permission_id')
+                ->from('role_permissions')
+                ->whereIn('role_id', $this->roles()->pluck('id'));
+        })->pluck('name');
+    }
+
     public function getAuthIdentifierName()
     {
         return 'user_id';
     }
     //lay nguoi dung theo email hoac phone
-    public static function getUserbyEmailOrPhone(string $field, string $value) 
+    public static function getUserbyEmailOrPhone(string $field, string $value)
     {
         return self::where($field, $value)->first();
+    }
+    // get all users
+    public static function getAllUsers()
+    {
+        return self::with('roles')
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'user_id' => $user->user_id,
+                    'full_name' => $user->full_name,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                    'status' => $user->status,
+                    'roles' => $user->roles->pluck('name')->join(', '),
+                ];
+            });
+    }
+
+    //get user by id
+    public static function getUserById($id)
+    {
+        return self::find($id);
+    }
+    // add user
+    public static function addUser($data)
+    {
+        return self::create([
+            'full_name' => $data['username'] ?? null,
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'phone' => $data['phone'],
+            'status' => $data['status'] ?? 1,
+        ]);
+    }
+
+    // update user
+    public static function updateUser($id, array $data)
+    {
+        $user = self::find($id);
+        if ($user) {
+            $user->update($data);
+            return $user;
+        }
+    }
+    // delete user
+    public static function deleteUser($id)
+    {
+        $user = self::find($id);
+        if ($user) {
+            return $user->delete();
+        }
+    }
+    //lay ten vai tro cua nguoi dung
+    public function getRoleNames()
+    {
+        return $this->roles()->pluck('name');
     }
 
 }
