@@ -22,7 +22,7 @@ use App\Http\Controllers\CategoryIngredientController;
 use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\TableController;
-use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\Api\PaymentController;
 
 use App\Http\Controllers\Api\PreOrderController;
@@ -62,10 +62,7 @@ Route::get('/reviews/{menuItemId}/average', [ReviewController::class, 'averageRa
 Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
 Route::post('/ingredients', [IngredientController::class, 'store']);
 Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
-Route::post('/add', [IngredientController::class, 'store']);
-Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
-Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
-Route::get('/export', [IngredientController::class, 'exportPDF']);
+Route::delete('/ingredients/delete/{id}', [IngredientController::class, 'destroy']);
 Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
 Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::get('/export', [IngredientController::class, 'exportPDF']);
@@ -142,13 +139,12 @@ Route::get('/tables', [TableController::class, 'index']);
 |--------------------------------------------------------------------------
 */
 Route::prefix('customers')->group(function () {
-    Route::get('/search', [CustomerController::class, 'search']);
     Route::get('/', [CustomerController::class, 'index']);
     Route::post('/', [CustomerController::class, 'store']);
     Route::put('/{id}', [CustomerController::class, 'update']);
     Route::delete('/{id}', [CustomerController::class, 'destroy']);
+    Route::get('/search', [CustomerController::class, 'search']);
 });
-
 
 
 /*
@@ -166,36 +162,45 @@ Route::prefix('orders')->group(function () {
 Route::get('/menu', [OrderController::class, 'menu']);
 
 
-// /*
-// |--------------------------------------------------------------------------
-// | 📦 Pre-Order (Đặt trước)
-// |--------------------------------------------------------------------------
-// */
-// Route::get('/pre-orders', [PreOrderController::class, 'index']);
-// Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
-// Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
+/*
+|--------------------------------------------------------------------------
+| 📦 Pre-Order (Đặt trước)
+|--------------------------------------------------------------------------
+*/
+Route::get('/pre-orders', [PreOrderController::class, 'index']);
+Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
+Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
 
 
-//Table
-Route::apiResource('tables', TableController::class);
-Route::post('/reservations', [ReservationController::class, 'store']);
-//login mới được đặt bàn
-//Route::middleware('auth:sanctum')->post('/reservations', [ReservationController::class, 'store']);
-
-// Route::get('/tables', [TableController::class, 'index']);
-// Route::post('/tables', [TableController::class, 'store']);
-// Route::put('/tables/{id}', [TableController::class, 'update']);
-// Route::delete('/tables/{id}', [TableController::class, 'destroy']);
-
-//Payments
-Route::post('/payments', [PaymentController::class, 'store']);
+/*
+|--------------------------------------------------------------------------
+| 💳 Payments
+|--------------------------------------------------------------------------
+*/
+Route::prefix('payments')->group(function () {
+    Route::get('/', [PaymentController::class, 'index']);
+    Route::get('/{id}', [PaymentController::class, 'show']);
+    Route::post('/', [PaymentController::class, 'store']);
+});
 
 
+/*
+|--------------------------------------------------------------------------
+| 🛍️ ORDER ONLINE (Frontend Website)
+|--------------------------------------------------------------------------
+*/
 Route::post('/order-online', [OrderOnlineController::class, 'store']);
 Route::get('/order-online', [OrderOnlineController::class, 'index']);
 Route::get('/order-online/{id}', [OrderOnlineController::class, 'show']);
 Route::put('/order-online/{id}', [OrderOnlineController::class, 'update']);
 
+
+/*
+|--------------------------------------------------------------------------
+| 🛒 ORDER ONLINE ADMIN
+|--------------------------------------------------------------------------
+*/
 Route::get('/admin/order-online', [OrderOnlineAdminController::class, 'index']);
 Route::get('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'show']);
 Route::put('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'updateStatus']);
+

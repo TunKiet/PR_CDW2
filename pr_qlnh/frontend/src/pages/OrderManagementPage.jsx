@@ -148,7 +148,7 @@ const OrderManagementPage = () => {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
 
-      <div className="flex-1 ml-64 p-6 px-4 py-4 text-center">
+      <div className="flex-1 ml-64 p-6">
         <div className="mb-6 justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-800">
             Quản Lý Đơn Hàng

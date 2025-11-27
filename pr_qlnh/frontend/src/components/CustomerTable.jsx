@@ -1,7 +1,7 @@
 // src/components/CustomerTable.jsx
 import React from "react";
 import { MoreVertical, Trash2 } from "lucide-react";
-import { formatCurrency, getRankByPoints, getRankColor } from "../data/customerData";
+import { formatCurrency, getRankColor } from "../data/customerData";
 
 const CustomerTable = ({ customers = [], onViewDetails, onDelete, loading = false }) => {
   return (
@@ -31,60 +31,28 @@ const CustomerTable = ({ customers = [], onViewDetails, onDelete, loading = fals
           ) : (
             customers.map((c) => {
               const id = c.customer_id ?? c.id;
-              const rank = getRankByPoints(c.points ?? 0);
               return (
                 <tr key={id} className="hover:bg-gray-50">
-                  
-                  {/* Mã KH */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {`KH${id}`}
-                  </td>
-
-                  {/* Tên */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                    {c.name || "Khách lẻ"}
-                  </td>
-
-                  {/* SĐT */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {c.phone || "—"}
-                  </td>
-
-                  {/* Tổng chi tiêu */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                    {formatCurrency(c.total_spent ?? c.totalSpent ?? 0)}
-                  </td>
-
-                  {/* Điểm */}
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-orange-600">
-                    {(c.points ?? 0).toLocaleString()} điểm
-                  </td>
-
-                  {/* Rank */}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{`KH${id}`}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{c.name || "Khách lẻ"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{c.phone || "—"}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{formatCurrency(c.total_spent ?? c.totalSpent ?? 0)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-orange-600">{(c.points ?? 0) + " điểm"}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getRankColor(rank)}`}>
-                      {rank}
+                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getRankColor(c.rank ?? (c.points ?? 0))}`}>
+                      {c.rank ?? (typeof c.points === "number" ? (c.points >= 15000 ? "Kim Cương" : c.points >= 5000 ? "Vàng" : c.points >= 1500 ? "Bạc" : "Đồng") : "Đồng")}
                     </span>
                   </td>
-
-                  {/* Action */}
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium flex items-center justify-center gap-2">
-                    <button 
-                      onClick={() => onViewDetails && onViewDetails(c)} 
-                      className="text-gray-500 hover:text-indigo-600 p-1"
-                    >
+                    <button onClick={() => onViewDetails && onViewDetails(c)} className="text-gray-500 hover:text-indigo-600 p-1">
                       <MoreVertical size={18} />
                     </button>
                     {onDelete && (
-                      <button 
-                        onClick={() => onDelete(id)} 
-                        className="text-red-500 hover:text-red-700 p-1"
-                      >
+                      <button onClick={() => onDelete(id)} className="text-red-500 hover:text-red-700 p-1">
                         <Trash2 size={18} />
                       </button>
                     )}
                   </td>
-
                 </tr>
               );
             })
@@ -92,7 +60,6 @@ const CustomerTable = ({ customers = [], onViewDetails, onDelete, loading = fals
         </tbody>
       </table>
 
-      {/* Footer */}
       <div className="flex justify-between items-center p-4 border-t bg-gray-50">
         <span className="text-sm text-gray-600">Hiển thị {customers.length} khách hàng</span>
         <div className="flex space-x-2">
@@ -101,7 +68,6 @@ const CustomerTable = ({ customers = [], onViewDetails, onDelete, loading = fals
           <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg">Sau</button>
         </div>
       </div>
-
     </div>
   );
 };
