@@ -83,8 +83,6 @@ const Ingredient = () => {
         }
     }, [page, selectedCategory]); // 👈 thêm selectedCategory
 
-
-
     const handleCategoryFilter = (categoryId) => {
         console.log("🟢 Category selected in Ingredient:", categoryId);
         setSelectedCategory(categoryId);

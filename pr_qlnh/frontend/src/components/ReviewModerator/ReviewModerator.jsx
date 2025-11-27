@@ -15,11 +15,13 @@ import ChartReply from './ChartReply';
 const endPoint = 'http://localhost:8000/api';
 
 const ReviewModerator = () => {
+
   const [chartData, setChartData] = useState(null);
   const [dataReply, setDataReply] = useState(null);
-  const [allReview, setAllReview] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [showComment, setShowComment] = useState(true);
+
 
   useEffect(() => {
     const fetchDataChart = async () => {
@@ -55,23 +57,7 @@ const ReviewModerator = () => {
     fetchDataReply();
   }, []);
 
-  //Get all review
-  useEffect(() => {
-    const fetchAllReview = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`${endPoint}/reviews`);
-        setAllReview(res.data.data);
 
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllReview();
-  }, []);
 
   if (loading || !chartData) {
     return <div><CircularProgress /></div>;
@@ -216,7 +202,10 @@ const ReviewModerator = () => {
               </div>
             </div>
 
-            {showComment ? <ManagerReview allReview={allReview} loading={loading} /> : <ManagerReply dataReply={dataReply} />}
+            {showComment ?
+              <ManagerReview /> :
+              <ManagerReply
+                dataReply={dataReply} />}
           </div>
         </div>
       </div>

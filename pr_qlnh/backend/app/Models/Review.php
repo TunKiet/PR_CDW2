@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class Review extends Model
 {
+
     protected $table = 'reviews';
     protected $primaryKey = 'review_id';
     public $timestamps = true;
@@ -39,48 +40,49 @@ class Review extends Model
         return $this->belongsTo(MenuItem::class, 'menu_item_id', 'menu_item_id');
     }
 
-    public static function getReview()
+    public static function getReview($perPage = 10)
     {
-        return Cache::remember('reviews.latest.10', 60, function () {
-            return self::with([
-                'user:user_id,full_name',
-                'menuItem:menu_item_id,menu_item_name'
-            ])
-                ->orderBy('created_at', 'DESC')
-                ->limit(10)
-                ->get();
-        });
+        return self::with('user:user_id,full_name', 'menuItem:menu_item_id,menu_item_name')
+            ->orderBy('review_id', 'desc')
+            ->paginate($perPage);
     }
+
+
 
     //Input menuItemId, limit = 5 review
     //Get review with user, cache Redis
     public static function getReviewByMenuItemId($menuItemId, $limit = 5)
     {
-        return Cache::remember("reviews:$menuItemId", 60, function () use ($menuItemId, $limit) {
-            return self::with(['user', 'replies'])
-                ->where('menu_item_id', $menuItemId)
-                ->orderBy('created_at', 'desc')
-                ->take($limit)
-                ->get();
-        });
+        return self::with(['user', 'replies'])
+            ->where('menu_item_id', $menuItemId)
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->take($limit)
+            ->get();
     }
+
 
     //Total review, Input menuItemId
     public static function totalReviewOfOneMenuItem($menuItemId)
     {
-        return self::where('menu_item_id', $menuItemId)->count();
+        return self::where('menu_item_id', $menuItemId)
+            ->where('status', 'approved')
+            ->count();
     }
 
     //Average review, Input menuItemId
     public static function averageRating($menuItemId)
     {
-        return self::where('menu_item_id', $menuItemId)->avg('rating');
+        return self::where('menu_item_id', $menuItemId)
+            ->where('status', 'approved')
+            ->avg('rating');
     }
 
     //Total review of every rating, Input menuItemId
     public static function ratingCounts($menuItemId)
     {
         return self::where('menu_item_id', $menuItemId)
+            ->where('status', 'approved')
             ->selectRaw('rating, COUNT(*) as count')
             ->groupBy('rating')
             ->pluck('count', 'rating');
@@ -152,5 +154,42 @@ class Review extends Model
         }
 
         return $percent;
+    }
+
+    //Delete review
+    public static function deleteReview($reviewId)
+    {
+        $review = self::find($reviewId);
+        if (!$review) {
+            return false;
+        }
+        return $review->delete();
+    }
+
+    //Hide review
+    public static function hideReview($reviewId)
+    {
+        $review = self::find($reviewId);
+
+        if (!$review) {
+            return false;
+        }
+
+        $review->status = 'hide';
+
+        return $review->save();
+    }
+
+    //Approved review
+    public static function approvedReview($reviewId)
+    {
+        $review = self::find($reviewId);
+
+        if (!$review) {
+            return false;
+        }
+        $review->status = 'approved';
+
+        return $review->save();
     }
 }

@@ -23,7 +23,7 @@ class ReviewReply extends Model
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-        public function reviewId()
+    public function reviewId()
     {
         return $this->belongsTo(Review::class, 'review_id', 'review_id');
     }
@@ -44,15 +44,48 @@ class ReviewReply extends Model
         return self::count();
     }
 
-    public static function getReply()
+    public static function getReply($perPage = 10)
     {
-        return Cache::remember('review_replies.lasted.10', 60, function () {
-            return self::with(['user:user_id,full_name',
-            'reviewId:review_id,comment']
-            )
-            ->orderBy('created_at', 'DESC')
-                ->limit(10)
-                ->get();
-        });
+        return self::with('user:user_id,full_name', 'reviewId:review_id,comment')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+        ;
+    }
+
+    //Delete reply
+    public static function deleteReply($replyId)
+    {
+        $reply = self::find($replyId);
+        if (!$reply) {
+            return false;
+        }
+        return $reply->delete();
+    }
+
+    //Hide review
+    public static function hideReply($replyId)
+    {
+        $reply = self::find($replyId);
+
+        if (!$reply) {
+            return false;
+        }
+
+        $reply->status = 'hide';
+
+        return $reply->save();
+    }
+
+    //Approved reply
+    public static function approvedReply($replyId)
+    {
+        $reply = self::find($replyId);
+
+        if (!$reply) {
+            return false;
+        }
+        $reply->status = 'approved';
+
+        return $reply->save();
     }
 }

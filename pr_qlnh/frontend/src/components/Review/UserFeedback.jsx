@@ -1,8 +1,6 @@
 import React from 'react'
 import { MdAccessTime } from "react-icons/md";
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-dayjs.extend(relativeTime);
+
 const UserFeedback = ({ reply }) => {
 
     const { user, reply_text, created_at } = reply;
@@ -24,7 +22,7 @@ const UserFeedback = ({ reply }) => {
                     </div>
                     <div className="box-time flex items-center text-gray-400 mx-2">
                         <MdAccessTime />
-                        <span>{dayjs(created_at).fromNow()}</span>
+                        <span>{created_at}</span>
                     </div>
                 </div>
                 <div className="box-rep-question">

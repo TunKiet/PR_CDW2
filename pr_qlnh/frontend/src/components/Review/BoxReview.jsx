@@ -14,8 +14,6 @@ const endPoint = 'http://localhost:8000/api';
 
 const BoxReview = ({ reviews, userId }) => {
 
-    // console.log("User id" + userId);
-
     const [loading, setLoading] = useState(true);
 
     // State để mở/tắt feedback per review
@@ -34,7 +32,7 @@ const BoxReview = ({ reviews, userId }) => {
         const fetchAllReplies = async () => {
             const data = {};
             for (const review of reviews) {
-                const res = await axios.get(`${endPoint}/reviews/${review.review_id}/reply`);
+                const res = await axios.get(`${endPoint}/reviews/reply/${review.review_id}`);
                 data[review.review_id] = res.data.reply;
             }
             setRepliesByReview(data);

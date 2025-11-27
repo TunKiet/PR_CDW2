@@ -23,7 +23,6 @@
     "@tailwindcss/vite": "^4.1.17",
     "axios": "^1.12.2",
     "bootstrap": "^5.3.8",
-    "dayjs": "^1.11.19",
     "emoji-picker-react": "^4.15.2",
     "firebase": "^12.4.0",
     "formik": "^2.4.6",

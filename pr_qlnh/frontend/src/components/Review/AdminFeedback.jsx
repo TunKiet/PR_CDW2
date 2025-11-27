@@ -1,8 +1,6 @@
 import React from 'react'
 import { MdAccessTime } from "react-icons/md";
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-dayjs.extend(relativeTime);
+
 
 const AdminFeedback = ({ reply }) => {
 
@@ -21,7 +19,6 @@ const AdminFeedback = ({ reply }) => {
                                 <p className='flex justify-center items-center text-white font-bold text-2xl m-0 p-0'>{avatarText}</p>
                             </div>
                         </div>
-
                         <span className="box-info-name flex items-center mx-2 text-2xl font-bold">{user.full_name || 'Quản Trị Viên'}</span>
 
                         <div className="box-info-tag w-10 h-5 flex justify-center items-center bg-red-600 rounded-[5px]">
@@ -30,7 +27,7 @@ const AdminFeedback = ({ reply }) => {
                     </div>
                     <div className="box-time flex items-center text-gray-400 mx-2">
                         <MdAccessTime />
-                        <span>{dayjs(created_at).fromNow()}</span>
+                        <span>{created_at}</span>
                     </div>
                 </div>
                 <div className="box-rep-question">

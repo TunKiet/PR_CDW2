@@ -19,7 +19,7 @@ const Feedback = ({ reviewId, userId, onSuccess }) => {
 
         try {
             const res = await axios.post(
-                'http://localhost:8000/api/reply',
+                'http://localhost:8000/api/reply/add-reply',
                 {
                     review_id: reviewId,
                     user_id: userId,

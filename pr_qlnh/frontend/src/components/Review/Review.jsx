@@ -53,8 +53,10 @@ const Review = () => {
         const fetchReviews = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`${endPoint}/reviews/${menuItemId}`);
-                setReviews(res.data.reviews);
+                const res = await axios.get(`${endPoint}/reviews/item/${menuItemId}`);
+                setReviews(res.data.data);
+
+                console.log(res.data.data);
                 setTotal(res.data.total);
                 setAverage(res.data.average);
                 setRatingCounts(res.data.rating_counts);
@@ -111,7 +113,7 @@ const Review = () => {
 
         try {
             const res = await axios.post(
-                `${endPoint}/review`,
+                `${endPoint}/reviews/add-review`,
                 {
                     user_id: userId,
                     menu_item_id: menuItemId,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Log;
 
 class ReviewController extends Controller
@@ -60,14 +61,17 @@ class ReviewController extends Controller
 
     //     return response()->json($review);
     // }
-    
 
-    public function getAllReviews()
+    public function getAllReviews(Request $request)
     {
-        $review = Review::getReview();
+        $perPage = $request->query('per_page', 10);
+        $review = Review::getReview($perPage);
 
         return response()->json([
-            'data' => $review
+            'data' => $review->items(),
+            'current_page' => $review->currentPage(),
+            'last_page' => $review->lastPage(),
+            'per_page' => $review->perPage(),
         ]);
     }
 
@@ -90,5 +94,55 @@ class ReviewController extends Controller
             'review_of_day' => $reviewOfDay,
             'percent_year' => $percentYear
         ]);
+    }
+
+    //Delete review
+    public function delete($reviewId)
+    {
+        $delete = Review::deleteReview($reviewId);
+
+        if ($delete) {
+            return response()->json([
+                'data' => true,
+                'message' => 'Xóa thành công'
+            ]);
+        }
+
+        return response()->json([
+            'data' => false,
+            'message' => 'Xóa không hợp lệ'
+        ], 404);
+    }
+
+    //Hide review 
+    public function hide($reviewId)
+    {
+        $hide = Review::hideReview($reviewId);
+
+        if ($hide) {
+            return response()->json([
+                'data' => true,
+            ]);
+        } else {
+            return response()->json([
+                'data' => false
+            ], 404);
+        }
+    }
+
+    //Approved review
+    public function approved($reviewId)
+    {
+        $approved = Review::approvedReview($reviewId);
+
+        if ($approved) {
+            return response()->json([
+                'data' => true,
+            ]);
+        } else {
+            return response()->json([
+                'data' => false
+            ], 404);
+        }
     }
 }

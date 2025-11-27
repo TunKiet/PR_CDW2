@@ -99,15 +99,25 @@ Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::post('/chat', [ChatController::class, 'message']);
 
 //Review
-Route::get('/reviews/{menuItemId}', [ReviewController::class, 'getDataReview']);
-Route::get('/reviews/{reviewId}/reply', [ReviewReplyController::class, 'getDataReply']);
-Route::post('/review', [ReviewController::class, 'store']);
-Route::post('/reviews/${reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
-Route::post('/reply', [ReviewReplyController::class, 'store']);
-Route::get('/reviews', action: [ReviewController::class, 'getAllReviews']);
-Route::get('/reviews/chart/data', [ReviewController::class, 'getDataChartReview']);
-Route::get('/reply/chart', [ReviewReplyController::class, 'getAllReplies']);
+Route::prefix('reviews')->group(function () {
+    Route::get('/all-review', action: [ReviewController::class, 'getAllReviews']);
+    Route::post('/add-review', [ReviewController::class, 'store']);
+    Route::get('/chart/data', [ReviewController::class, 'getDataChartReview']);
+    Route::get('/item/{menuItemId}', [ReviewController::class, 'getDataReview']);
+    Route::get('/reply/{reviewId}', [ReviewReplyController::class, 'getDataReply']);
+    Route::post('/{reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
+    Route::delete('/{reviewId}/delete', [ReviewController::class, 'delete']);
+    Route::patch('/{reviewId}/hide', [ReviewController::class, 'hide']);
+    Route::patch('/{reviewId}/approve', [ReviewController::class, 'approved']);
+});
 
+Route::prefix('reply')->group(function () {
+    Route::post('/add-reply', [ReviewReplyController::class, 'store']);
+    Route::get('/chart', [ReviewReplyController::class, 'getAllReplies']);
+    Route::delete('/{replyId}/delete', [ReviewReplyController::class, 'delete']);
+    Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);
+    Route::patch('/{replyId}/approve', [ReviewReplyController::class, 'approved']);
+});
 
 /*
 |--------------------------------------------------------------------------
