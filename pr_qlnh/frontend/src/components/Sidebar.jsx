@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 // src/components/Sidebar.jsx (ĐÃ CẬP NHẬT để tạo hiệu ứng ĐỘNG)
 import React, { useState, useEffect, useRef } from 'react'; // IMPORT useRef
 import { Link, useLocation } from 'react-router-dom';
 import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, User, Users, Settings, Building, ChevronDown, ChevronUp } from "lucide-react";
+=======
+import React, { useState, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import UserData from '../data/UserData';
+import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, Users, Settings, Building, ChevronDown, ChevronUp, LogOut } from "lucide-react";
+import axios from 'axios';
+>>>>>>> 18-kiet/RE-Role
 
 const menuItems = [
    { title: "Đơn hàng mới", icon: <ClipboardList size={20} />, path: '/order-page' },
