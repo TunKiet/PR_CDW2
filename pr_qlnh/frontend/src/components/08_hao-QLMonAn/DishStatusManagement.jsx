@@ -1,3 +1,4 @@
+// src/pages/Admin/DishStatusManagement.jsx
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Sidebar from "../../components/Sidebar";
 import "./DishTable.css";
@@ -6,7 +7,7 @@ import "./DishTable.css";
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 const API_DISHES_URL = `${API_BASE_URL}/dishes`;
 
-// === HÀM HỖ TRỢ ===
+// === HÀM HỖ TRỢ (OUTSIDE COMPONENT - OK) ===
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
@@ -15,7 +16,7 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-// Mapping status từ API (active/inactive) sang UI
+// Mapping status
 const statusMap = {
   'active': 'Còn hàng',
   'inactive': 'Hết hàng',
@@ -31,7 +32,7 @@ const categoryMap = {
   4: 'Khai Vị'
 };
 
-// === COMPONENT MODAL LÝ DO HẾT HÀNG ===
+// === COMPONENT MODAL (NESTED COMPONENT) ===
 const UnavailableReasonModal = ({ isVisible, onClose, onSave, dishName }) => {
   const [reason, setReason] = useState('');
   const [customReason, setCustomReason] = useState('');
@@ -71,7 +72,18 @@ const UnavailableReasonModal = ({ isVisible, onClose, onSave, dishName }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="modal is-active">
+    <div className="modal is-active" style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      right: 0, 
+      bottom: 0, 
+      backgroundColor: 'rgba(0,0,0,0.5)', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      zIndex: 1000
+    }}>
       <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
         <h3 className="text-xl font-bold mb-4 text-gray-800">
           Lý do hết hàng: {dishName}
@@ -95,7 +107,7 @@ const UnavailableReasonModal = ({ isVisible, onClose, onSave, dishName }) => {
             </select>
           </div>
 
-          {/* Custom reason nếu chọn "Khác" */}
+          {/* Custom reason */}
           {reason === 'Khác' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -111,7 +123,7 @@ const UnavailableReasonModal = ({ isVisible, onClose, onSave, dishName }) => {
             </div>
           )}
 
-          {/* Thời gian dự kiến */}
+          {/* Thời gian */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Dự kiến có hàng trở lại (Tùy chọn)
@@ -147,7 +159,7 @@ const UnavailableReasonModal = ({ isVisible, onClose, onSave, dishName }) => {
 
 // === COMPONENT CHÍNH ===
 export default function DishStatusManagement() {
-  // === STATES ===
+  // === ALL STATES MUST BE HERE (INSIDE COMPONENT) ===
   const [dishes, setDishes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
@@ -175,9 +187,7 @@ export default function DishStatusManagement() {
   });
 
   // === API CALLS ===
-
-  // Fetch all dishes
-  const fetchDishes = async () => {
+  const fetchDishes = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`${API_DISHES_URL}`);
@@ -195,35 +205,30 @@ export default function DishStatusManagement() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  // Calculate stats
-  const calculateStats = (dishesData) => {
+  const calculateStats = useCallback((dishesData) => {
     const total = dishesData.length;
     const active = dishesData.filter(d => d.status === 'active').length;
     const inactive = dishesData.filter(d => d.status === 'inactive' || d.status === 'out_of_stock').length;
     const low_stock = dishesData.filter(d => d.stock_quantity <= 5 && d.stock_quantity > 0).length;
 
     setStats({ total, active, inactive, low_stock });
-  };
+  }, []);
 
-  // Toggle status với API mới
-  const toggleStatus = async (dish) => {
+  const toggleStatus = useCallback((dish) => {
     const newStatus = dish.status === 'active' ? 'inactive' : 'active';
 
-    // Nếu chuyển sang "Hết hàng", mở modal để nhập lý do
     if (newStatus === 'inactive') {
       setSelectedDish(dish);
       setIsModalOpen(true);
       return;
     }
 
-    // Nếu chuyển sang "Còn hàng", gọi API trực tiếp
-    await updateDishStatus(dish.menu_item_id, newStatus, null, null);
-  };
+    updateDishStatus(dish.menu_item_id, newStatus, null, null);
+  }, []);
 
-  // Update dish status (gọi API endpoint mới)
-  const updateDishStatus = async (dishId, newStatus, reason = null, estimatedTime = null) => {
+  const updateDishStatus = useCallback(async (dishId, newStatus, reason = null, estimatedTime = null) => {
     try {
       const payload = {
         status: newStatus,
@@ -243,7 +248,7 @@ export default function DishStatusManagement() {
 
       if (result.status === 'success') {
         alert(result.message);
-        await fetchDishes(); // Reload data
+        await fetchDishes();
         setIsModalOpen(false);
         setSelectedDish(null);
       } else {
@@ -253,10 +258,9 @@ export default function DishStatusManagement() {
       console.error('Error updating status:', error);
       alert('Có lỗi xảy ra khi cập nhật trạng thái');
     }
-  };
+  }, [fetchDishes]);
 
-  // Bulk update
-  const bulkUpdateStatus = async (newStatus, reason = null) => {
+  const bulkUpdateStatus = useCallback(async (newStatus, reason = null) => {
     if (selectedDishes.length === 0) {
       alert('Vui lòng chọn ít nhất 1 món');
       return;
@@ -292,12 +296,12 @@ export default function DishStatusManagement() {
       console.error('Error bulk updating:', error);
       alert('Có lỗi xảy ra khi cập nhật hàng loạt');
     }
-  };
+  }, [selectedDishes, fetchDishes]);
 
   // === EFFECTS ===
   useEffect(() => {
     fetchDishes();
-  }, []);
+  }, [fetchDishes]);
 
   // === FILTERING ===
   const filteredDishes = useMemo(() => {
@@ -325,35 +329,35 @@ export default function DishStatusManagement() {
   const currentItems = filteredDishes.slice(startIndex, startIndex + itemsPerPage);
 
   // === HANDLERS ===
-  const handleFilterChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value });
+  const handleFilterChange = useCallback((e) => {
+    setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
     setCurrentPage(1);
-  };
+  }, []);
 
-  const toggleSelectDish = (dishId) => {
+  const toggleSelectDish = useCallback((dishId) => {
     setSelectedDishes(prev =>
       prev.includes(dishId)
         ? prev.filter(id => id !== dishId)
         : [...prev, dishId]
     );
-  };
+  }, []);
 
-  const selectAll = () => {
+  const selectAll = useCallback(() => {
     setSelectedDishes(currentItems.map(d => d.menu_item_id));
-  };
+  }, [currentItems]);
 
-  const deselectAll = () => {
+  const deselectAll = useCallback(() => {
     setSelectedDishes([]);
-  };
+  }, []);
 
-  const handleModalSave = (data) => {
+  const handleModalSave = useCallback((data) => {
     updateDishStatus(
       selectedDish.menu_item_id,
       'inactive',
       data.unavailable_reason,
       data.unavailable_until
     );
-  };
+  }, [selectedDish, updateDishStatus]);
 
   // === RENDER ===
   return (
@@ -385,7 +389,7 @@ export default function DishStatusManagement() {
             </div>
           </div>
 
-          {/* FILTERS & BULK ACTIONS */}
+          {/* FILTERS */}
           <div className="dish-controls">
             <input
               type="text"
@@ -415,10 +419,8 @@ export default function DishStatusManagement() {
               <option value="">Tất cả Trạng thái</option>
               <option value="active">Còn hàng</option>
               <option value="inactive">Hết hàng</option>
-              <option value="paused">Tạm ngưng</option>
             </select>
 
-            {/* Bulk Actions */}
             <button
               onClick={() => setShowBulkActions(!showBulkActions)}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
@@ -427,7 +429,7 @@ export default function DishStatusManagement() {
             </button>
           </div>
 
-          {/* BULK ACTIONS PANEL */}
+          {/* BULK ACTIONS */}
           {showBulkActions && (
             <div className="bg-gray-50 p-4 rounded-lg mb-4 border">
               <div className="flex items-center justify-between">
@@ -435,16 +437,10 @@ export default function DishStatusManagement() {
                   <span className="font-medium">
                     Đã chọn: {selectedDishes.length} món
                   </span>
-                  <button
-                    onClick={selectAll}
-                    className="text-sm text-blue-600 hover:underline"
-                  >
+                  <button onClick={selectAll} className="text-sm text-blue-600 hover:underline">
                     Chọn tất cả
                   </button>
-                  <button
-                    onClick={deselectAll}
-                    className="text-sm text-gray-600 hover:underline"
-                  >
+                  <button onClick={deselectAll} className="text-sm text-gray-600 hover:underline">
                     Bỏ chọn
                   </button>
                 </div>
@@ -482,7 +478,6 @@ export default function DishStatusManagement() {
                     <th className="w-3/12">Tên Món Ăn</th>
                     <th className="w-1/12">Loại</th>
                     <th className="w-1/12">Giá</th>
-                    <th className="w-1/12 text-center">Tồn kho</th>
                     <th className="w-1/12 text-center">Tình Trạng</th>
                     <th className="w-2/12 text-center">Thao tác</th>
                   </tr>
@@ -521,13 +516,6 @@ export default function DishStatusManagement() {
                         <td>{categoryMap[dish.category_id] || 'N/A'}</td>
                         <td>{formatCurrency(dish.price)}</td>
                         <td className="text-center">
-                          <span className={`font-semibold ${
-                            dish.stock_quantity <= 5 ? 'text-red-600' : 'text-green-600'
-                          }`}>
-                            {dish.stock_quantity || 0}
-                          </span>
-                        </td>
-                        <td className="text-center">
                           <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
                             dish.status === "active"
                               ? "bg-green-100 text-green-800"
@@ -552,8 +540,8 @@ export default function DishStatusManagement() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={showBulkActions ? 9 : 8} className="no-data">
-                        Không có món ăn nào phù hợp với điều kiện lọc.
+                      <td colSpan={showBulkActions ? 8 : 7} className="no-data">
+                        Không có món ăn nào phù hợp.
                       </td>
                     </tr>
                   )}
@@ -566,7 +554,7 @@ export default function DishStatusManagement() {
           {!isLoading && filteredDishes.length > 0 && (
             <div className="dish-pagination-wrapper">
               <div className="text-sm text-gray-700">
-                Hiển thị {startIndex + 1} - {Math.min(startIndex + itemsPerPage, filteredDishes.length)} trong tổng số {filteredDishes.length} món
+                Hiển thị {startIndex + 1} - {Math.min(startIndex + itemsPerPage, filteredDishes.length)} / {filteredDishes.length}
               </div>
               <div className="flex space-x-2">
                 <button
@@ -577,7 +565,7 @@ export default function DishStatusManagement() {
                   Trước
                 </button>
                 <span className="px-3 py-1">
-                  Trang {currentPage} / {totalPages}
+                  {currentPage} / {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
@@ -592,7 +580,7 @@ export default function DishStatusManagement() {
         </div>
       </main>
 
-      {/* MODAL LÝ DO HẾT HÀNG */}
+      {/* MODAL */}
       <UnavailableReasonModal
         isVisible={isModalOpen}
         onClose={() => {

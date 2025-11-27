@@ -69,28 +69,7 @@ Route::get('/test', function () {
 | 🍽️ Dish & Review Routes
 |--------------------------------------------------------------------------
 */
-Route::apiResource('dishes', DishController::class);
-// ⭐ THÊM ROUTES MỚI CHO STATUS MANAGEMENT
-Route::prefix('dishes')->group(function () {
-    // Toggle status đơn lẻ
-    Route::patch('/{id}/status', [DishController::class, 'updateStatus']);
-    
-    // Cập nhật hàng loạt
-    Route::post('/bulk-update-status', [DishController::class, 'bulkUpdateStatus']);
-    
-    // Lịch sử thay đổi
-    Route::get('/{id}/status-history', [DishController::class, 'getStatusHistory']);
-    
-    // Thống kê
-    Route::get('/status-stats', [DishController::class, 'getStatusStats']);
-    
-    // Món sắp hết
-    Route::get('/low-stock', [DishController::class, 'getLowStock']);
-    
-    // Lọc nâng cao
-    Route::get('/filter', [DishController::class, 'filter']);
-});
-Route::apiResource('categories', CategoryController::class);
+
 
 Route::post('/reviews', [ReviewController::class, 'store']);
 Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
@@ -208,7 +187,7 @@ Route::get('/tables', [TableController::class, 'index']);
 
 Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
 
-
+// hao chuc nang
 
 use App\Http\Controllers\Api\PromotionController;
 // Protected routes (cần authentication - thêm middleware 'auth:sanctum' khi đã setup)
@@ -224,3 +203,39 @@ Route::prefix('v1')->group(function () {
     Route::get('/active-promotions', [PromotionController::class, 'getActive']);
     
 });
+// routes/api.php
+
+use App\Http\Controllers\Api\StatisticController;
+
+// ⭐ STATISTICS ROUTES
+Route::prefix('statistics')->group(function () {
+    Route::get('/dashboard', [StatisticController::class, 'dashboard']);
+    Route::get('/revenue-chart', [StatisticController::class, 'revenueChart']);
+    Route::get('/top-dishes', [StatisticController::class, 'topDishes']);
+    Route::get('/comparison', [StatisticController::class, 'comparison']);
+    Route::get('/top-customers', [StatisticController::class, 'topCustomers']);
+    Route::get('/summary', [StatisticController::class, 'summary']); // Bonus
+});
+
+Route::apiResource('dishes', DishController::class);
+// ⭐ THÊM ROUTES MỚI CHO STATUS MANAGEMENT
+Route::prefix('dishes')->group(function () {
+    // Toggle status đơn lẻ
+    Route::patch('/{id}/status', [DishController::class, 'updateStatus']);
+    
+    // Cập nhật hàng loạt
+    Route::post('/bulk-update-status', [DishController::class, 'bulkUpdateStatus']);
+    
+    // Lịch sử thay đổi
+    Route::get('/{id}/status-history', [DishController::class, 'getStatusHistory']);
+    
+    // Thống kê
+    Route::get('/status-stats', [DishController::class, 'getStatusStats']);
+    
+    // Món sắp hết
+    Route::get('/low-stock', [DishController::class, 'getLowStock']);
+    
+    // Lọc nâng cao
+    Route::get('/filter', [DishController::class, 'filter']);
+});
+Route::apiResource('categories', CategoryController::class);
