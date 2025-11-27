@@ -31,8 +31,8 @@ class User extends Authenticatable implements JWTSubject
         'full_name', // Đã thay thế 'name' bằng 'username'
         'email',
         'password',
-        'full_name',
         'phone',
+        'role',
         'status',
     ];
 

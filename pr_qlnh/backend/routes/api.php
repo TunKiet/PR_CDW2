@@ -104,6 +104,10 @@ Route::get('/reviews/{reviewId}/reply', [ReviewReplyController::class, 'getDataR
 Route::post('/review', [ReviewController::class, 'store']);
 Route::post('/reviews/${reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
 Route::post('/reply', [ReviewReplyController::class, 'store']);
+Route::get('/reviews', action: [ReviewController::class, 'getAllReviews']);
+Route::get('/reviews/chart/data', [ReviewController::class, 'getDataChartReview']);
+Route::get('/reply/chart', [ReviewReplyController::class, 'getAllReplies']);
+
 
 /*
 |--------------------------------------------------------------------------

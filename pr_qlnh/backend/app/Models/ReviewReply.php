@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class ReviewReply extends Model
 {
@@ -22,6 +23,11 @@ class ReviewReply extends Model
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
+        public function reviewId()
+    {
+        return $this->belongsTo(Review::class, 'review_id', 'review_id');
+    }
+
     //Get reply review
     public static function getReplyByReviewId($reviewId)
     {
@@ -30,5 +36,23 @@ class ReviewReply extends Model
             ->where('status', 'approved')
             ->orderBy('created_at', 'asc')
             ->get();
+    }
+
+    //Count reply review
+    public static function countReply()
+    {
+        return self::count();
+    }
+
+    public static function getReply()
+    {
+        return Cache::remember('review_replies.lasted.10', 60, function () {
+            return self::with(['user:user_id,full_name',
+            'reviewId:review_id,comment']
+            )
+            ->orderBy('created_at', 'DESC')
+                ->limit(10)
+                ->get();
+        });
     }
 }

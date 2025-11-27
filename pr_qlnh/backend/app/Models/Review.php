@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class Review extends Model
 {
@@ -33,7 +34,23 @@ class Review extends Model
             ->with('user')
             ->orderBy('created_at', 'asc');
     }
+    public function menuItem()
+    {
+        return $this->belongsTo(MenuItem::class, 'menu_item_id', 'menu_item_id');
+    }
 
+    public static function getReview()
+    {
+        return Cache::remember('reviews.latest.10', 60, function () {
+            return self::with([
+                'user:user_id,full_name',
+                'menuItem:menu_item_id,menu_item_name'
+            ])
+                ->orderBy('created_at', 'DESC')
+                ->limit(10)
+                ->get();
+        });
+    }
 
     //Input menuItemId, limit = 5 review
     //Get review with user, cache Redis
@@ -69,4 +86,71 @@ class Review extends Model
             ->pluck('count', 'rating');
     }
 
+    //Count all review
+    public static function countAllReview()
+    {
+        return self::count();
+    }
+
+    //Average rating all review
+    public static function averageRatingAllReview()
+    {
+        return round(self::avg('rating'), 1);
+    }
+
+    //Quantity review of rating
+    public static function quantityOfRating()
+    {
+        return self::select('rating', DB::raw('COUNT(*) as total'))
+            ->groupBy('rating')
+            ->orderBy('rating', 'DESC')
+            ->pluck('total', 'rating');
+    }
+
+    //Get quantity review of weekday
+    public static function quantityReviewOfWeekday()
+    {
+        return self::select(
+            DB::raw('DAYOFWEEK(created_at) as weekday'),
+            DB::raw('COUNT(*) as total')
+        )
+            ->groupBy('weekday')
+            ->orderBy('weekday')
+            ->pluck('total', 'weekday');
+    }
+
+    //Get count monthly review
+    public static function countReviewByMonth()
+    {
+        return self::select(
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('COUNT(*) as total')
+        )
+            ->whereYear('created_at', date('Y'))
+            ->groupBy('month')
+            ->orderBy('month')
+            ->pluck('total', 'month');
+    }
+
+    //Percent monthly review
+    public static function reviewPercentByMonth()
+    {
+        $count = self::countReviewByMonth(); //total monthly review
+
+        $totalReviewYear = $count->sum(); //total yearly review
+
+        $percent = []; //save percent monthly
+
+        foreach (range(1, 12) as $month) {
+            $monthTotal = $count[$month] ?? 0;
+
+            if ($totalReviewYear > 0) {
+                $percent[$month] = round(($monthTotal / $totalReviewYear) * 100, 2);
+            } else {
+                $percent[$month] = 0;
+            }
+        }
+
+        return $percent;
+    }
 }

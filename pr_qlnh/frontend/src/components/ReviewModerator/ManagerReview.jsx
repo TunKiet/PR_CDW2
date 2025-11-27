@@ -7,8 +7,11 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import Pagination from '@mui/material/Pagination';
 
 import { CiImageOff } from "react-icons/ci";
-const ManagerReview = () => {
-    
+const ManagerReview = ({ allReview, loading }) => {
+    // const [loading, setLoading] = useState(false);
+
+    // setLoading(true);
+
     return (
         <>
             <div className="reviewModerator-table pt-2">
@@ -30,37 +33,45 @@ const ManagerReview = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr className='hover:bg-gray-300 transition cursor-pointer'>
-                                <td className='px-4 py-2 text-center border-b'>1</td>
-                                <td className='px-4 py-2 text-center border-b'>An</td>
-                                <td className='px-4 py-2 text-center border-b'>Phở bò</td>
-                                <td className='px-4 py-2 text-center border-b'>5</td>
-                                <td className='px-4 py-2 text-center border-b flex justify-center'><CiImageOff size={30}/></td>
-                                <td className='px-4 py-2 text-center border-b'>Tuyet voi</td>
-                                <td className='px-4 py-2 text-center border-b'>2025:10:10</td>
-                                <td className='px-4 py-2 text-center border-b'>100</td>
-                                <td className='px-4 py-2 text-center border-b'>0</td>
-                                <td className='px-4 py-2 text-center border-b'>Pending</td>
-                                <td className='text-center border-b'>
-                                    <Tooltip title="Approve">
-                                        <IconButton>
-                                            <CheckCircleOutlineIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                    
-                                    <Tooltip title="Hide">
-                                        <IconButton>
-                                            <VisibilityOffOutlinedIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Delete">
-                                        <IconButton>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </td>
-                            </tr>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan={11} className="text-center py-4">Đang tải...</td>
+                                </tr>
+                            ) : allReview.length > 0 ? (
+                                allReview.map((review) => (
+                                    <tr key={review.review_id} className='hover:bg-gray-300 transition cursor-pointer'>
+                                        <td className='text-[11px] text-center border-b'>{review.review_id}</td>
+                                        <td className='text-[11px] text-center border-b'>{review.user?.full_name}</td>
+                                        <td className='text-[11px] text-center border-b'>{review.menu_item?.menu_item_name}</td>
+                                        <td className='text-[11px] text-center border-b'>{review.rating}</td>
+                                        <td className='text-[11px] text-center border-b flex justify-center'>
+                                            {review.image_url ? <img src={review.image_url} alt="" className="w-10 h-10 object-cover" /> : <CiImageOff size={30} />}
+                                        </td>
+                                        <td className='text-[11px] text-center border-b'>{review.comment}</td>
+                                        <td className='text-[11px] text-center border-b'>{new Date(review.created_at).toLocaleString()}</td>
+                                        <td className='text-[11px] text-center border-b'>{review.like || 0}</td>
+                                        <td className='text-[11px] text-center border-b'>{review.dislike || 0}</td>
+                                        <td className='text-[11px] text-center border-b'>{review.status}</td>
+                                        <td className='text-[11px] text-center border-b'>
+                                            <Tooltip title="Approve">
+                                                <IconButton><CheckCircleOutlineIcon size={20}/></IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Hide">
+                                                <IconButton><VisibilityOffOutlinedIcon /></IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Delete">
+                                                <IconButton><DeleteIcon /></IconButton>
+                                            </Tooltip>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={11} className="text-center py-4">Không có đánh giá</td>
+                                </tr>
+                            )}
                         </tbody>
+
                     </table>
                 </div>
                 <div className="reviewModerator-pagination flex justify-center">

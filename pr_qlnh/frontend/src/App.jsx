@@ -62,7 +62,6 @@ function App() {
         <Route path="/chat" element={<UserChat />} />
         <Route path="/admin-chat" element={<AdminChat />} />
         <Route path="/restaurant-info" element={<RestaurantInfoManage />} />
-        <Route path="/export" element={<IngredientInOut />} />
         <Route path="/tables" element={<TableManagementAdmin />} />
 
         {/* Định tuyến cho các trang khác nhau */}

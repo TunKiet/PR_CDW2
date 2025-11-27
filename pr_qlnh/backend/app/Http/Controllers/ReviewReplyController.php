@@ -30,4 +30,17 @@ class ReviewReplyController extends Controller
             'data' => $reply,
         ]);
     }
+    
+    //Count reply
+    public function getAllReplies()
+    {
+        $countReply = ReviewReply::countReply();
+
+        $replies = ReviewReply::getReply();
+
+        return response()->json([
+            'countReply' => $countReply,
+            'replies' => $replies
+        ]);
+    }
 }

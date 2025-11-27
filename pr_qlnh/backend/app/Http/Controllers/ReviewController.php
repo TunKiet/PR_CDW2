@@ -45,19 +45,50 @@ class ReviewController extends Controller
     }
 
     //Request button like, dislike
-    public function toggleLike($reviewId, Request $request)
+    // public function toggleLike($reviewId, Request $request)
+    // {
+    //     $review = Review::findOrFail($reviewId);
+    //     $type = $request->type;
+
+    //     if ($type === 'like') {
+    //         $review->like = $review->like == 0 ? 1 : 0;
+    //     } else {
+    //         $review->dislike = $review->dislike == 0 ? 1 : 0;
+    //     }
+
+    //     $review->save();
+
+    //     return response()->json($review);
+    // }
+    
+
+    public function getAllReviews()
     {
-        $review = Review::findOrFail($reviewId);
-        $type = $request->type;
+        $review = Review::getReview();
 
-        if ($type === 'like') {
-            $review->like = $review->like == 0 ? 1 : 0;
-        } else {
-            $review->dislike = $review->dislike == 0 ? 1 : 0;
-        }
+        return response()->json([
+            'data' => $review
+        ]);
+    }
 
-        $review->save();
+    public function getDataChartReview()
+    {
+        $countReview = Review::countAllReview();
 
-        return response()->json($review);
+        $averageReview = Review::averageRatingAllReview();
+
+        $quantityReviewRating = Review::quantityOfRating();
+
+        $reviewOfDay = Review::quantityReviewOfWeekday();
+
+        $percentYear = Review::reviewPercentByMonth();
+
+        return response()->json([
+            'count_review' => $countReview,
+            'average_review' => $averageReview,
+            'quantity_review_rating' => $quantityReviewRating,
+            'review_of_day' => $reviewOfDay,
+            'percent_year' => $percentYear
+        ]);
     }
 }
