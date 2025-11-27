@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\PreOrderController;
 //Table
 use App\Http\Controllers\API\TableController;
 use App\Http\Controllers\API\ReservationController;
+use App\Http\Controllers\API\ReservationManagementController;
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
 // use App\Http\Controllers\Api\MenuItemController;
@@ -126,6 +127,16 @@ Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus'
 //Table
 Route::apiResource('tables', TableController::class);
 Route::post('/reservations', [ReservationController::class, 'store']);
+Route::prefix('reservation-management')->group(function () {
+
+    Route::get('/', [ReservationManagementController::class, 'index']);        // lấy danh sách + filter
+    Route::get('/{id}', [ReservationManagementController::class, 'show']);      // chi tiết đơn
+
+    Route::put('/{id}/status', [ReservationManagementController::class, 'updateStatus']); // cập nhật trạng thái
+    Route::put('/{id}/cancel', [ReservationManagementController::class, 'cancel']);       // hủy đơn
+
+    Route::delete('/{id}', [ReservationManagementController::class, 'destroy']);          // xóa đơn
+});
 //login mới được đặt bàn
 //Route::middleware('auth:sanctum')->post('/reservations', [ReservationController::class, 'store']);
 
