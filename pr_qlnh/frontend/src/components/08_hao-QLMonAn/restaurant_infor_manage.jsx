@@ -109,7 +109,7 @@ const PromoEditModal = ({ isVisible, onClose, onSave, promotion }) => {
   return (
     <div
       id="promo-edit-modal"
-      className={`modal ${isVisible ? "is-active" : ""}`}
+      className={`app-modal-overlay ${isVisible ? "is-active" : ""}`}
     >
       <div
         className={`bg-white p-6 rounded-xl w-full max-w-2xl shadow-2xl transform transition-all duration-300 ${
@@ -368,7 +368,7 @@ const DishSelectorModal = ({ isVisible, onClose, dishList, onSave }) => {
   return (
     <div
       id="dish-selector-modal"
-      className={`modal ${isVisible ? "is-active" : ""}`}
+      className={`app-modal-overlay ${isVisible ? "is-active" : ""}`}
     >
       <div
         className={`bg-white p-6 rounded-xl w-full max-w-4xl shadow-2xl transform transition-all duration-300 ${
