@@ -194,7 +194,9 @@ export default function HomePage() {
   // Pagination
   const lastIndex = currentPage * itemsPerPage;
   const firstIndex = lastIndex - itemsPerPage;
-  const currentItems = filteredItems.slice(firstIndex, lastIndex);
+  const currentItems = Array.isArray(filteredItems) 
+  ? filteredItems.slice(firstIndex, lastIndex) 
+  : [];
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
   const nextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
