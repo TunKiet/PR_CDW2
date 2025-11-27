@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
     {
         // ✅ Thêm 1 tài khoản admin riêng biệt
         DB::table('users')->insert([
-            'username' => 'admin',
+            'full_name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('admin123'),
             'phone' => '0999999999',

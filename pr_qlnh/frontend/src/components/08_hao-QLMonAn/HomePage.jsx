@@ -49,34 +49,70 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
   return (
     <div className="reservation-overlay" onClick={onClose}>
       <div className="reservation-box" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>&times;</button>
+        <button className="close-btn" onClick={onClose}>
+          &times;
+        </button>
         <h2 className="reservation-title">Đặt Bàn Ngay</h2>
         <form onSubmit={handleSubmit}>
           {/* Form fields giữ nguyên */}
           <div className="form-grid">
             <div>
               <label>Tên *</label>
-              <input name="name" value={formData.name} onChange={handleChange} required />
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div>
               <label>Số điện thoại *</label>
-              <input name="phone" value={formData.phone} onChange={handleChange} required />
+              <input
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div className="full">
               <label>Email</label>
-              <input name="email" value={formData.email} onChange={handleChange} />
+              <input
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
             </div>
             <div>
               <label>Ngày *</label>
-              <input type="date" min={today} name="date" value={formData.date} onChange={handleChange} required />
+              <input
+                type="date"
+                min={today}
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div>
               <label>Giờ *</label>
-              <input type="time" name="time" value={formData.time} onChange={handleChange} required />
+              <input
+                type="time"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div className="full">
               <label>Số lượng khách *</label>
-              <input type="number" min="1" name="guests" value={formData.guests} onChange={handleChange} required />
+              <input
+                type="number"
+                min="1"
+                name="guests"
+                value={formData.guests}
+                onChange={handleChange}
+                required
+              />
             </div>
           </div>
           <fieldset className="seating">
@@ -84,7 +120,14 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
             <div className="seating-options">
               {["Trong nhà", "Ngoài trời", "Phòng VIP"].map((area) => (
                 <label key={area}>
-                  <input type="radio" name="seating_area" value={area} checked={formData.seating_area === area} onChange={handleChange} required />
+                  <input
+                    type="radio"
+                    name="seating_area"
+                    value={area}
+                    checked={formData.seating_area === area}
+                    onChange={handleChange}
+                    required
+                  />
                   <span>{area}</span>
                 </label>
               ))}
@@ -93,15 +136,27 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
           {cart.length > 0 && (
             <div className="preorder-summary">
               <h3>🍽️ Tóm Tắt Đặt Món Trước</h3>
-              <p>Tổng: <strong>{formatCurrency(total)}</strong></p>
-              <p>Cọc 50%: <strong className="text-red">{formatCurrency(deposit)}</strong></p>
+              <p>
+                Tổng: <strong>{formatCurrency(total)}</strong>
+              </p>
+              <p>
+                Cọc 50%:{" "}
+                <strong className="text-red">{formatCurrency(deposit)}</strong>
+              </p>
             </div>
           )}
           <div className="notes">
             <label>Ghi chú</label>
-            <textarea rows="3" name="notes" value={formData.notes} onChange={handleChange} />
+            <textarea
+              rows="3"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+            />
           </div>
-          <button type="submit" className="submit-btn">Gửi Yêu Cầu Đặt Bàn</button>
+          <button type="submit" className="submit-btn">
+            Gửi Yêu Cầu Đặt Bàn
+          </button>
         </form>
       </div>
     </div>
@@ -141,7 +196,7 @@ export default function HomePage() {
     fetch(`${API_BASE_URL}/v1/featured-dishes`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.status === 'success') {
+        if (data.status === "success") {
           setFeaturedDishes(data.data);
         }
       })
@@ -152,7 +207,7 @@ export default function HomePage() {
     fetch(`${API_BASE_URL}/categories`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.status === 'success') {
+        if (data.status === "success") {
           setCategories(data.data);
         }
       })
@@ -174,10 +229,27 @@ export default function HomePage() {
     fetch(`${API_BASE_URL}/menu-items`)
       .then((res) => res.json())
       .then((data) => {
-        setMenuItems(data);
-        setFilteredItems(data);
+        console.log("Menu API response:", data);
+
+        if (Array.isArray(data)) {
+          // Trường hợp API trả về array trực tiếp
+          setMenuItems(data);
+          setFilteredItems(data);
+        } else if (data.success === true && Array.isArray(data.data)) {
+          // ⭐ SỬA: success thay vì status
+          setMenuItems(data.data);
+          setFilteredItems(data.data);
+        } else {
+          console.error("API response không đúng format:", data);
+          setMenuItems([]);
+          setFilteredItems([]);
+        }
       })
-      .catch((err) => console.error("Lỗi tải menu:", err));
+      .catch((err) => {
+        console.error("Lỗi tải menu:", err);
+        setMenuItems([]);
+        setFilteredItems([]);
+      });
   }, []);
 
   // Filter by category
@@ -194,12 +266,13 @@ export default function HomePage() {
   // Pagination
   const lastIndex = currentPage * itemsPerPage;
   const firstIndex = lastIndex - itemsPerPage;
-  const currentItems = Array.isArray(filteredItems) 
-  ? filteredItems.slice(firstIndex, lastIndex) 
-  : [];
+  const currentItems = Array.isArray(filteredItems)
+    ? filteredItems.slice(firstIndex, lastIndex)
+    : [];
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
-  const nextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const nextPage = () =>
+    currentPage < totalPages && setCurrentPage(currentPage + 1);
   const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
 
   // Cart functions
@@ -245,11 +318,21 @@ export default function HomePage() {
         <nav className="home-navbar">
           <div className="nav-logo">🍜 Nhà Hàng Nhóm D</div>
           <ul className="nav-links">
-            <li><a href="#home">Trang chủ</a></li>
-            <li><a href="#featured">Món nổi bật</a></li>
-            <li><a href="#menu">Thực đơn</a></li>
-            <li><a href="#promotions">Ưu đãi</a></li>
-            <li><a href="#reservation">Đặt bàn</a></li>
+            <li>
+              <a href="#home">Trang chủ</a>
+            </li>
+            <li>
+              <a href="#featured">Món nổi bật</a>
+            </li>
+            <li>
+              <a href="#menu">Thực đơn</a>
+            </li>
+            <li>
+              <a href="#promotions">Ưu đãi</a>
+            </li>
+            <li>
+              <a href="#reservation">Đặt bàn</a>
+            </li>
           </ul>
           <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
             🛒 <span>{cart.reduce((s, i) => s + i.quantity, 0)}</span>
@@ -288,7 +371,7 @@ export default function HomePage() {
               >
                 <div className="h-48 overflow-hidden">
                   <img
-                    src={dish.image_url || 'https://placehold.co/600x400'}
+                    src={dish.image_url || "https://placehold.co/600x400"}
                     alt={dish.menu_item_name}
                     className="w-full h-full object-cover cursor-pointer hover:scale-110 transition duration-300"
                     onClick={() => {
@@ -299,11 +382,15 @@ export default function HomePage() {
                 </div>
                 <div className="p-5">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-gray-800">{dish.menu_item_name}</h3>
-                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">⭐ Nổi bật</span>
+                    <h3 className="text-xl font-bold text-gray-800">
+                      {dish.menu_item_name}
+                    </h3>
+                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                      ⭐ Nổi bật
+                    </span>
                   </div>
                   <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {dish.description || 'Món ăn đặc biệt của nhà hàng'}
+                    {dish.description || "Món ăn đặc biệt của nhà hàng"}
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-indigo-600">
@@ -447,7 +534,10 @@ export default function HomePage() {
       </section>
 
       {/* ===== PROMOTIONS SECTION - DYNAMIC FROM API ===== */}
-      <section id="promotions" className="promo-section py-12 bg-gradient-to-r from-purple-50 to-pink-50">
+      <section
+        id="promotions"
+        className="promo-section py-12 bg-gradient-to-r from-purple-50 to-pink-50"
+      >
         <h2 className="text-3xl font-bold mb-8 text-center">
           🎁 Ưu Đãi Đặc Biệt
         </h2>
@@ -466,12 +556,12 @@ export default function HomePage() {
               <div
                 key={promo.promotion_id}
                 className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 border-t-4"
-                style={{ borderTopColor: '#3b82f6' }}
+                style={{ borderTopColor: "#3b82f6" }}
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="px-3 py-1 bg-red-100 text-red-600 text-xs font-bold rounded-full">
-                    {promo.discount_type === 'percent' 
-                      ? `-${promo.discount_value}%` 
+                    {promo.discount_type === "percent"
+                      ? `-${promo.discount_value}%`
                       : `-${formatCurrency(promo.discount_value)}`}
                   </span>
                   <span className="text-xs text-gray-500">
@@ -486,7 +576,10 @@ export default function HomePage() {
                 </p>
                 <div className="text-xs text-gray-500 mb-4">
                   {promo.expired_at && (
-                    <p>⏰ Hết hạn: {new Date(promo.expired_at).toLocaleDateString('vi-VN')}</p>
+                    <p>
+                      ⏰ Hết hạn:{" "}
+                      {new Date(promo.expired_at).toLocaleDateString("vi-VN")}
+                    </p>
                   )}
                   {promo.max_uses > 0 && (
                     <p>📊 Còn: {promo.max_uses - promo.used_count} lượt</p>
@@ -524,7 +617,9 @@ export default function HomePage() {
         <div className="cart-popup">
           <div className="cart-box">
             <h3>🛍️ Giỏ hàng</h3>
-            <button className="close-btn" onClick={() => setShowCart(false)}>&times;</button>
+            <button className="close-btn" onClick={() => setShowCart(false)}>
+              &times;
+            </button>
             {cart.length === 0 ? (
               <p>Chưa có món nào.</p>
             ) : (
@@ -534,15 +629,25 @@ export default function HomePage() {
                     <li key={item.menu_item_id}>
                       <span>{item.menu_item_name}</span>
                       <div className="quantity-control">
-                        <button onClick={() => updateQuantity(item.menu_item_id, -1)}>-</button>
+                        <button
+                          onClick={() => updateQuantity(item.menu_item_id, -1)}
+                        >
+                          -
+                        </button>
                         <span>{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.menu_item_id, +1)}>+</button>
+                        <button
+                          onClick={() => updateQuantity(item.menu_item_id, +1)}
+                        >
+                          +
+                        </button>
                       </div>
                       <span>{formatCurrency(item.price * item.quantity)}</span>
                     </li>
                   ))}
                 </ul>
-                <p className="cart-total">Tổng cộng: {formatCurrency(totalAmount)}</p>
+                <p className="cart-total">
+                  Tổng cộng: {formatCurrency(totalAmount)}
+                </p>
                 <div className="cart-actions">
                   <button className="checkout-btn">Thanh toán</button>
                   <button

@@ -14,6 +14,7 @@ class MessageSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         $senderTypes = ['user', 'admin'];
         $sampleMessages = [
             'Xin chào, tôi muốn đặt bàn.',
@@ -43,5 +44,6 @@ class MessageSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }
