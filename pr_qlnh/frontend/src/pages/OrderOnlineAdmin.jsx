@@ -3,18 +3,9 @@ import Sidebar from "../components/Sidebar";
 import "./OrderOnlineAdmin.css";
 
 const formatCurrency = (num) =>
-  new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(num);
-
-const statusLabel = {
-  pending: "Chờ xác nhận",
-  confirmed: "Đã xác nhận",
-  delivering: "Đang giao",
-  done: "Hoàn tất",
-  cancelled: "Đã hủy",
-};
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+    num
+  );
 
 export default function OrderOnlineAdmin() {
   const [orders, setOrders] = useState([]);
@@ -27,13 +18,11 @@ export default function OrderOnlineAdmin() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
-  const [message, setMessage] = useState("");
-
-  // ===================================================
-  // LOAD DANH SÁCH ĐƠN — TỰ GỌI LẠI KHI STATUS THAY ĐỔI
-  // ===================================================
+  // ============================
+  // Load danh sách đơn
+  // ============================
   useEffect(() => {
-    fetchOrders(1);
+    fetchOrders();
   }, [status]);
 
   async function fetchOrders(page = 1) {
@@ -41,72 +30,52 @@ export default function OrderOnlineAdmin() {
 
     const url = new URL("http://127.0.0.1:8000/api/order-online");
     url.searchParams.append("page", page);
+    if (search) url.searchParams.append("q", search);
+    if (status) url.searchParams.append("status", status);
 
-    if (search.trim() !== "") url.searchParams.append("q", search);
-    if (status.trim() !== "") url.searchParams.append("status", status);
+    const res = await fetch(url);
+    const data = await res.json();
 
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-
-      setOrders(data.data || []);
-      setPageInfo(data);
-    } catch (err) {
-      alert("Không thể tải danh sách đơn hàng");
-    }
-
+    setOrders(data.data);
+    setPageInfo(data);
     setLoading(false);
   }
 
-  // ===================================================
-  // CLICK VÀO TRẠNG THÁI ĐỂ LỌC
-  // ===================================================
-  function filterByStatus(s) {
-    setStatus(s); // chỉ SET, không fetch ngay
-  }
-
-  // ===================================================
+  // ============================
   // LẤY CHI TIẾT ĐƠN HÀNG
-  // ===================================================
+  // ============================
   async function openDetail(id) {
     setIsLoadingDetail(true);
     setSelectedOrder(null);
 
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/order-online/${id}`);
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/order-online/${id}`
+      );
       const data = await res.json();
       setSelectedOrder(data);
     } catch (err) {
+      console.error("Detail API error:", err);
       alert("Không tải được chi tiết đơn hàng");
     }
 
     setIsLoadingDetail(false);
   }
 
-  // ===================================================
+  // ============================
   // CẬP NHẬT TRẠNG THÁI
-  // ===================================================
+  // ============================
   async function updateStatus(id, newStatus) {
-    const statusText = statusLabel;
+    await fetch(`http://127.0.0.1:8000/api/order-online/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus }),
+    });
 
-    try {
-      const res = await fetch(`http://127.0.0.1:8000/api/order-online/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
+    fetchOrders();
 
-      if (!res.ok) throw new Error();
-
-      setMessage(`✔ Đã cập nhật trạng thái: ${statusText[newStatus]}`);
-      setTimeout(() => setMessage(""), 2000);
-
-      fetchOrders();
-
-      if (selectedOrder)
-        setSelectedOrder({ ...selectedOrder, status: newStatus });
-    } catch {
-      alert("Không thể cập nhật trạng thái!");
+    if (selectedOrder) {
+      setSelectedOrder({ ...selectedOrder, status: newStatus });
     }
   }
 
@@ -120,17 +89,13 @@ export default function OrderOnlineAdmin() {
         {/* BỘ LỌC */}
         <div className="filter-row">
           <input
-            placeholder="Tìm theo tên, SĐT, ID..."
+            placeholder="Tìm tên, SĐT, ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && fetchOrders(1)}
           />
-          <button onClick={() => fetchOrders(1)}>Tìm</button>
+          <button onClick={() => fetchOrders()}>Tìm</button>
 
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
+          <select value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="">Tất cả trạng thái</option>
             <option value="pending">Chờ xác nhận</option>
             <option value="confirmed">Đã xác nhận</option>
@@ -142,8 +107,6 @@ export default function OrderOnlineAdmin() {
 
         {/* BẢNG ĐƠN */}
         <table className="order-table">
-          {loading && <p className="loading-msg">🔄 Đang tải dữ liệu...</p>}
-
           <thead>
             <tr>
               <th>ID</th>
@@ -163,16 +126,9 @@ export default function OrderOnlineAdmin() {
                 <td>{o.customer_name}</td>
                 <td>{o.phone}</td>
                 <td>{formatCurrency(o.total)}</td>
-
                 <td>
-                  <span
-                    className={`status ${o.status} status-clickable`}
-                    onClick={() => filterByStatus(o.status)}
-                  >
-                    {statusLabel[o.status]}
-                  </span>
+                  <span className={`status ${o.status}`}>{o.status}</span>
                 </td>
-
                 <td>{new Date(o.created_at).toLocaleString()}</td>
                 <td>
                   <button onClick={() => openDetail(o.id)}>Xem</button>
@@ -182,7 +138,7 @@ export default function OrderOnlineAdmin() {
           </tbody>
         </table>
 
-        {/* PHÂN TRANG */}
+        {/* PAGINATION */}
         <div className="pagination">
           <button
             disabled={pageInfo.current_page === 1}
@@ -203,11 +159,13 @@ export default function OrderOnlineAdmin() {
           </button>
         </div>
 
-        {/* MODAL CHI TIẾT */}
+        {/* ======================== */}
+        {/* MODAL CHI TIẾT ĐƠN */}
+        {/* ======================== */}
         {(isLoadingDetail || selectedOrder) && (
           <div className="modal" onClick={() => setSelectedOrder(null)}>
             <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-              {!selectedOrder ? (
+              {isLoadingDetail || !selectedOrder ? (
                 <p>Đang tải chi tiết...</p>
               ) : (
                 <>
@@ -221,14 +179,16 @@ export default function OrderOnlineAdmin() {
                   </p>
 
                   <p>
-                    <b>Địa chỉ giao hàng:</b> {selectedOrder.address_detail}
+                    <b>Địa chỉ giao hàng: </b>
+                    
+                    {selectedOrder.address_detail}
                   </p>
 
                   <p>
                     <b>Thanh toán:</b> {selectedOrder.payment_method}
                   </p>
 
-                  <h4>Danh sách món ăn</h4>
+                  <h4>Danh sách món</h4>
 
                   <div className="item-list">
                     <div className="item-list-header">
@@ -239,34 +199,26 @@ export default function OrderOnlineAdmin() {
 
                     {selectedOrder.items.map((i) => (
                       <div key={i.id} className="item-row">
-                        <span className="item-name">
-                          {i.menu.menu_item_name}
-                        </span>
+                        <span className="item-name">{i.menu.menu_item_name}</span>
                         <span className="item-qty">{i.quantity}</span>
-                        <span className="item-price">
-                          {formatCurrency(i.price)}
-                        </span>
+                        <span className="item-price">{formatCurrency(i.price)}</span>
                       </div>
                     ))}
                   </div>
 
                   <p>
-                    <b>Tạm tính:</b>{" "}
-                    {formatCurrency(
-                      selectedOrder.total -
-                        selectedOrder.ship_fee +
-                        selectedOrder.discount
-                    )}
-                  </p>
+  <b>Tạm tính:</b>{" "}
+  {formatCurrency(
+    selectedOrder.total - selectedOrder.ship_fee + selectedOrder.discount
+  )}
+</p>
 
                   <p>
                     <b>Phí ship:</b> {formatCurrency(selectedOrder.ship_fee)}
                   </p>
-
                   <p>
                     <b>Giảm giá:</b> {formatCurrency(selectedOrder.discount)}
                   </p>
-
                   <p>
                     <b>Tổng cộng:</b> {formatCurrency(selectedOrder.total)}
                   </p>
@@ -311,9 +263,6 @@ export default function OrderOnlineAdmin() {
             </div>
           </div>
         )}
-
-        {/* THÔNG BÁO */}
-        {message && <div className="toast-msg">{message}</div>}
       </div>
     </div>
   );

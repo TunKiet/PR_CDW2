@@ -1,78 +1,78 @@
-// src/pages/RoleManagementPage.jsx
+// src/pages/UserManagementPage.jsx
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
-import RoleTable from "../components/RoleTable";
-import RoleDetailsModal from "../components/RoleDetailsModal";
+import Sidebar from "./Sidebar";
+import UserTable from "./UserTable";
+import UserDetailsModal from "./UserDetailsModal";
 import { Search } from "lucide-react";
 import "../pages/Dashboard/Sales_Statistics_Dashboard.css";
 import {
-  getAllRole,
-  addRole,
-  updateRole,
-  deleteRole,
-  searchRole,
-} from "../data/RoleData";
+  getAllUser,
+  addUser,
+  updateUser,
+  deleteUser,
+  searchUser,
+} from "../data/UserData";
 
-const RoleManagementPage = () => {
-  const [Role, setRole] = useState([]);
+const UserManagementPage = () => {
+  const [User, setUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRole, setSelectedRole] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadRole();
+    loadUser();
   }, []);
 
-  const loadRole = async () => {
+  const loadUser = async () => {
     setLoading(true);
     try {
-      const res = await getAllRole();
+      const res = await getAllUser();
       const data = Array.isArray(res) ? res : res?.data ?? res;
-      setRole(data || []);
+      setUser(data || []);
     } catch (err) {
-      console.error("Lỗi tải vai tro:", err);
+      console.error("Lỗi tải nhân viên:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddRole = async () => {
+  const handleAddUser = async () => {
     try {
-      const payload = { name: "vai trò mới", phone: "" };
-      const res = await addRole(payload);
+      const payload = { name: "nhân viên mới", phone: "" };
+      const res = await addUser(payload);
       // support different shapes
-      const newRole = res?.data ?? res;
-      // if wrapper { data: Role }:
-      const item = newRole?.data ?? newRole;
-      setRole((prev) => [item, ...prev]);
-      setSelectedRole(item);
+      const newUser = res?.data ?? res;
+      // if wrapper { data: User }:
+      const item = newUser?.data ?? newUser;
+      setUser((prev) => [item, ...prev]);
+      setSelectedUser(item);
     } catch (err) {
-      console.error("Lỗi thêm vai trò", err);
-      alert("Thêm vai trò lỗi.");
+      console.error("Lỗi thêm nhân viên:", err);
+      alert("Thêm nhân viên lỗi. Kiểm tra console.");
     }
   };
 
-  const handleSaveRole = async (updatedFields) => {
+  const handleSaveUser = async (updatedFields) => {
     try {
-      const id = selectedRole?.Role_id;
+      const id = selectedUser?.user_id;
       if (!id) {
-        console.error("Không có mã vai trò để update");
+        console.error("Không có mã người dùng để update");
         return;
       }
-      await updateRole(id, updatedFields);
-      setSelectedRole(null);
-      await loadRole();
+      await updateUser(id, updatedFields);
+      setSelectedUser(null);
+      await loadUser();
     } catch (err) {
       console.error("Lỗi cập nhật nhân viên:", err);
       alert("Cập nhật lỗi. Kiểm tra console.");
     }
   };
 
-  const handleDeleteRole = async (id) => {
+  const handleDeleteUser = async (id) => {
     if (!window.confirm(`Bạn có chắc muốn xóa nhân viên có mã ${id} này không?`)) return;
     try {
-      await deleteRole(id);
-      await loadRole();
+      await deleteUser(id);
+      await loadUser();
     } catch (err) {
       console.error("Lỗi xóa nhân viên:", err);
       alert("Xóa lỗi. Kiểm tra console.");
@@ -87,11 +87,11 @@ const RoleManagementPage = () => {
     const digits = trimmed.replace(/\D/g, "");
     if (digits.length >= 6) {
       try {
-        const res = await searchRole(digits);
+        const res = await searchUser(digits);
         const data = res?.data ?? res;
         const item = data?.data ?? data;
         if (item && !Array.isArray(item)) {
-          setRole([item]);
+          setUser([item]);
           return;
         }
       } catch (err) {
@@ -100,17 +100,17 @@ const RoleManagementPage = () => {
       }
     }
 
-    // fallback client-side filter on loaded Role
+    // fallback client-side filter on loaded User
     if (!trimmed) {
-      loadRole();
+      loadUser();
     } else {
       const lower = trimmed.toLowerCase();
-      setRole((prev) =>
+      setUser((prev) =>
         prev.filter(
           (c) =>
             (c.name || "").toLowerCase().includes(lower) ||
             (c.phone || "").includes(trimmed) ||
-            (String(c.Role_id || c.id || "") || "").includes(trimmed)
+            (String(c.user_id || c.id || "") || "").includes(trimmed)
         )
       );
     }
@@ -122,7 +122,7 @@ const RoleManagementPage = () => {
       <main className="dish-main">
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-            Quản Lý vai trò
+            Quản Lý nhân viên
           </h1>
 
           <div className="flex justify-between items-center mb-6 space-x-4">
@@ -143,39 +143,39 @@ const RoleManagementPage = () => {
 
             <div className="flex gap-3">
               <button
-                onClick={loadRole}
+                onClick={loadUser}
                 className="bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50"
               >
                 Tải lại
               </button>
 
               <button
-                onClick={handleAddRole}
+                onClick={handleAddUser}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg shadow-md transition"
               >
                 + Thêm nhân viên
               </button>
             </div>
           </div>
-          <RoleTable
-            roles={Role}
-            onViewDetails={(c) => setSelectedRole(c)}
-            onDelete={handleDeleteRole}
+          <UserTable
+            users={User}
+            onViewDetails={(c) => setSelectedUser(c)}
+            onDelete={handleDeleteUser}
             loading={loading}
           />
         </div>
       </main>
 
-      {selectedRole && (
-        <RoleDetailsModal
-          Role={selectedRole}
-          onClose={() => setSelectedRole(null)}
-          onSave={handleSaveRole}
-          onDelete={() => handleDeleteRole(selectedRole.Role_id)}
+      {selectedUser && (
+        <UserDetailsModal
+          user={selectedUser}
+          onClose={() => setSelectedUser(null)}
+          onSave={handleSaveUser}
+          onDelete={() => handleDeleteUser(selectedUser.user_id)}
         />
       )}
     </div>
   );
 };
 
-export default RoleManagementPage;
+export default UserManagementPage;

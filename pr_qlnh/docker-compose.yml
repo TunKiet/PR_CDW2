@@ -10,8 +10,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www
     volumes:
-      - ./backend:/var/www:delegated
-      - vendor_data:/var/www/vendor
+      - ./backend:/var/www
       - ./backend/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network
@@ -122,6 +121,5 @@ networks:
     driver: bridge
 
 volumes:
-  vendor_data:
   dbdata:
     driver: local

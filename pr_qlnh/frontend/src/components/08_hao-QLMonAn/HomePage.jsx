@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./HomePage.css";
 import "./ReservationForm.css";
 import MenuItemModal from "../MenuItemModal";
-import OrderOnlineForm from "../OrderOnlineForm";
+import OrderOnlineForm from "../OrderOnlineForm"; // <-- đảm bảo đường dẫn đúng
 
 // =========================
 // FORMAT TIỀN
@@ -15,7 +15,6 @@ const formatCurrency = (amount) =>
 
 // ===================================================================
 // ReservationForm Component
-// (NGUYÊN BẢN – KHÔNG ĐỤNG)
 // ===================================================================
 function ReservationForm({ cart, onClose, formatCurrency }) {
   const [formData, setFormData] = useState({
@@ -31,6 +30,7 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deposit = total * 0.5;
+const [showOrderOnline, setShowOrderOnline] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,6 +41,11 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
     alert("✅ Yêu cầu đặt bàn đã được gửi!");
     onClose();
   };
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => (document.body.style.overflow = "auto");
+  }, []);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -72,37 +77,17 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
 
             <div>
               <label>Ngày *</label>
-              <input
-                type="date"
-                min={today}
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-              />
+              <input type="date" min={today} name="date" value={formData.date} onChange={handleChange} required />
             </div>
 
             <div>
               <label>Giờ *</label>
-              <input
-                type="time"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-                required
-              />
+              <input type="time" name="time" value={formData.time} onChange={handleChange} required />
             </div>
 
             <div className="full">
               <label>Số lượng khách *</label>
-              <input
-                type="number"
-                min="1"
-                name="guests"
-                value={formData.guests}
-                onChange={handleChange}
-                required
-              />
+              <input type="number" min="1" name="guests" value={formData.guests} onChange={handleChange} required />
             </div>
           </div>
 
@@ -125,19 +110,20 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
             </div>
           </fieldset>
 
+          {cart.length > 0 && (
+            <div className="preorder-summary">
+              <h3>🍽️ Tóm Tắt Đặt Món Trước</h3>
+              <p>Tổng: <strong>{formatCurrency(total)}</strong></p>
+              <p>Cọc 50%: <strong className="text-red">{formatCurrency(deposit)}</strong></p>
+            </div>
+          )}
+
           <div className="notes">
             <label>Ghi chú</label>
-            <textarea
-              rows="3"
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-            />
+            <textarea rows="3" name="notes" value={formData.notes} onChange={handleChange} />
           </div>
 
-          <button type="submit" className="submit-btn">
-            Gửi Yêu Cầu Đặt Bàn
-          </button>
+          <button type="submit" className="submit-btn">Gửi Yêu Cầu Đặt Bàn</button>
         </form>
       </div>
     </div>
@@ -145,83 +131,63 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
 }
 
 // ===================================================================
-// HOME PAGE — ĐÃ FIX HOÀN TOÀN
+// HomePage Component
 // ===================================================================
 export default function HomePage() {
-const [showOrderOnline, setShowOrderOnline] = useState(false);
-const [loading, setLoading] = useState(true);
 
+  // ================= HOOKS =================
+  const [showOrderOnline, setShowOrderOnline] = useState(false);
 
-  // Cart
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const [showReservation, setShowReservation] = useState(false);
+  const [toast, setToast] = useState(null);
 
-  // Modal
+  // Modal xem món
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
 
-  // Reservation
-  const [showReservation, setShowReservation] = useState(false);
-
-  // Toast
-  const [toast, setToast] = useState(null);
-
-  // MENU ITEMS + FILTER
+  // Menu Items
   const [menuItems, setMenuItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
 
-  const [categories, setCategories] = useState([]);
+  // Category filter
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // PAGINATION
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
-  // ================= FETCH MENU (CÓ PHÂN TRANG BACKEND) =================
-  const loadMenu = async (pageNum = 1, category = selectedCategory) => {
-    setLoading(true);
-    const res = await fetch(
-      `http://127.0.0.1:8000/api/menu-items?page=${pageNum}&category_id=${category}`
-    );
-    const json = await res.json();
-
-    console.log("API DATA = ", json.data);
-
-    setMenuItems(json.data || []);
-    setFilteredItems(json.data || []);
-
-    setPage(json.current_page);
-    setLastPage(json.last_page);
-
-    setLoading(false);
-  };
-
+  // ================= FETCH DATA =================
   useEffect(() => {
-    loadMenu(1, selectedCategory);
-  }, [selectedCategory]);
-
-  // ================= FETCH CATEGORIES =================
-  useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/categories")
+    fetch("http://127.0.0.1:8000/api/menu-items")
       .then((res) => res.json())
-      .then((res) => {
-        const list = res.data || [];
-        setCategories([
-          { id: "all", name: "Tất cả" },
-          ...list.map((c) => ({
-            id: c.category_id,
-            name: c.category_name,
-          })),
-        ]);
+      .then((data) => {
+        setMenuItems(data);
+        setFilteredItems(data);
       })
-      .catch((err) => console.error("Lỗi tải categories:", err));
+      .catch((err) => console.error("Lỗi tải menu:", err));
   }, []);
 
-  // ================= FILTER =================
-  const filterByCategory = (catId) => {
-    setSelectedCategory(catId);
-    loadMenu(1, catId);
+  // ================= FILTER BY CATEGORY =================
+  const filterByCategory = (cat) => {
+    setSelectedCategory(cat);
+    if (cat === "all") {
+      setFilteredItems(menuItems);
+    } else {
+      setFilteredItems(menuItems.filter((i) => i.category_id === cat));
+    }
+    setCurrentPage(1);
   };
+
+  // ================= PAGINATION =================
+  const lastIndex = currentPage * itemsPerPage;
+  const firstIndex = lastIndex - itemsPerPage;
+  const currentItems = filteredItems.slice(firstIndex, lastIndex);
+
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const nextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
 
   // ================= CART =================
   const onAddToCart = (item) => {
@@ -245,7 +211,9 @@ const [loading, setLoading] = useState(true);
     setCart((prev) =>
       prev
         .map((i) =>
-          i.menu_item_id === id ? { ...i, quantity: i.quantity + amount } : i
+          i.menu_item_id === id
+            ? { ...i, quantity: i.quantity + amount }
+            : i
         )
         .filter((i) => i.quantity > 0)
     );
@@ -262,7 +230,7 @@ const [loading, setLoading] = useState(true);
   return (
     <div className="home-container">
 
-      {/* HEADER + NAVIGATION — GIỮ NGUYÊN */}
+      {/* Header */}
       <header className="home-header">
         <nav className="home-navbar">
           <div className="nav-logo">🍜 Nhà Hàng Nhóm D</div>
@@ -279,7 +247,7 @@ const [loading, setLoading] = useState(true);
         </nav>
       </header>
 
-      {/* BANNER */}
+      {/* Banner */}
       <section id="home" className="home-banner">
         <div className="banner-content">
           <h1>Chào mừng đến với Nhà hàng Nhóm D</h1>
@@ -293,13 +261,20 @@ const [loading, setLoading] = useState(true);
 
         {/* CATEGORY FILTER */}
         <div className="flex flex-wrap justify-center gap-3 mb-6">
-          {categories.map((cat) => (
+          {[
+            { id: "all", name: "Tất cả" },
+            { id: 1, name: "Món chính" },
+            { id: 2, name: "Món phụ" },
+            { id: 3, name: "Món khai vị" },
+            { id: 4, name: "Đồ uống" },
+          ].map((cat) => (
             <button
               key={cat.id}
-              className={`px-4 py-2 rounded-full ${selectedCategory === cat.id
+              className={`px-4 py-2 rounded-full ${
+                selectedCategory === cat.id
                   ? "bg-indigo-600 text-white"
                   : "bg-gray-200 hover:bg-gray-300"
-                }`}
+              }`}
               onClick={() => filterByCategory(cat.id)}
             >
               {cat.name}
@@ -309,100 +284,112 @@ const [loading, setLoading] = useState(true);
 
         {/* MENU GRID */}
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5 px-2 py-4">
-  
-  {loading ? (
-    <p className="text-gray-500 text-center col-span-full py-10">
-      🔄 Đang tải dữ liệu...
-    </p>
-  ) : filteredItems.length === 0 ? (
-    <p className="text-gray-500 text-center col-span-full py-10">
-      Không tìm thấy món nào.
-    </p>
-  ) : (
-    filteredItems.map((item) => (
-      <div
-        key={item.menu_item_id}
-        className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-gray-100 hover:border-indigo-400 transition"
-      >
-        <img
-          src={item.image_url}
-          alt={item.menu_item_name}
-          onClick={() => {
-            setSelectedItem(item);
-            setShowModal(true);
-          }}
-          className="rounded-xl mb-3 w-full h-36 object-cover cursor-pointer"
-        />
+          {currentItems.length > 0 ? (
+            currentItems.map((item) => (
+              <div
+  key={item.menu_item_id}
+  className="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-gray-100 hover:border-indigo-400 transition"
+>
 
-        <h5
-          className="font-semibold text-gray-800 truncate cursor-pointer"
-          onClick={() => {
-            setSelectedItem(item);
-            setShowModal(true);
-          }}
-        >
-          {item.menu_item_name}
-        </h5>
-
-        <p className="text-indigo-600 font-semibold mt-1">
-          {new Intl.NumberFormat("vi-VN").format(item.price)}đ
-        </p>
-
-        <button
-          onClick={() => onAddToCart(item)}
-          className="mt-3 w-full bg-indigo-600 text-white py-2 rounded-xl hover:bg-indigo-700 transition"
-        >
-          ➕ Thêm vào giỏ hàng
-        </button>
-      </div>
-    ))
+  {/* CLICK VÀO HÌNH → MỞ MODAL */}
+  {item.image_url && (
+    <img
+      src={item.image_url}
+      alt={item.menu_item_name}
+      onClick={() => {
+        setSelectedItem(item);
+        setShowModal(true);
+      }}
+      className="rounded-xl mb-3 w-full h-36 object-cover cursor-pointer"
+    />
   )}
+
+  {/* CLICK VÀO TÊN → MỞ MODAL */}
+  <h5
+    className="font-semibold text-gray-800 truncate cursor-pointer"
+    onClick={() => {
+      setSelectedItem(item);
+      setShowModal(true);
+    }}
+  >
+    {item.menu_item_name}
+  </h5>
+
+  {/* GIÁ */}
+  <p className="text-indigo-600 font-semibold mt-1">
+    {new Intl.NumberFormat("vi-VN").format(item.price)}đ
+  </p>
+
+  {/* NÚT THÊM VÀO GIỎ HÀNG */}
+  <button
+    onClick={() => onAddToCart(item)}
+    className="mt-3 w-full bg-indigo-600 text-white py-2 rounded-xl hover:bg-indigo-700 transition"
+  >
+    ➕ Thêm vào giỏ hàng
+  </button>
 
 </div>
 
+            ))
+          ) : (
+            <p className="text-gray-500 text-center col-span-full py-10">
+              Không tìm thấy món nào.
+            </p>
+          )}
+        </div>
 
         {/* PAGINATION */}
-        <div className="flex justify-center gap-4 mt-6">
+        <div className="flex justify-center items-center gap-4 mt-6">
           <button
-            disabled={page <= 1}
-            className="px-4 py-2 border rounded-lg disabled:opacity-50"
-            onClick={() => loadMenu(page - 1, selectedCategory)}
+            onClick={prevPage}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-lg ${
+              currentPage === 1
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-indigo-600 text-white"
+            }`}
           >
             ◀ Trang trước
           </button>
 
           <span className="font-semibold text-lg">
-            {page} / {lastPage}
+            {currentPage} / {totalPages}
           </span>
 
           <button
-            disabled={page >= lastPage}
-            className="px-4 py-2 border rounded-lg disabled:opacity-50"
-            onClick={() => loadMenu(page + 1, selectedCategory)}
+            onClick={nextPage}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded-lg ${
+              currentPage === totalPages
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-indigo-600 text-white"
+            }`}
           >
             Trang sau ▶
           </button>
         </div>
       </section>
 
-      {/* PROMOTIONS — GIỮ NGUYÊN */}
+      {/* Promotion Section */}
       <section id="promotions" className="promo-section">
         <h2 className="text-2xl font-bold mb-4 text-center">🎁 Ưu Đãi Đặc Biệt</h2>
+
         <div className="promo-grid">
           {[
-            { id: 1, title: "Giảm 20% Thứ Ba", desc: "Áp dụng cho đặt bàn online." },
-            { id: 2, title: "Tặng Cocktail", desc: "Cho nhóm từ 4 người trở lên." },
-            { id: 3, title: "Miễn phí phòng VIP", desc: "Cho hóa đơn từ 5.000.000đ." },
+            { id: 1, title: "Giảm 20% Thứ Ba", desc: "Áp dụng cho đặt bàn online.", color: "#3b82f6" },
+            { id: 2, title: "Tặng Cocktail", desc: "Cho nhóm từ 4 người trở lên.", color: "#10b981" },
+            { id: 3, title: "Miễn phí phòng VIP", desc: "Cho hóa đơn từ 5.000.000đ.", color: "#f97316" },
           ].map((promo) => (
-            <div key={promo.id} className="promo-item">
+            <div key={promo.id} className="promo-item" style={{ borderTopColor: promo.color }}>
               <h3>{promo.title}</h3>
               <p>{promo.desc}</p>
+              <a href="#reservation" className="btn-promo">Đặt ngay</a>
             </div>
           ))}
         </div>
       </section>
 
-      {/* RESERVATION BUTTON */}
+      {/* Reservation Section */}
       <section id="reservation" className="reservation-anchor mt-10">
         <h2 className="text-2xl font-bold text-center mb-3">Sẵn sàng thưởng thức?</h2>
         <div className="flex justify-center">
@@ -415,7 +402,7 @@ const [loading, setLoading] = useState(true);
         </div>
       </section>
 
-      {/* CART POPUP — GIỮ NGUYÊN */}
+      {/* Cart */}
       {showCart && (
         <div className="cart-popup">
           <div className="cart-box">
@@ -434,13 +421,9 @@ const [loading, setLoading] = useState(true);
                       <span>{item.menu_item_name}</span>
 
                       <div className="quantity-control">
-                        <button onClick={() => updateQuantity(item.menu_item_id, -1)}>
-                          -
-                        </button>
+                        <button onClick={() => updateQuantity(item.menu_item_id, -1)}>-</button>
                         <span>{item.quantity}</span>
-                        <button onClick={() => updateQuantity(item.menu_item_id, +1)}>
-                          +
-                        </button>
+                        <button onClick={() => updateQuantity(item.menu_item_id, +1)}>+</button>
                       </div>
 
                       <span>{formatCurrency(item.price * item.quantity)}</span>
@@ -454,33 +437,34 @@ const [loading, setLoading] = useState(true);
 
                 <div className="cart-actions">
                   <button
-                    className="checkout-btn"
-                    onClick={() => {
-                      setShowCart(false);
-                      setShowOrderOnline(true);   // ✅ MỞ FORM ĐẶT HÀNG ONLINE
-                    }}
-                  >
-                    Thanh toán
-                  </button>
+  className="checkout-btn"
+  onClick={() => {
+    setShowCart(false);
+    setShowOrderOnline(true);
+  }}
+>
+  Thanh toán
+</button>
+
+
+
+                  
                 </div>
-
-
               </>
             )}
           </div>
         </div>
       )}
 
-      {/* MENU ITEM MODAL */}
-      {showModal && (
-        <MenuItemModal
-          item={selectedItem}
-          onClose={() => setShowModal(false)}
-          onAddToCart={onAddToCart}
-        />
-      )}
-
-      {/* RESERVATION FORM */}
+      
+{showModal && (
+  <MenuItemModal
+    item={selectedItem}
+    onClose={() => setShowModal(false)}
+    onAddToCart={onAddToCart}   // <-- thêm dòng này
+  />
+)}
+      {/* Form đặt bàn */}
       {showReservation && (
         <ReservationForm
           cart={cart}
@@ -488,24 +472,31 @@ const [loading, setLoading] = useState(true);
           formatCurrency={formatCurrency}
         />
       )}
+       {/* Form đặt hàng online */}
       {showOrderOnline && (
-        <div className="order-online-overlay" onClick={() => setShowOrderOnline(false)}>
-          <div className="order-online-box" onClick={(e) => e.stopPropagation()}>
-            <OrderOnlineForm
-              cart={cart}
-              onClose={() => setShowOrderOnline(false)}
-              formatCurrency={formatCurrency}
-            />
-          </div>
-        </div>
-      )}
+  <div className="order-online-overlay" onClick={() => setShowOrderOnline(false)}>
+    <div className="order-online-box" onClick={(e) => e.stopPropagation()}>
+      <OrderOnlineForm
+        cart={cart}
+        onClose={() => setShowOrderOnline(false)}
+        formatCurrency={formatCurrency}
+      />
+    </div>
+  </div>
+)}
 
-      {/* TOAST */}
+      
+      
+
+
+
+
+      {/* Toast */}
       {toast && <div className="toast">{toast}</div>}
 
-      {/* FOOTER */}
+      {/* Footer */}
       <footer className="home-footer">
-        <p>© 2025 Nhà hàng Nhóm D. All rights reserved.</p>
+        <p>© 2024 Nhà hàng Nhóm D. All rights reserved.</p>
       </footer>
     </div>
   );
