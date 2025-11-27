@@ -9,7 +9,7 @@ const formatCurrency = (amount) => {
 };
 
 // THAY ĐỔI: Nhận onCompleteOrder qua props
-const OrderDetailsModal = ({ order, onClose, onSave, onCompleteOrder }) => { 
+const OrderDetailsModal = ({ order, onClose, onSave, onCompleteOrder }) => {
     // Logic quản lý chỉnh sửa (ĐÃ BỔ SUNG)
     const [isEditing, setIsEditing] = useState(order.isEditing || false);
     const [editedOrder, setEditedOrder] = useState(order);
@@ -26,7 +26,7 @@ const OrderDetailsModal = ({ order, onClose, onSave, onCompleteOrder }) => {
     const handleQuantityChange = (itemName, newQuantity) => {
         const q = parseInt(newQuantity);
         if (q < 1 || isNaN(q)) return; // Không cho phép số lượng nhỏ hơn 1
-        
+
         setEditedOrder(prev => ({
             ...prev,
             items: prev.items.map(item =>
@@ -34,7 +34,7 @@ const OrderDetailsModal = ({ order, onClose, onSave, onCompleteOrder }) => {
             )
         }));
     };
-    
+
     const handleRemoveItem = (itemName) => {
         setEditedOrder(prev => ({
             ...prev,
@@ -52,18 +52,18 @@ const OrderDetailsModal = ({ order, onClose, onSave, onCompleteOrder }) => {
         onCompleteOrder(order.id); // Gọi hàm từ props
         onClose(); // Đóng modal
     };
-    
+
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                
+
                 {/* Header */}
                 <div className="flex justify-between items-center p-5 border-b sticky top-0 bg-white">
                     <h2 className="text-xl font-bold text-gray-800">
                         {isEditing ? `CHỈNH SỬA ĐƠN HÀNG ${order.id}` : `CHI TIẾT ĐƠN HÀNG ${order.id}`}
                     </h2>
                     <div className='flex space-x-2'>
-                        
+
                         {/* Nút Thanh toán/Hoàn thành */}
                         {order.status !== 'Đã thanh toán' && !isEditing && (
                             <button
@@ -74,7 +74,7 @@ const OrderDetailsModal = ({ order, onClose, onSave, onCompleteOrder }) => {
                                 <span>Thanh Toán & Hoàn Thành</span>
                             </button>
                         )}
-                        
+
                         {/* Nút Chỉnh Sửa / Lưu Lại */}
                         {!isEditing ? (
                             <button
@@ -131,7 +131,7 @@ const OrderDetailsModal = ({ order, onClose, onSave, onCompleteOrder }) => {
                                         ) : (
                                             <span className="text-lg font-bold text-blue-600">x{item.quantity}</span>
                                         )}
-                                        
+
                                     </div>
                                     <span className="ml-4 font-bold w-32 text-right">
                                         {formatCurrency(item.price * item.quantity)}
@@ -146,17 +146,17 @@ const OrderDetailsModal = ({ order, onClose, onSave, onCompleteOrder }) => {
                         <h3 className="font-semibold text-lg border-b pb-2 mb-4 text-blue-700">Tóm Tắt</h3>
                         <div className="space-y-3">
                             <p><strong>Mã đơn:</strong> {order.id}</p>
-                            <p><strong>Bàn/Khách hàng:</strong> {order.table}</p>
+                            <p><strong>Bàn:</strong> {order.table_name || order.table || "Mang về"}</p>
                             <p><strong>Thời gian:</strong> {order.time}</p>
                             <p><strong>Trạng thái:</strong> <span className='font-bold text-orange-600'>{order.status}</span></p>
-                            
+
                             <div className='pt-3 border-t'>
                                 <p className="flex justify-between font-bold text-xl text-blue-800">
                                     <span>Thành tiền:</span>
                                     <span>{formatCurrency(editedOrder.total)}</span>
                                 </p>
                             </div>
-                            
+
                             <div className='pt-3 border-t'>
                                 <p className='text-sm text-gray-600'><strong>Ghi chú:</strong> {order.notes || 'Không có'}</p>
                             </div>

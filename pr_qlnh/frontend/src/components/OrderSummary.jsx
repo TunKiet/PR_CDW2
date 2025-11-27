@@ -13,6 +13,8 @@ const OrderSummary = ({
   onUpdateQty,
   onRemoveItem,
   transferItem,
+  clearTableCart,    
+  setSelectedTable    
 }) => {
   const navigate = useNavigate();
 
@@ -297,10 +299,19 @@ const OrderSummary = ({
         customer={assignedCustomer}
         note={note}
         tableId={table?.table_id}
+        tableName={table?.table_name}
         onCompletePayment={(order) => {
-          localStorage.setItem("lastOrder", JSON.stringify(order));
-          navigate("/order-management");
-        }}
+    if (table?.table_id) {
+        clearTableCart(table.table_id);   // <<< DÙNG ĐÚNG
+    }
+
+    setSelectedTable(null);
+
+    localStorage.setItem("lastOrder", JSON.stringify(order));
+
+    navigate("/order-management");
+}}
+
       />
     </>
   );

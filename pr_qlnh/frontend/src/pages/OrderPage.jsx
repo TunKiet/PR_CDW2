@@ -21,6 +21,15 @@ const OrderPage = () => {
   const [tableStatus, setTableStatus] = useState(() =>
     JSON.parse(localStorage.getItem("tableStatus") || "{}")
   );
+  const clearTableCart = (tableId) => {
+  setTableCarts(prev => ({ ...prev, [tableId]: [] }));
+
+  setTableStatus(prev => ({ ...prev, [tableId]: "available" }));
+
+  setTableCustomers(prev => ({ ...prev, [tableId]: null }));
+};
+
+
 useEffect(() => {
   const newStatus = {};
 
@@ -163,6 +172,8 @@ useEffect(() => {
         transferItem={transferItem}
         tableCustomers={tableCustomers}
         setCustomerForTable={setCustomerForTable}
+        clearTableCart={clearTableCart}       
+        setSelectedTable={setSelectedTable}
       />
     </div>
   );

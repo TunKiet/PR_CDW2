@@ -157,11 +157,11 @@ export default function SelectTableModal({
                         ${!isSelected && !hasItems ? "bg-gray-100 text-gray-700" : ""}
                       `}
                     >
-                      {isSelected
-                        ? "Đang sử dụng"
-                        : hasItems
-                        ? "Đang sử dụng"
-                        : statusMap[t.status]}
+                     {(hasItems || t.status === "in_use")
+    ? "Đang sử dụng"
+    : "Trống"
+}
+
                     </span>
                   </motion.div>
                 );

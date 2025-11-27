@@ -26,7 +26,8 @@ class OrderController extends Controller
 
         $order = Order::create([
             'customer_id' => $request->customer_id,
-            'total_price' => 0, // tạm
+            'table_id' => $request->table_id,
+            'total_price' => 0, 
             'note' => $request->note,
         ]);
 
@@ -70,17 +71,48 @@ class OrderController extends Controller
 
 
     public function index()
-    {
-        return Order::with(['customer', 'orderDetails.menuItem', 'payments'])
-            ->orderBy('order_id', 'desc')
-            ->get();
-    }
+{
+    return Order::with(['customer', 'table', 'orderDetails.menuItem', 'payments'])
+        ->orderBy('order_id', 'desc')
+        ->get()
+        ->map(function ($order) {
+            return [
+                'order_id' => $order->order_id,
+                'table_id' => $order->table_id,
+                'table_name' => $order->table->table_name ?? "Mang về",
+                'status' => $order->status,
+                'total_price' => $order->total_price,
+                'note' => $order->note,
+                'created_at' => $order->created_at,
+                'customer' => $order->customer,
+                'orderDetails' => $order->orderDetails,
+            ];
+        });
+}
+
 
     public function show($id)
-    {
-        return Order::with(['customer', 'orderDetails.menuItem', 'payments'])
-            ->findOrFail($id);
-    }
+{
+    $order = Order::with(['customer', 'table', 'orderDetails.menuItem', 'payments'])
+        ->findOrFail($id);
+
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'order_id' => $order->order_id,
+            'table_id' => $order->table_id,
+            'table_name' => $order->table->table_name ?? "Mang về",   // ⭐ QUAN TRỌNG
+            'total_price' => $order->total_price,
+            'status' => $order->status,
+            'note' => $order->note,
+            'created_at' => $order->created_at,
+            'customer' => $order->customer,
+            'orderDetails' => $order->orderDetails,
+            'payments' => $order->payments,
+        ]
+    ]);
+}
+
 
     public function destroy($id)
     {

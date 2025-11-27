@@ -28,7 +28,8 @@ const OrderManagementPage = () => {
 
           return {
             id: "DH" + o.order_id,
-            table: o.table_name || "Mang về",
+            table: o.table_name || o.table || o.table_title || "Mang về",
+
             total: parseFloat(o.total_price) || 0,
             status: o.status || "Đã thanh toán",
             time: o.created_at
