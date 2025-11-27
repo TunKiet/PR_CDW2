@@ -6,7 +6,10 @@ export const getAllUser = async () => {
   const res = await axios.get(API_BASE_URL);
   return res.data;
 };
-
+export const getUserById = async (id) => {
+  const res = await axios.get(`${API_BASE_URL}/${id}`);
+  return res.data;
+};
 export const searchUser = async (phone) => {
   const res = await axios.get(`${API_BASE_URL}/search`, { params: { phone } });
   return res.data;
