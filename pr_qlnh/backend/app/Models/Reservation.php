@@ -12,9 +12,14 @@ class Reservation extends Model
     protected $table = 'reservations';
     protected $primaryKey = 'reservation_id';
     protected $fillable = [
-        'table_id', 'customer_id', 'user_id',
-        'reservation_date', 'reservation_time', 'num_guests',
-        'deposit_amount', 'note', 'status'
+        'user_id',
+        'table_id',
+        'reservation_date',
+        'reservation_time',
+        'num_guests',
+        'deposit_amount',
+        'note',
+        'status',
     ];
 
     public function table()
@@ -29,6 +34,6 @@ class Reservation extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

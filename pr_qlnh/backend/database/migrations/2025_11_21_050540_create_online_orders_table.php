@@ -28,7 +28,7 @@ return new class extends Migration
         $table->integer('total');
 
         $table->text('notes')->nullable();
-        $table->enum('status', ['pending','confirmed','delivered','cancelled'])->default('pending');
+        $table->enum('status', ['pending','confirmed','delivering','done','cancelled'])->default('pending');
 
         $table->timestamps();
     });
