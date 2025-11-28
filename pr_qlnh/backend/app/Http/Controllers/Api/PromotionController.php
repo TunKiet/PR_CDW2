@@ -30,9 +30,9 @@ class PromotionController extends Controller
         // Search by code or title
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('title', 'like', "%{$search}%");
+                    ->orWhere('title', 'like', "%{$search}%");
             });
         }
 
@@ -275,22 +275,23 @@ class PromotionController extends Controller
     }
 
     public function getActive()
-{
-    $promotions = Promotion::where('status', 'active')
-        ->where(function($query) {
-            $query->whereNull('expired_at')
-                  ->orWhere('expired_at', '>', now());
-        })
-        ->where(function($query) {
-            $query->where('max_uses', 0)
-                  ->orWhereRaw('used_count < max_uses');
-        })
-        ->limit(3)
-        ->get();
+    {
+        $promotions = Promotion::where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('expired_at')
+                    ->orWhere('expired_at', '>', now());
+            })
+            ->where(function ($query) {
+                $query->whereNull('max_uses')
+                    ->orWhere('max_uses', 0)
+                    ->orWhereRaw('used_count < max_uses');
+            })
+            ->limit(3)
+            ->get();
 
-    return response()->json([
-        'success' => true,
-        'data' => $promotions
-    ]);
-}
+        return response()->json([
+            'success' => true,
+            'data' => $promotions
+        ]);
+    }
 }

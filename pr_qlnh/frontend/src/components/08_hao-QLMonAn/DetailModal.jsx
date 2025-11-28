@@ -68,12 +68,12 @@ export default function DetailModal({ isVisible, onClose, dish, categories }) {
 
     return (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm">
-            <div className="bg-white p-6 rounded-xl w-full max-w-2xl shadow-2xl transform transition-all duration-300">
-                <h3 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">
+            <div className="bg-white p-6 rounded-xl w-full max-w-2xl shadow-2xl transform transition-all duration-300 max-h-[90vh] flex flex-col">
+                <h3 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3 flex-shrink-0">
                     Chi Tiết Món Ăn: {dish.name}
                 </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-y-auto flex-grow pr-2">
                     {/* Cột 1: Ảnh và ID */}
                     <div className="md:col-span-1 space-y-4">
                         <img 
@@ -124,7 +124,7 @@ export default function DetailModal({ isVisible, onClose, dish, categories }) {
                 </div>
 
                 {/* Nút Đóng */}
-                <div className="mt-8 flex justify-end">
+                <div className="mt-4 flex justify-end pt-4 border-t border-gray-200 flex-shrink-0">
                     <button 
                         onClick={onClose} 
                         className="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition duration-150"

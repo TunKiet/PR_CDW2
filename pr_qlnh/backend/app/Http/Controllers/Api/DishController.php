@@ -97,7 +97,7 @@ class DishController extends Controller
             }
         }
 
-        // ... PHẦN VALIDATION VÀ UPDATE GIỮ NGUYÊN
+        // PHẦN VALIDATION VÀ UPDATE GIỮ NGUYÊN
         $validated = $request->validate([
             'category_id' => 'sometimes|integer|exists:categories,category_id',
             'menu_item_name' => 'sometimes|string|max:255',

@@ -1,5 +1,12 @@
 window.global = window;
 
+// === KHẮC PHỤC LỖI setImmediate CHO DRAFT.JS ===
+if (typeof setImmediate === 'undefined') {
+  window.setImmediate = (callback, ...args) => {
+    return setTimeout(callback, 0, ...args);
+  };
+}
+
 import React from 'react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

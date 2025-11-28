@@ -56,9 +56,30 @@ export default function DishCRUDTable() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false); // STATE CÓ VẤN ĐỀ
   const [selectedDish, setSelectedDish] = useState(null);
 
+  const [dishTimestamps, setDishTimestamps] = useState({});
+  const [showConflictModal, setShowConflictModal] = useState(false);
+  const [conflictData, setConflictData] = useState(null);
+
   // =========================================================
   // 1. FETCH DỮ LIỆU
   // =========================================================
+
+  const handleEditConflict = (result, dishId) => {
+    setConflictData({
+      message: result.message,
+      currentData: result.current_data,
+      dishId: dishId,
+    });
+    setShowConflictModal(true);
+    handleCloseEditModal(); // Đóng modal edit
+  };
+
+  const handleReloadAfterConflict = async () => {
+    await fetchDishes();
+    setShowConflictModal(false);
+    setConflictData(null);
+    alert("✅ Đã tải lại dữ liệu mới nhất!");
+  };
   const fetchCategories = useCallback(async () => {
     try {
       const response = await axios.get(CATEGORY_API_URL);
@@ -74,6 +95,12 @@ export default function DishCRUDTable() {
       const response = await axios.get(API_URL);
       const mappedData = response.data.data.map(mapApiDataToReact);
       setDishes(mappedData);
+      // ⭐ LƯU TIMESTAMPS
+      const timestamps = {};
+      response.data.data.forEach((item) => {
+        timestamps[item.menu_item_id] = item.updated_at;
+      });
+      setDishTimestamps(timestamps);
       setError(null);
     } catch (err) {
       console.error("Lỗi khi fetch data:", err);
@@ -94,44 +121,68 @@ export default function DishCRUDTable() {
   // 2. LOGIC CRUD & HỖ TRỢ
   // =========================================================
 
-  const handleSaveDish = async (formData, dishId) => { // formData bây giờ là đối tượng FormData
-        try {
-            
-            if (dishId) {
-                // CHẾ ĐỘ CHỈNH SỬA: SỬ DỤNG ID và formData
-                // Axios sẽ tự động gửi dưới dạng multipart/form-data
-                await axios.post(`${API_URL}/${dishId}`, formData); // Dùng POST cho PUT với _method
-                alert(`✅ Cập nhật món ăn thành công!`);
-            } else {
-                // CHẾ ĐỘ THÊM MỚI: SỬ DỤNG formData
-                await axios.post(API_URL, formData);
-                alert(`✅ Thêm món ăn thành công!`);
-            }
-            
-            handleCloseEditModal();
-            fetchDishes();
+  const handleSaveDish = async (formData, dishId) => {
+    // formData bây giờ là đối tượng FormData
+    try {
+      if (dishId && dishTimestamps[dishId]) {
+        formData.append("updated_at", dishTimestamps[dishId]);
+      }
+      if (dishId) {
+        // Chỉnh sửa
+        const response = await axios.post(`${API_URL}/${dishId}`, formData);
 
-        } catch (err) {
-            console.error("Lỗi khi lưu món ăn:", err.response ? err.response.data : err.message);
-            
-            let detailedError = "Không thể lưu món ăn. Vui lòng kiểm tra console để biết chi tiết.";
-
-            if (err.response && err.response.status === 422) {
-                const errors = err.response.data.errors;
-                if (errors) {
-                    detailedError = "Lỗi Validation: ";
-                    for (const key in errors) {
-                        detailedError += `[${key}]: ${errors[key].join(', ')} | `;
-                    }
-                    detailedError = detailedError.trim().slice(0, -1); 
-                }
-            } else if (err.response?.data?.message) {
-                 detailedError = err.response.data.message;
-            }
-            
-            alert(`Lỗi: ${detailedError}`);
+        // ⭐ XỬ LÝ CONFLICT
+        if (response.status === 409) {
+          handleEditConflict(response.data, dishId);
+          return;
         }
-    };
+
+        alert(`✅ Cập nhật món ăn thành công!`);
+      } else {
+        // CHẾ ĐỘ THÊM MỚI: SỬ DỤNG formData
+        await axios.post(API_URL, formData);
+        alert(`✅ Thêm món ăn thành công!`);
+      }
+
+      handleCloseEditModal();
+      fetchDishes();
+    } catch (err) {
+      // ⭐ HANDLE 404 (Món đã bị xóa)
+      if (err.response?.status === 404) {
+        alert("❌ Món ăn không tồn tại (có thể đã bị xóa). Tải lại danh sách!");
+        handleCloseEditModal();
+        fetchDishes();
+        return;
+      }
+      // ⭐ CATCH HTTP 409
+      if (err.response?.status === 409) {
+        handleEditConflict(err.response.data, dishId);
+        return;
+      }
+      console.error(
+        "Lỗi khi lưu món ăn:",
+        err.response ? err.response.data : err.message
+      );
+
+      let detailedError =
+        "Không thể lưu món ăn. Vui lòng kiểm tra console để biết chi tiết.";
+
+      if (err.response && err.response.status === 422) {
+        const errors = err.response.data.errors;
+        if (errors) {
+          detailedError = "Lỗi Validation: ";
+          for (const key in errors) {
+            detailedError += `[${key}]: ${errors[key].join(", ")} | `;
+          }
+          detailedError = detailedError.trim().slice(0, -1);
+        }
+      } else if (err.response?.data?.message) {
+        detailedError = err.response.data.message;
+      }
+
+      alert(`Lỗi: ${detailedError}`);
+    }
+  };
 
   const handleDeleteDish = async (id, name) => {
     if (!window.confirm(`Bạn có chắc chắn muốn xóa món ăn "${name}" không?`)) {
@@ -273,6 +324,64 @@ export default function DishCRUDTable() {
     setSelectedDish(null);
   };
 
+  // Component modal conflict (copy từ DishStatusManagement)
+  const ConflictModal = () => {
+    if (!showConflictModal || !conflictData) return null;
+
+    return (
+      <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[2000] flex items-center justify-center p-4">
+        <div className="bg-white p-6 rounded-xl max-w-md shadow-2xl">
+          <div className="flex items-center mb-4">
+            <span className="text-4xl mr-3">⚠️</span>
+            <h3 className="text-xl font-bold text-red-600">
+              Xung đột dữ liệu!
+            </h3>
+          </div>
+
+          <p className="text-gray-700 mb-4">{conflictData.message}</p>
+
+          {conflictData.currentData && (
+            <div className="bg-gray-50 p-4 rounded-lg mb-4 border-l-4 border-yellow-500">
+              <h4 className="font-semibold mb-2">📊 Dữ liệu hiện tại:</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Tên: {conflictData.currentData.menu_item_name}</li>
+                <li>• Giá: {formatCurrency(conflictData.currentData.price)}</li>
+                <li>
+                  • Cập nhật:{" "}
+                  {new Date(conflictData.currentData.updated_at).toLocaleString(
+                    "vi-VN"
+                  )}
+                </li>
+              </ul>
+            </div>
+          )}
+
+          <div className="bg-blue-50 p-3 rounded-lg mb-4 text-sm text-blue-800">
+            <strong>💡 Lý do:</strong> Có người khác đã chỉnh sửa món này khi
+            bạn đang mở form.
+          </div>
+
+          <div className="flex space-x-3">
+            <button
+              onClick={handleReloadAfterConflict}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              🔄 Tải lại
+            </button>
+            <button
+              onClick={() => {
+                setShowConflictModal(false);
+                setConflictData(null);
+              }}
+              className="flex-1 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
   // =========================================================
   // 5. HIỂN THỊ (JSX)
   // =========================================================
@@ -617,6 +726,8 @@ export default function DishCRUDTable() {
             dish={editingDish}
             categories={categories}
           />
+          {/* ⭐ THÊM MODAL CONFLICT */}
+          <ConflictModal />
         </div>
       </main>
     </div>
