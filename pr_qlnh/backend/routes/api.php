@@ -22,7 +22,7 @@ use App\Http\Controllers\CategoryIngredientController;
 use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\TableController;
-use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\PaymentController;
 
 use App\Http\Controllers\Api\PreOrderController;
@@ -32,7 +32,14 @@ use App\Http\Controllers\Api\OrderOnlineController;
 
 // Online Order (Admin)
 use App\Http\Controllers\Api\OrderOnlineAdminController;
-
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Models\Ingredient;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ReviewReplyController;
+use App\Models\Review;
+use App\Models\ReviewReply;
 
 /*
 |--------------------------------------------------------------------------
@@ -171,17 +178,7 @@ Route::prefix('customers')->group(function () {
 
 Route::get('/menu-items', [MenuItemController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\CategoryIngredientController;
-use App\Http\Controllers\MessageController;
-use App\Http\Controllers\PurchaseOrderController;
-use App\Models\Ingredient;
-use App\Http\Controllers\Api\PreOrderController;
-use App\Http\Controllers\ChatController;
-use App\Http\Controllers\PromotionController;
-use App\Http\Controllers\ReviewReplyController;
-use App\Models\Review;
-use App\Models\ReviewReply;
+
 
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
