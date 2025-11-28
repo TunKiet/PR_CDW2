@@ -39,6 +39,7 @@ export default function DishCRUDTable() {
   const [dishes, setDishes] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [dishTimestamps, setDishTimestamps] = useState({});
   const [error, setError] = useState(null);
 
   // === STATES LỌC & PHÂN TRANG ===
@@ -56,7 +57,7 @@ export default function DishCRUDTable() {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false); // STATE CÓ VẤN ĐỀ
   const [selectedDish, setSelectedDish] = useState(null);
 
-  const [dishTimestamps, setDishTimestamps] = useState({});
+  
   const [showConflictModal, setShowConflictModal] = useState(false);
   const [conflictData, setConflictData] = useState(null);
 
@@ -147,6 +148,7 @@ export default function DishCRUDTable() {
       handleCloseEditModal();
       fetchDishes();
     } catch (err) {
+      console.error("Lỗi khi lưu món ăn:", err.response ? err.response.data : err.message);
       // ⭐ HANDLE 404 (Món đã bị xóa)
       if (err.response?.status === 404) {
         alert("❌ Món ăn không tồn tại (có thể đã bị xóa). Tải lại danh sách!");
@@ -159,10 +161,6 @@ export default function DishCRUDTable() {
         handleEditConflict(err.response.data, dishId);
         return;
       }
-      console.error(
-        "Lỗi khi lưu món ăn:",
-        err.response ? err.response.data : err.message
-      );
 
       let detailedError =
         "Không thể lưu món ăn. Vui lòng kiểm tra console để biết chi tiết.";
