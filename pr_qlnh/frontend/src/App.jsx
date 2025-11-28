@@ -33,6 +33,7 @@ import MenuItemDetailPage from "./pages/MenuItemDetailPage";
 import UserManager from "./components/UserManager";
 import RoleManager from "./components/RoleManager";
 import PermissionManager from "./components/PermissionManager";
+import SystemSettings from "./components/SystemSettings";
 //import  chức năng 08_hao
 import DishTable from "./components/08_hao-QLMonAn/DishCRUDTable";
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
@@ -108,6 +109,14 @@ function App() {
           element={
             <ProtectedRoute>
               <PermissionManager />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/system-settings"
+          element={
+            <ProtectedRoute>
+              <SystemSettings />
             </ProtectedRoute>
           }
         />

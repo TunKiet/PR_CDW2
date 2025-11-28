@@ -12,6 +12,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  
+  // 2FA OTP State
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [userId, setUserId] = useState(null);
+  const [userEmail, setUserEmail] = useState("");
 
   // Validate login
   const loginSchema = Yup.object({
@@ -71,22 +77,78 @@ export default function LoginPage() {
           "http://localhost:8000/api/login",
           payload
         );
+        
+        // Kiểm tra nếu cần xác thực 2FA
+        if (res.data.requires_2fa) {
+          setRequires2FA(true);
+          setUserId(res.data.user_id);
+          setUserEmail(res.data.email);
+          alert(res.data.message);
+          return;
+        }
+        
         // Lưu token vào localStorage
         localStorage.setItem("token", res.data.token);
         
+        // Lưu thông tin user vào localStorage
+        if (res.data.user) {
+          localStorage.setItem("user", JSON.stringify(res.data.user));
+        }
+        
         const roles = res.data.roles || [];
+        
+        // Lưu roles vào localStorage
+        localStorage.setItem("roles", JSON.stringify(roles));
 
         alert(res.data.message);
 
-        if (roles.includes("ADMIN")) navigate("/admin/dashboard");
-        else if (roles.includes("Staff")) navigate("/user/dashboard");
-        else navigate("/user/homepage");
+        // ADMIN và Staff đều vào admin dashboard
+        if (roles.includes("ADMIN") || roles.includes("staff")) {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/user/homepage");
+        }
       } catch (err) {
         const msg = err.response?.data?.message || "Đăng nhập thất bại!";
         alert(msg);
       }
     },
   });
+
+  // Xác thực OTP cho 2FA
+  const handleVerifyOTP = async () => {
+    if (!otpCode || otpCode.length !== 6) {
+      alert("Vui lòng nhập mã OTP 6 chữ số!");
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://localhost:8000/api/verify-login-otp", {
+        user_id: userId,
+        otp: otpCode
+      });
+
+      // Lưu token và thông tin user
+      localStorage.setItem("token", res.data.token);
+      if (res.data.user) {
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+      }
+      const roles = res.data.roles || [];
+      localStorage.setItem("roles", JSON.stringify(roles));
+
+      alert(res.data.message);
+
+      // Điều hướng
+      if (roles.includes("ADMIN") || roles.includes("staff")) {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/user/homepage");
+      }
+    } catch (err) {
+      const msg = err.response?.data?.message || "Mã OTP không chính xác!";
+      alert(msg);
+    }
+  };
 
   // Đăng ký
   const registerFormik = useFormik({
@@ -179,7 +241,7 @@ export default function LoginPage() {
         </h1>
 
         {/* --- FORM LOGIN --- */}
-        {activeTab === "login" && (
+        {activeTab === "login" && !requires2FA && (
           <form onSubmit={loginFormik.handleSubmit} className="form">
             {/* Phone */}
             <div className="form-group">
@@ -260,6 +322,52 @@ export default function LoginPage() {
               {loginFormik.isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
           </form>
+        )}
+
+        {/* --- FORM 2FA OTP --- */}
+        {activeTab === "login" && requires2FA && (
+          <div className="form">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-blue-800">
+                🔐 Mã OTP đã được gửi đến email: <strong>{userEmail}</strong>
+              </p>
+              <p className="text-xs text-blue-600 mt-1">
+                Vui lòng kiểm tra hộp thư và nhập mã OTP để hoàn tất đăng nhập
+              </p>
+            </div>
+
+            <div className="form-group">
+              <label className="label">Mã OTP (6 chữ số)</label>
+              <input
+                type="text"
+                maxLength="6"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="Nhập mã OTP"
+                className="input text-center text-2xl tracking-widest"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={handleVerifyOTP}
+              className="btn btn-primary"
+            >
+              Xác thực OTP
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setRequires2FA(false);
+                setOtpCode("");
+                setUserId(null);
+              }}
+              className="btn bg-gray-200 hover:bg-gray-300 text-gray-700 mt-2"
+            >
+              Quay lại đăng nhập
+            </button>
+          </div>
         )}
 
         {/* --- FORM REGISTER --- */}

@@ -1,120 +1,89 @@
-// src/pages/UserManagementPage.jsx
+// src/components/PermissionManager.jsx
 import React, { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
-import UserTable from "./UserTable";
-import UserDetailsModal from "./UserDetailsModal";
-import { Search } from "lucide-react";
+import { Search, Shield, Trash2, Edit, Plus } from "lucide-react";
 import "../pages/Dashboard/Sales_Statistics_Dashboard.css";
 import {
-  getAllUser,
-  addUser,
-  updateUser,
-  deleteUser,
-  searchUser,
-} from "../data/UserData";
+  getAllPermission,
+  addPermission,
+  updatePermission,
+  deletePermission,
+} from "../data/PermissionData";
 
-const UserManagementPage = () => {
-  const [User, setUser] = useState([]);
+const PermissionManager = () => {
+  const [permissions, setPermissions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedPermission, setSelectedPermission] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadUser();
+    loadPermissions();
   }, []);
 
-  const loadUser = async () => {
+  const loadPermissions = async () => {
     setLoading(true);
     try {
-      const res = await getAllUser();
+      const res = await getAllPermission();
       const data = Array.isArray(res) ? res : res?.data ?? res;
-      setUser(data || []);
+      setPermissions(data || []);
     } catch (err) {
-      console.error("Lỗi tải nhân viên:", err);
+      console.error("Đỗi tải quyền:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddUser = async () => {
+  const handleAddPermission = async (permissionData) => {
     try {
-      const payload = { name: "nhân viên mới", phone: "" };
-      const res = await addUser(payload);
-      // support different shapes
-      const newUser = res?.data ?? res;
-      // if wrapper { data: User }:
-      const item = newUser?.data ?? newUser;
-      setUser((prev) => [item, ...prev]);
-      setSelectedUser(item);
+      await addPermission(permissionData);
+      setShowAddModal(false);
+      await loadPermissions();
+      alert("Thêm quyền thành công!");
     } catch (err) {
-      console.error("Lỗi thêm nhân viên:", err);
-      alert("Thêm nhân viên lỗi. Kiểm tra console.");
+      console.error("Lỗi thêm quyền:", err);
+      const errorMsg = err.response?.data?.message || "Thêm quyền lỗi. Kiểm tra console.";
+      alert(errorMsg);
     }
   };
 
-  const handleSaveUser = async (updatedFields) => {
+  const handleUpdatePermission = async (updatedData) => {
     try {
-      const id = selectedUser?.user_id;
-      if (!id) {
-        console.error("Không có mã người dùng để update");
-        return;
-      }
-      await updateUser(id, updatedFields);
-      setSelectedUser(null);
-      await loadUser();
+      const id = selectedPermission?.id;
+      if (!id) return;
+      await updatePermission(id, updatedData);
+      setShowEditModal(false);
+      setSelectedPermission(null);
+      await loadPermissions();
+      alert("Cập nhật quyền thành công!");
     } catch (err) {
-      console.error("Lỗi cập nhật nhân viên:", err);
-      alert("Cập nhật lỗi. Kiểm tra console.");
+      console.error("Lỗi cập nhật quyền:", err);
+      const errorMsg = err.response?.data?.message || "Cập nhật lỗi.";
+      alert(errorMsg);
     }
   };
 
-  const handleDeleteUser = async (id) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa nhân viên có mã ${id} này không?`)) return;
+  const handleDeletePermission = async (id) => {
+    if (!window.confirm(`Bạn có chắc muốn xóa quyền này không?`)) return;
     try {
-      await deleteUser(id);
-      await loadUser();
+      await deletePermission(id);
+      await loadPermissions();
+      alert("Xóa quyền thành công!");
     } catch (err) {
-      console.error("Lỗi xóa nhân viên:", err);
-      alert("Xóa lỗi. Kiểm tra console.");
+      console.error("Lỗi xóa quyền:", err);
+      const errorMsg = err.response?.data?.message || "Xóa lỗi.";
+      alert(errorMsg);
     }
   };
 
-  // local filter OR server search by phone
-  const handleSearch = async (value) => {
-    setSearchTerm(value);
-    const trimmed = value.trim();
-    // if looks like a phone (digits and length >= 6) then call API search
-    const digits = trimmed.replace(/\D/g, "");
-    if (digits.length >= 6) {
-      try {
-        const res = await searchUser(digits);
-        const data = res?.data ?? res;
-        const item = data?.data ?? data;
-        if (item && !Array.isArray(item)) {
-          setUser([item]);
-          return;
-        }
-      } catch (err) {
-        // if not found, just fallback to client filtering
-        // console.warn("Search API failed, fallback to client filter", err);
-      }
-    }
-
-    // fallback client-side filter on loaded User
-    if (!trimmed) {
-      loadUser();
-    } else {
-      const lower = trimmed.toLowerCase();
-      setUser((prev) =>
-        prev.filter(
-          (c) =>
-            (c.name || "").toLowerCase().includes(lower) ||
-            (c.phone || "").includes(trimmed) ||
-            (String(c.user_id || c.id || "") || "").includes(trimmed)
-        )
-      );
-    }
-  };
+  const filteredPermissions = permissions.filter((permission) => {
+    const lower = searchTerm.toLowerCase();
+    return (
+      (permission.name || "").toLowerCase().includes(lower) ||
+      (permission.description || "").toLowerCase().includes(lower)
+    );
+  });
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -122,9 +91,8 @@ const UserManagementPage = () => {
       <main className="dish-main">
         <div className="flex-1 p-6">
           <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-            Quản Lý nhân viên
+            Quản Lý Quyền
           </h1>
-
           <div className="flex justify-between items-center mb-6 space-x-4">
             <div className="relative flex-1">
               <Search
@@ -132,50 +100,233 @@ const UserManagementPage = () => {
                 size={20}
               />
               <input
-                class="ps-5"
                 type="text"
-                placeholder=" Tìm nhân viên theo tên hoặc SĐT..."
+                placeholder="Tìm quyền theo tên..."
                 value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 px-5 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700"
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700"
               />
             </div>
 
             <div className="flex gap-3">
               <button
-                onClick={loadUser}
+                onClick={loadPermissions}
                 className="bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50"
               >
                 Tải lại
               </button>
 
               <button
-                onClick={handleAddUser}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg shadow-md transition"
+                onClick={() => setShowAddModal(true)}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg shadow-md transition flex items-center gap-2"
               >
-                + Thêm nhân viên
+                <Plus size={20} />
+                Thêm quyền
               </button>
             </div>
           </div>
-          <UserTable
-            users={User}
-            onViewDetails={(c) => setSelectedUser(c)}
-            onDelete={handleDeleteUser}
-            loading={loading}
-          />
+
+          {/* Permissions Table */}
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tên quyền
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Mô tả
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Số vai trò
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                      Đang tải...
+                    </td>
+                  </tr>
+                ) : filteredPermissions.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                      Không có quyền nào
+                    </td>
+                  </tr>
+                ) : (
+                  filteredPermissions.map((permission) => (
+                    <tr key={permission.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {permission.id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Shield className="text-indigo-600 mr-2" size={16} />
+                          <span className="text-sm font-medium text-gray-900">
+                            {permission.name}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">
+                        {permission.description || "—"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                          {permission.roles_count || 0} vai trò
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => {
+                            setSelectedPermission(permission);
+                            setShowEditModal(true);
+                          }}
+                          className="text-indigo-600 hover:text-indigo-900 mr-3"
+                        >
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDeletePermission(permission.id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
 
-      {selectedUser && (
-        <UserDetailsModal
-          user={selectedUser}
-          onClose={() => setSelectedUser(null)}
-          onSave={handleSaveUser}
-          onDelete={() => handleDeleteUser(selectedUser.user_id)}
+      {/* Add Permission Modal */}
+      {showAddModal && (
+        <PermissionModal
+          onClose={() => setShowAddModal(false)}
+          onSave={handleAddPermission}
+          title="Thêm Quyền Mới"
+        />
+      )}
+
+      {/* Edit Permission Modal */}
+      {showEditModal && selectedPermission && (
+        <PermissionModal
+          permission={selectedPermission}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedPermission(null);
+          }}
+          onSave={handleUpdatePermission}
+          title="Chỉnh Sửa Quyền"
         />
       )}
     </div>
   );
 };
 
-export default UserManagementPage;
+// Permission Modal Component
+const PermissionModal = ({ permission, onClose, onSave, title }) => {
+  const [formData, setFormData] = useState({
+    name: permission?.name || "",
+    description: permission?.description || "",
+  });
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = "Tên quyền không được để trống";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = () => {
+    if (validate()) {
+      onSave(formData);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-gray-200/40 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 space-y-4">
+        <div className="flex justify-between items-center border-b pb-2">
+          <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
+            ×
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Tên quyền <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className={`w-full mt-1 border rounded-md p-2 ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              }`}
+              placeholder="Ví dụ: view_users, edit_orders..."
+            />
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Mô tả
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full mt-1 border border-gray-300 rounded-md p-2"
+              rows="3"
+              placeholder="Mô tả quyền này..."
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+          >
+            Hủy
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            Lưu
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PermissionManager;

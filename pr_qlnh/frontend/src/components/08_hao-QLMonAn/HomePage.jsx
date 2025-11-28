@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import "./ReservationForm.css";
 import MenuItemModal from "../MenuItemModal";
@@ -30,7 +31,6 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deposit = total * 0.5;
-const [showOrderOnline, setShowOrderOnline] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -134,18 +134,22 @@ const [showOrderOnline, setShowOrderOnline] = useState(false);
 // HomePage Component
 // ===================================================================
 export default function HomePage() {
+  const navigate = useNavigate();
+  
+  // User state
+  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  // ================= HOOKS =================
-  const [showOrderOnline, setShowOrderOnline] = useState(false);
-
+  // Cart
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
+  const [showOrderOnline, setShowOrderOnline] = useState(false);
   const [toast, setToast] = useState(null);
-
-  // Modal xem món
-  const [showModal, setShowModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
 
   // Menu Items
   const [menuItems, setMenuItems] = useState([]);
@@ -157,6 +161,29 @@ export default function HomePage() {
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  
+  // Check if user is logged in
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+    if (storedUser && token) {
+      setUser(JSON.parse(storedUser));
+      setIsLoggedIn(true);
+    }
+  }, []);
+  
+  // Logout handler
+  const handleLogout = () => {
+    if (window.confirm("Bạn có chắc muốn đăng xuất?")) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("roles");
+      setUser(null);
+      setIsLoggedIn(false);
+      alert("Đã đăng xuất thành công!");
+      navigate("/");
+    }
+  };
 
   // ================= FETCH DATA =================
   useEffect(() => {
@@ -241,8 +268,31 @@ export default function HomePage() {
             <li><a href="#reservation">Đặt bàn</a></li>
           </ul>
 
-          <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
-            🛒 <span>{cart.reduce((s, i) => s + i.quantity, 0)}</span>
+          <div className="flex items-center gap-4">
+            {isLoggedIn && user && (
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-gray-700">
+                  <span className="font-medium">👤 {user.full_name || user.username || "Khách"}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition text-sm font-medium"
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            )}
+            {!isLoggedIn && (
+              <button
+                onClick={() => navigate("/")}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition text-sm font-medium"
+              >
+                Đăng nhập
+              </button>
+            )}
+            <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
+              🛒 <span>{cart.reduce((s, i) => s + i.quantity, 0)}</span>
+            </div>
           </div>
         </nav>
       </header>

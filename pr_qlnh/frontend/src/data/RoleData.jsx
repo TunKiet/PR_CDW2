@@ -10,10 +10,6 @@ export const getRoleById = async (id) => {
   const res = await axios.get(`${API_BASE_URL}/${id}`);
   return res.data;
 };
-export const searchRole = async (phone) => {
-  const res = await axios.get(`${API_BASE_URL}/search`, { params: { phone } });
-  return res.data;
-};
 export const addRole = async (RolesData) => {
   const res = await axios.post(API_BASE_URL, RolesData);
   return res.data;
@@ -25,6 +21,16 @@ export const updateRole = async (id, RolesData) => {
 };
 
 export const deleteRole = async (id) => {
-  const res = await axios.delete(`${API_BASE_URL}/del/${id}`);
+  const res = await axios.delete(`${API_BASE_URL}/${id}`);
+  return res.data;
+};
+
+export const assignPermissions = async (id, permissions) => {
+  const res = await axios.post(`${API_BASE_URL}/${id}/permissions`, { permissions });
+  return res.data;
+};
+
+export const getUsersByRole = async (id) => {
+  const res = await axios.get(`${API_BASE_URL}/${id}/users`);
   return res.data;
 };
