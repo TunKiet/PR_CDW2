@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import Avatar from '@mui/material/Avatar';
@@ -9,22 +9,35 @@ import { FaStar } from "react-icons/fa";
 import { FaChevronRight } from "react-icons/fa";
 import BoxReview from './BoxReview';
 import { CiCamera } from "react-icons/ci";
+import { notify } from '../../utils/notify'
 import axios from "axios";
 
+const endPoint = 'http://localhost:8000/api';
+
 const Review = () => {
+
+    const menuItemId = 1;
+    const userId = 1;
 
     const [activeFilter, setActiveFilter] = useState(1);
     const [openFormReview, setOpenFormReview] = useState(false);
     // const [values, setValues] = useState(null);
 
     //get information review
+    const [reviews, setReviews] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [average, setAverage] = useState(0);
+    const [ratingCounts, setRatingCounts] = useState({});
+
+    // Process add review
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
     const [preview, setPreview] = useState(null);
-    const [image, setImage] = useState(null);
+    const [image, setImage] = useState("");
     const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
 
+    //Reply
 
     const filters = [
         { id: 1, label: "Tất cả" },
@@ -35,9 +48,27 @@ const Review = () => {
         { id: 6, label: "1 sao" },
     ];
 
-    const handleClickOpen = () => {
-        setOpenFormReview(true);
-    }
+    //Fetch api review
+    useEffect(() => {
+        const fetchReviews = async () => {
+            setLoading(true);
+            try {
+                const res = await axios.get(`${endPoint}/reviews/item/${menuItemId}`);
+                setReviews(res.data.reviews);
+                setTotal(res.data.total);
+                setAverage(res.data.average);
+                setRatingCounts(res.data.rating_counts);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (menuItemId) fetchReviews();
+    }, [menuItemId]);
+
+
     const handleClose = () => {
         setOpenFormReview(false);
     }
@@ -48,47 +79,66 @@ const Review = () => {
     }
 
     //Handle change file
-    const handleChangeFile = (e) => {
+    const handleChangeFile = async (e) => {
         const file = e.target.files[0];
-        setImage(file);
         setPreview(URL.createObjectURL(file));
+
+        const data = new FormData();
+        data.append("file", file);
+        data.append("upload_preset", "image_review");
+        data.append("cloud_name", "dpq6tyosc");
+
+        try {
+            const res = await axios.post(
+                "https://api.cloudinary.com/v1_1/dpq6tyosc/image/upload",
+                data
+            );
+
+            setImage(res.data.secure_url);
+        } catch (error) {
+            console.log("Upload error:", error.response?.data);
+        }
     };
 
     //Handle button submit
     const handleSubmit = async () => {
-        if (!rating) return alert('Vui long chon sao!');
+        if (!rating) {
+            notify.info('Vui lòng chọn số sao');
+            return;
+        }
+
         setLoading(true);
 
-        const formData = new FormData();
-        formData.append("menu_item_id", 1);
-        formData.append("rating", rating);
-        formData.append("comment", comment);
-
-        if (image) {
-            formData.append("image_url", image);
-        }
-
-        for (let pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        }
-
         try {
-            const res = await axios.post("http://localhost:8000/api/reviews", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+            const res = await axios.post(
+                `${endPoint}/reviews/add-review`,
+                {
+                    user_id: userId,
+                    menu_item_id: menuItemId,
+                    rating,
+                    comment,
+                    image_url: image
                 },
-            });
-            alert(res.data.message);
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+
+            console.log(res.data);
+            notify.success('Gửi đánh giá thành công')
             handleClose();
+
         } catch (error) {
-            console.log(error);
-            alert("Gui danh gia that bai");
-        }
-        finally {
+            console.log(error.response?.data);
+            notify.error('Gửi đánh giá thất bại');
+        } finally {
             setLoading(false);
         }
-    }
+    };
+
+
 
     return (
         <>
@@ -99,16 +149,16 @@ const Review = () => {
                 <div className="boxReview w-full h-[200px] bg-white p-3 flex rounded-lg">
                     <div className="boxReview-overview w-[250px]">
                         <div className="boxReview-score">
-                            <div className="rating text-4xl"><span className="average-rating text-6xl">4.8</span>/5</div>
+                            <div className="rating text-4xl"><span className="average-rating text-6xl">{average}</span>/5</div>
                             <div className="item-star">
-                                <Star />
+                                <Rating readOnly value={average} />
                             </div>
-                            <div className="count-review py-1 ">100 lượt đánh giá</div>
-                            <Button variant="contained" color='error' onClick={handleClickOpen}>Viết đánh giá</Button>
+                            <div className="count-review py-1 ">{total} lượt đánh giá</div>
+                            <Button variant="contained" color='error' onClick={() => setOpenFormReview(true)}>Viết đánh giá</Button>
                             {/* Form write review for user */}
-                            <Dialog open={openFormReview} onClose={handleClose}>
+                            <Dialog open={openFormReview} onClose={() => setOpenFormReview(false)} maxWidth="sm" fullWidth="sm" >
                                 <div className="container p-3 m-3 max-w-xl w-full mx-auto">
-                                    <div className="absolute top-1 right-1 p-3! rounded-full! me-auto! hover:bg-gray-300 w-10! cursor-pointer" onClick={handleClose}><IoClose /></div>
+                                    <div className="absolute top-1 right-1 p-3! rounded-full! me-auto! hover:bg-gray-300 w-10! cursor-pointer" onClick={() => setOpenFormReview(false)}><IoClose /></div>
                                     <h2 className='text-5xl font-bold pt-3'>Đánh giá về chúng tôi</h2>
                                     <div className="formReview-info flex items-center">
                                         <div className="formReview-info-avatar">
@@ -119,7 +169,20 @@ const Review = () => {
                                         </div>
                                     </div>
                                     <div className="formReview-select-rating py-2">
-                                        <Rating value={rating} size='large' onChange={(e, newValue) => { setRating(newValue) }} />
+                                        <Rating value={rating} size="large" name="simple-controlled" onChange={(e, newValue) => { setRating(newValue) }}
+                                            sx={{
+                                                "& .MuiRating-icon": {
+                                                    fontSize: 30,
+                                                },
+                                                color: "#facc15",
+                                                "& .MuiRating-iconFilled": {
+                                                    color: "#facc15",
+                                                },
+                                                "& .MuiRating-iconHover": {
+                                                    color: "#fbbf24",
+                                                }
+                                            }}
+                                        />
                                     </div>
                                     <div className="formReview-upload mb-2">
                                         <div className="formReview-upload-title">
@@ -156,58 +219,32 @@ const Review = () => {
                         </div>
                     </div>
                     <div className="boxReview-star w-[500px] space-y-2 mt-3">
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>5</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={85} className='custom-progress w-[250px] h-2.5 appearance-none '></progress>
-                            <span className="text-sm text-gray-600 ml-2">85 đánh giá</span>
-                        </div>
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>4</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={10} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
-                            <span className="text-sm text-gray-600 ml-2">10 đánh giá</span>
-                        </div>
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>3</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={0} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
-                            <span className="text-sm text-gray-600 ml-2">0 đánh giá</span>
-                        </div>
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>2</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={0} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
-                            <span className="text-sm text-gray-600 ml-2">0 đánh giá</span>
-                        </div>
-                        <div className="rating-level flex items-center gap-2">
-                            <div className="number-star flex items-center w-8">
-                                <span>1</span>
-                                <FaStar className="text-yellow-400 ml-1" />
-                            </div>
-                            <progress max={100} value={5} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
-                            <span className="text-sm text-gray-600 ml-2">5 đánh giá</span>
-                        </div>
+                        {[5, 4, 3, 2, 1].map(star => {
+                            const count = ratingCounts[star] || 0;
+                            const percent = total ? Math.round((count / total) * 100) : 0;
+                            return (
+                                <div key={star} className="rating-level flex items-center gap-2">
+                                    <div className="number-star flex items-center w-8">
+                                        <span>{star}</span>
+                                        <FaStar className="text-yellow-400 ml-1" />
+                                    </div>
+                                    <progress max={100} value={percent} className='custom-progress w-[250px] h-2.5 appearance-none'></progress>
+                                    <span className="text-sm text-gray-600 ml-2">{count} đánh giá</span>
+                                </div>
+                            );
+                        })}
                     </div>
 
                 </div>
 
                 <div className='w-full h-auto bg-white p-3 my-2 rounded-lg' >
                     <div className="boxReview-filter flex items-center mb-3">
-                        <div className="title">Lọc đánh giá</div>
+                        <div className="title m-0">Lọc đánh giá</div>
                         <div className="container-filter flex items-center">
                             {
                                 filters.map((filter) => (
                                     <div key={filter.id} className={`filter-item py-1 px-2 rounded-2xl border border[#333] mx-2 cursor-pointer
-                                    ${activeFilter === filter.id ? "bg-blue-100 text-blue-600" : 'bg-gray-100 text-black'}`}
+                                    ${activeFilter === filter.id ? "bg-blue-100 text-blue-600" : 'bg-gray-100'}`}
                                         onClick={() => setActiveFilter(filter.id)}>
                                         {filter.label}
                                     </div>
@@ -219,19 +256,12 @@ const Review = () => {
                         </div>
                     </div>
 
-                    {/* Info review */}
-                    <BoxReview menuItemId={1} />
-                    {/* <Feedback /> */}
-
-                    <hr />
+                    <BoxReview reviews={reviews} userId={userId} />
 
 
-                    {/* <Feedback /> */}
-
-                    <div className="flex justify-center">
+                    <div className="flex justify-center mt-3">
                         <Button variant='contained'>Xem tất cả đánh giá <FaChevronRight /> </Button>
                     </div>
-
                 </div>
             </div>
         </>

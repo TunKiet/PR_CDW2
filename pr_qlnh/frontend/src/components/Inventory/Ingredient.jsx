@@ -17,8 +17,6 @@ import axios from "axios";
 import CategoryIngredient from './CategoryIngredient';
 
 const Ingredient = () => {
-
-
     //Open dialog add ingredient
     const [openAdd, setOpenAdd] = useState(false);
 
@@ -84,8 +82,6 @@ const Ingredient = () => {
             setLoading(false);
         }
     }, [page, selectedCategory]); // 👈 thêm selectedCategory
-
-
 
     const handleCategoryFilter = (categoryId) => {
         console.log("🟢 Category selected in Ingredient:", categoryId);

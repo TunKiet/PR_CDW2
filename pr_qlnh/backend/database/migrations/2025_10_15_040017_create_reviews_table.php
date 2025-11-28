@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('image_url', 255)->nullable();
             $table->integer('like')->nullable();
             $table->integer('dislike')->nullable();
-            $table->string('status', 50)->default('pending');
+            $table->string('status', 50)->default('approved');
             $table->timestamps();
         });
     }
