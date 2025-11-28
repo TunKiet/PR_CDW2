@@ -231,7 +231,7 @@ export default function DishStatusManagement() {
     setStats({ total, active, inactive, low_stock });
   }, []);
 
-    const updateDishStatus = useCallback(
+  const updateDishStatus = useCallback(
     async (dishId, newStatus, reason = null, estimatedTime = null) => {
       try {
         const payload = {
@@ -273,22 +273,23 @@ export default function DishStatusManagement() {
         alert("Có lỗi xảy ra khi cập nhật trạng thái");
       }
     },
-    [dishTimestamps , fetchDishes]
+    [dishTimestamps, fetchDishes]
   );
 
-  const toggleStatus = useCallback((dish) => {
-    const newStatus = dish.status === "active" ? "inactive" : "active";
+  const toggleStatus = useCallback(
+    (dish) => {
+      const newStatus = dish.status === "active" ? "inactive" : "active";
 
-    if (newStatus === "inactive") {
-      setSelectedDish(dish);
-      setIsModalOpen(true);
-      return;
-    }
+      if (newStatus === "inactive") {
+        setSelectedDish(dish);
+        setIsModalOpen(true);
+        return;
+      }
 
-    updateDishStatus(dish.menu_item_id, newStatus, null, null);
-  }, [updateDishStatus]);
-
-
+      updateDishStatus(dish.menu_item_id, newStatus, null, null);
+    },
+    [updateDishStatus]
+  );
 
   const [showConflictModal, setShowConflictModal] = useState(false);
   const [conflictData, setConflictData] = useState(null);
