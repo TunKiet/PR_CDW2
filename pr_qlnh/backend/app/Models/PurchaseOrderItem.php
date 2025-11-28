@@ -16,4 +16,9 @@ protected $table = 'purchase_order_items';
         'quantity',
         'price'
     ];
+
+    public function order()
+    {
+        return $this->hasMany(PurchaseOrder::class, 'po_item_id', 'po_item_id');
+    }
 }

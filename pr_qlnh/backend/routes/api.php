@@ -169,11 +169,98 @@ Route::prefix('customers')->group(function () {
 });
 
 
+Route::get('/menu-items', [MenuItemController::class, 'index']);
+Route::post('/orders', [OrderController::class, 'store']);
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\CategoryIngredientController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Models\Ingredient;
+use App\Http\Controllers\Api\PreOrderController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\PromotionController;
+
+// 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
+// use App\Http\Controllers\Api\TableController;
+// use App\Http\Controllers\Api\MenuItemController;
+
+
+
 /*
 |--------------------------------------------------------------------------
 | 🧾 Orders (Ăn tại nhà hàng)
 |--------------------------------------------------------------------------
 */
+// ✅ Test route kiểm tra API hoạt động
+Route::get('/test', function () {
+    return response()->json(['message' => 'API file is loaded']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 🍽️ Dish & Review Routes
+|--------------------------------------------------------------------------
+*/
+Route::apiResource('dishes', DishController::class);
+
+Route::post('/reviews', [ReviewController::class, 'store']);
+Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
+Route::get('/reviews/{menuItemId}/average', [ReviewController::class, 'averageRating']);
+Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
+Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
+Route::post('/add', [IngredientController::class, 'store']);
+Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
+Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
+Route::get('/export', [IngredientController::class, 'exportPDF']);
+Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
+Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
+Route::get('/ingredients/used', [IngredientController::class, 'getUsedIngredients']);
+Route::post('/send-message', [MessageController::class, 'sendMessage']);
+Route::get('/conversations', [MessageController::class, 'getConversations']);
+Route::get('/messages/{conversationId}', [MessageController::class, 'getMessages']);
+Route::post('/mark-read', [MessageController::class, 'markAsRead']);
+Route::get('/alert', [IngredientController::class, 'alertIngredient']);
+Route::post('/chat', [ChatController::class, 'message']);
+
+
+/*
+|--------------------------------------------------------------------------
+| 👤 Auth Routes (JWT)
+|--------------------------------------------------------------------------
+*/
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 🛡️ Role & Permission Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::apiResource('/roles', RoleController::class);
+    Route::apiResource('/permissions', PermissionController::class);
+});
+
+Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
+Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);
+
+Route::get('/categories', [CategoryController::class, 'index']);
+
+
+Route::get('/pre-orders', [PreOrderController::class, 'index']);
+Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
+Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
+
+
+Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
+Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
+
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']);
     Route::get('/{id}', [OrderController::class, 'show']);

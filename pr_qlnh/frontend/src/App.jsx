@@ -39,18 +39,19 @@ import DishTable from "./components/08_hao-QLMonAn/DishCRUDTable";
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
 import RestaurantInfoManage from "./components/08_hao-QLMonAn/restaurant_infor_manage";
 import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
+import DishModal from "./components/08_hao-QLMonAn/DishModal";
+import UserChat from "./components/Chat/UserChat";
+import AdminChat from "./components/Chat/AdminChat";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
 import OrderOnlineAdmin from "./pages/OrderOnlineAdmin";
 
 function App() {
   return (
     <BrowserRouter>
-     <ToastContainer />
       <Routes>
-        <Route
-          path="/dish-status-management"
-          element={<DishStatusManagement />}
-        />
+
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/dish-status-management" element={<DishStatusManagement />} />
         <Route path="/category-manager" element={<CategoryManager />} />
         <Route path="/" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -70,9 +71,8 @@ function App() {
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
+
         <Route path="/restaurant-info" element={<RestaurantInfoManage />} />
-        <Route path="/inventory" element={<Invertory />} />
-        <Route path="/export" element={<IngredientInOut />} />
         <Route path="/inventory" element={<Invertory />} />
         <Route path="/export" element={<IngredientInOut />} />
         <Route path="/inventory-overview" element={<InventoryOverview />} />
@@ -120,8 +120,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+       
+        {/* <Route path="/restaurant-info" element={<RestaurantInforManage />} /> */}
+        <Route path="/category-manager" element={<CategoryManager />} />
         
-        <Route path="/analytics" element={<UserDashboard />} />
+        <Route path="/chat" element={<UserChat />} />
+        <Route path="/admin-chat" element={<AdminChat />} />
+        <Route path="/restaurant-info" element={<RestaurantInfoManage />} />
+        {/* Định tuyến cho các trang khác nhau */}
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path='/analytics' element={<UserDashboard />} />
+
 
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}
           <Route
@@ -151,8 +160,13 @@ function App() {
           }
         />
 
+        <Route path="/customers" element={<CustomerManagementPage />} />
+
+        {/* Thêm các route khác nếu có: /invoices, /menu, ... */}
+        {/* <Route path="/invoices" element={<InvoicePage />} /> */}
+
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
-        <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} />
+        {/* <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} /> */}
       </Routes>
     </BrowserRouter>
   );

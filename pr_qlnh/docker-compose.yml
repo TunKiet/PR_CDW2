@@ -11,6 +11,7 @@ services:
     working_dir: /var/www
     volumes:
       - ./backend:/var/www
+      - /var/www/vendor
       - ./backend/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     networks:
       - app-network
@@ -54,27 +55,14 @@ services:
       MYSQL_ROOT_PASSWORD: root 
       MYSQL_PASSWORD: password
       MYSQL_USER: laravel
-      # MYSQL_PASSWORD: laravel
+    # MYSQL_PASSWORD: laravel
     ports:
       - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql
     networks:
       - app-network
-
-  # ✅ phpMyAdmin
-  # phpmyadmin:
-  #   image: phpmyadmin/phpmyadmin:latest
-  #   container_name: phpmyadmin
-  #   restart: unless-stopped
-  #   environment:
-  #     PMA_HOST: mysql
-  #     PMA_PORT: 3306
-  #     PMA_USER: root
-  #     PMA_PASSWORD: YourStrongPassword@123
-  #   ports:
-  #     - "3306:3306"
-
+      
   # Redis
   redis:
     image: redis:alpine
