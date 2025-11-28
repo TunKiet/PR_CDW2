@@ -43,8 +43,21 @@ const IngredientAlert = ({ loading, ingredientAlert }) => {
     const allChecked = checked.length > 0 && checked.every(Boolean);
     const someChecked = checked.some(Boolean);
 
-    const handleOpen = () => setOpen(true);
+    // const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
+    const handleCreateOrder = () => {
+        //filter ingredient checked
+        const selectedItems = ingredientAlert
+        .map((item, index) => checked[index] ? {
+            ingredient_id: item.ingredient_id,
+            ingredient_name: item.ingredient_name,
+            quantity: quantities[index] || 0
+        }: null)
+        .filter(Boolean);
+
+        console.log('Nguyen lieu duoc chon: ', selectedItems);
+    }
 
 
     return (
@@ -55,7 +68,7 @@ const IngredientAlert = ({ loading, ingredientAlert }) => {
                         <h5>Nguyên liệu sắp hết hàng</h5>
                     </div>
                     <div className="boxIngredient-button ms-auto">
-                        <Button variant="contained" color="primary" onClick={handleOpen}>
+                        <Button variant="contained" color="primary" onClick={handleCreateOrder}>
                             <RiFileList2Line size={20} /> Tạo đơn nhập hàng
                         </Button>
 
@@ -105,7 +118,7 @@ const IngredientAlert = ({ loading, ingredientAlert }) => {
                                         </td>
                                         <td className="px-4 py-2 text-center border-b">{index + 1}</td>
                                         <td className="px-4 py-2 text-center border-b">{item.ingredient_name}</td>
-                                        <td className="px-4 py-2 text-center border-b">{item.category_ingredient.category_ingredient_name || '—'}</td>
+                                        <td className="px-4 py-2 text-center border-b">{item.category_ingredient?.category_ingredient_name || '—'}</td>
                                         <td className="px-4 py-2 text-center border-b">{item.stock_quantity}</td>
                                         <td className="px-4 py-2 text-center border-b">{item.min_stock_level}</td>
 

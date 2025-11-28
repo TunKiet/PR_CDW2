@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Sidebar from '../Sidebar/Sidebar'
 import Ingredient from './Ingredient'
 import IngredientAlert from './IngredientAlert'
@@ -8,10 +8,16 @@ import Badge from '@mui/material/Badge';
 import axios from "axios";
 
 const Invertory = () => {
-
+    //data ingredient alert
     const [activeTab, setActiveTab] = useState(1);
     const [ingredientAlert, setIngredientAlert] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    //data ingredient list
+    const [ingredients, setIngredients] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [selectedCategory, setSelectedCategory] = useState('all');
     //fetch api ingredieng alert
     useEffect(() => {
         const fetchAlert = async () => {
@@ -30,6 +36,28 @@ const Invertory = () => {
 
         fetchAlert();
     }, []);
+
+    const fetchIngredients = useCallback(async () => {
+        try {
+            let url = `http://localhost:8000/api/ingredients?page=${page}`;
+            console.log(selectedCategory);
+            if (selectedCategory !== 'all') {
+                url += `&category_ingredient_id=${selectedCategory}`;
+            }
+
+            console.log("📡 Gọi API:", url);
+
+            const res = await axios.get(url);
+            console.log("📦 Dữ liệu nhận được:", res.data);
+
+            setIngredients(res.data.data);
+            setTotalPages(res.data.last_page);
+            setLoading(false);
+        } catch (error) {
+            console.error("❌ Lỗi fetch nguyên liệu:", error);
+            setLoading(false);
+        }
+    }, [page, selectedCategory]);
 
     const tabs = [
         { id: 1, label: "Quản lý nguyên liệu" },
@@ -80,7 +108,15 @@ const Invertory = () => {
                                 </div>
                             </div>
                             <div className="boxIngredient-content mt-4">
-                                {activeTab === 1 && <Ingredient />}
+                                {activeTab === 1 && <Ingredient
+                                    loading={loading}
+                                    ingredients={ingredients}
+                                    setPage={setPage}
+                                    page={page}
+                                    totalPages={totalPages}
+                                    setSelectedCategory={setSelectedCategory}
+                                    fetchIngredients={fetchIngredients}
+                                />}
                                 {activeTab === 2 && <IngredientAlert loading={loading} ingredientAlert={ingredientAlert} />}
                                 {activeTab === 3 && <IngredientInOut />}
                             </div>
