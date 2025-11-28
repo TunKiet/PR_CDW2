@@ -71,10 +71,33 @@ class DishController extends Controller
     {
         $dish = MenuItem::find($id);
         if (!$dish) {
-            return response()->json(['status' => 'error', 'message' => 'Không tìm thấy món ăn!'], 404);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không tìm thấy món ăn!'
+            ], 404);
         }
 
-        // 1. Validation: File ảnh là tùy chọn (nullable) khi update
+        // ⭐ KIỂM TRA TIMESTAMP (SỬ DỤNG updated_at CÓ SẴN)
+        $clientUpdatedAt = $request->input('updated_at');
+
+        if ($clientUpdatedAt) {
+            // So sánh timestamp client gửi lên với DB
+            $dbTimestamp = $dish->updated_at->format('Y-m-d H:i:s');
+            $clientTimestamp = date('Y-m-d H:i:s', strtotime($clientUpdatedAt));
+
+            if ($clientTimestamp !== $dbTimestamp) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Dữ liệu đã bị thay đổi bởi người dùng khác. Vui lòng tải lại trang!',
+                    'error_code' => 'DATA_CONFLICT',
+                    'current_data' => $dish, // Trả về data mới nhất
+                    'client_timestamp' => $clientTimestamp,
+                    'server_timestamp' => $dbTimestamp,
+                ], 409); // HTTP 409 Conflict
+            }
+        }
+
+        // ... PHẦN VALIDATION VÀ UPDATE GIỮ NGUYÊN
         $validated = $request->validate([
             'category_id' => 'sometimes|integer|exists:categories,category_id',
             'menu_item_name' => 'sometimes|string|max:255',
@@ -83,39 +106,30 @@ class DishController extends Controller
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'status' => 'nullable|string|max:50',
             'is_featured' => 'sometimes|integer|in:0,1',
-            // Laravel sẽ tự xử lý _method, không cần validate
         ]);
 
-        // 2. XỬ LÝ UPLOAD FILE MỚI
+        // Xử lý upload file
         if ($request->hasFile('image_file')) {
-
-            // XÓA ẢNH CŨ (Tùy chọn)
             if ($dish->image_url) {
-                // Tách path file ra khỏi URL công khai (ví dụ: 'http://.../storage/images/dishes/xyz.jpg' -> 'images/dishes/xyz.jpg')
                 $pathSegments = parse_url($dish->image_url, PHP_URL_PATH);
                 $oldPath = str_replace('/storage/', '', $pathSegments);
-
-                // Kiểm tra và xóa file cũ
                 if (Storage::disk('public')->exists($oldPath)) {
                     Storage::disk('public')->delete($oldPath);
                 }
             }
-
-            // Lưu file mới và lấy URL
             $path = $request->file('image_file')->store('images/dishes', 'public');
             $validated['image_url'] = Storage::disk('public')->url($path);
         }
 
-        // 3. Cập nhật món ăn
-        // Loại bỏ trường file khỏi $validated trước khi update
         unset($validated['image_file']);
+        unset($validated['updated_at']); // ⭐ Loại bỏ updated_at khỏi validated data
 
         $dish->update($validated);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Cập nhật món ăn thành công!',
-            'data' => $dish
+            'data' => $dish->fresh() // Trả về data mới kèm updated_at mới
         ]);
     }
 
@@ -169,12 +183,29 @@ class DishController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $dish = MenuItem::find($id);
-        
+
         if (!$dish) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Không tìm thấy món ăn!'
             ], 404);
+        }
+
+        // ⭐ KIỂM TRA CONFLICT
+        $clientUpdatedAt = $request->input('updated_at');
+
+        if ($clientUpdatedAt) {
+            $dbTimestamp = $dish->updated_at->format('Y-m-d H:i:s');
+            $clientTimestamp = date('Y-m-d H:i:s', strtotime($clientUpdatedAt));
+
+            if ($clientTimestamp !== $dbTimestamp) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Dữ liệu đã được thay đổi. Vui lòng tải lại!',
+                    'error_code' => 'DATA_CONFLICT',
+                    'current_data' => $dish,
+                ], 409);
+            }
         }
 
         // Validation
@@ -185,19 +216,11 @@ class DishController extends Controller
             'stock_quantity' => 'nullable|integer|min:0',
         ]);
 
-        // Lưu trạng thái cũ để ghi log
         $oldStatus = $dish->status;
 
-        // Cập nhật
-        $dish->update([
-            'status' => $validated['status'],
-            'unavailable_reason' => $validated['unavailable_reason'] ?? null,
-            'unavailable_until' => $validated['unavailable_until'] ?? null,
-            'stock_quantity' => $validated['stock_quantity'] ?? $dish->stock_quantity,
-            'updated_by' => $request->user()->id ?? null, // Nếu có auth
-        ]);
+        $dish->update($validated);
 
-        // ⭐ GHI LỊCH SỬ
+        // Ghi log
         DishStatusHistory::create([
             'menu_item_id' => $dish->menu_item_id,
             'old_status' => $oldStatus,
@@ -209,7 +232,7 @@ class DishController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Cập nhật trạng thái thành công!',
-            'data' => $dish
+            'data' => $dish->fresh()
         ]);
     }
 
@@ -231,10 +254,10 @@ class DishController extends Controller
         DB::transaction(function () use ($validated, &$updatedCount, $request) {
             foreach ($validated['dish_ids'] as $dishId) {
                 $dish = MenuItem::find($dishId);
-                
+
                 if ($dish) {
                     $oldStatus = $dish->status;
-                    
+
                     $dish->update([
                         'status' => $validated['status'],
                         'unavailable_reason' => $validated['unavailable_reason'] ?? null,
@@ -269,7 +292,7 @@ class DishController extends Controller
     public function getStatusHistory($id)
     {
         $dish = MenuItem::find($id);
-        
+
         if (!$dish) {
             return response()->json([
                 'status' => 'error',
@@ -304,8 +327,8 @@ class DishController extends Controller
 
         $total = MenuItem::count();
         $lowStock = MenuItem::where('stock_quantity', '<=', 5)
-                           ->where('stock_quantity', '>', 0)
-                           ->count();
+            ->where('stock_quantity', '>', 0)
+            ->count();
 
         return response()->json([
             'status' => 'success',

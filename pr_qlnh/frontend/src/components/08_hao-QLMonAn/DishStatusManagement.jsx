@@ -9,81 +9,84 @@ const API_DISHES_URL = `${API_BASE_URL}/dishes`;
 
 // === HÀM HỖ TRỢ (OUTSIDE COMPONENT - OK) ===
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    minimumFractionDigits: 0
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
   }).format(amount);
 };
 
 // Mapping status
 const statusMap = {
-  'active': 'Còn hàng',
-  'inactive': 'Hết hàng',
-  'out_of_stock': 'Hết hàng',
-  'paused': 'Tạm ngưng',
-  'low_stock': 'Sắp hết'
+  active: "Còn hàng",
+  inactive: "Hết hàng",
+  out_of_stock: "Hết hàng",
+  paused: "Tạm ngưng",
+  low_stock: "Sắp hết",
 };
 
 const categoryMap = {
-  1: 'Món Chính',
-  2: 'Tráng Miệng',
-  3: 'Đồ Uống',
-  4: 'Khai Vị'
+  1: "Món Chính",
+  2: "Tráng Miệng",
+  3: "Đồ Uống",
+  4: "Khai Vị",
 };
 
 // === COMPONENT MODAL (NESTED COMPONENT) ===
 const UnavailableReasonModal = ({ isVisible, onClose, onSave, dishName }) => {
-  const [reason, setReason] = useState('');
-  const [customReason, setCustomReason] = useState('');
-  const [estimatedTime, setEstimatedTime] = useState('');
+  const [reason, setReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
+  const [estimatedTime, setEstimatedTime] = useState("");
 
   const predefinedReasons = [
-    'Hết nguyên liệu chính',
-    'Thiết bị bếp hỏng',
-    'Đầu bếp chuyên môn nghỉ',
-    'Nguyên liệu không đạt chất lượng',
-    'Món không phù hợp khung giờ',
-    'Khác'
+    "Hết nguyên liệu chính",
+    "Thiết bị bếp hỏng",
+    "Đầu bếp chuyên môn nghỉ",
+    "Nguyên liệu không đạt chất lượng",
+    "Món không phù hợp khung giờ",
+    "Khác",
   ];
 
   const handleSave = () => {
-    const finalReason = reason === 'Khác' ? customReason : reason;
-    
+    const finalReason = reason === "Khác" ? customReason : reason;
+
     if (!finalReason) {
-      alert('Vui lòng chọn hoặc nhập lý do hết hàng');
+      alert("Vui lòng chọn hoặc nhập lý do hết hàng");
       return;
     }
 
     onSave({
       unavailable_reason: finalReason,
-      unavailable_until: estimatedTime || null
+      unavailable_until: estimatedTime || null,
     });
   };
 
   useEffect(() => {
     if (!isVisible) {
-      setReason('');
-      setCustomReason('');
-      setEstimatedTime('');
+      setReason("");
+      setCustomReason("");
+      setEstimatedTime("");
     }
   }, [isVisible]);
 
   if (!isVisible) return null;
 
   return (
-    <div className="modal is-active" style={{ 
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      right: 0, 
-      bottom: 0, 
-      backgroundColor: 'rgba(0,0,0,0.5)', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
+    <div
+      className="modal is-active"
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 1000,
+      }}
+    >
       <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
         <h3 className="text-xl font-bold mb-4 text-gray-800">
           Lý do hết hàng: {dishName}
@@ -101,14 +104,16 @@ const UnavailableReasonModal = ({ isVisible, onClose, onSave, dishName }) => {
               onChange={(e) => setReason(e.target.value)}
             >
               <option value="">-- Chọn lý do --</option>
-              {predefinedReasons.map(r => (
-                <option key={r} value={r}>{r}</option>
+              {predefinedReasons.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
               ))}
             </select>
           </div>
 
           {/* Custom reason */}
-          {reason === 'Khác' && (
+          {reason === "Khác" && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nhập lý do cụ thể
@@ -162,6 +167,7 @@ export default function DishStatusManagement() {
   // === ALL STATES MUST BE HERE (INSIDE COMPONENT) ===
   const [dishes, setDishes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [dishTimestamps, setDishTimestamps] = useState({});
   const [filters, setFilters] = useState({
     keyword: "",
     category: "",
@@ -183,7 +189,7 @@ export default function DishStatusManagement() {
     total: 0,
     active: 0,
     inactive: 0,
-    low_stock: 0
+    low_stock: 0,
   });
 
   // === API CALLS ===
@@ -193,15 +199,20 @@ export default function DishStatusManagement() {
       const response = await fetch(`${API_DISHES_URL}`);
       const result = await response.json();
 
-      if (result.status === 'success') {
+      if (result.status === "success") {
         setDishes(result.data);
+        const timestamps = {};
+        result.data.forEach((dish) => {
+          timestamps[dish.menu_item_id] = dish.updated_at;
+        });
+        setDishTimestamps(timestamps);
         calculateStats(result.data);
       } else {
-        alert('Không thể tải danh sách món ăn');
+        alert("Không thể tải danh sách món ăn");
       }
     } catch (error) {
-      console.error('Error fetching dishes:', error);
-      alert('Có lỗi xảy ra khi tải dữ liệu');
+      console.error("Error fetching dishes:", error);
+      alert("Có lỗi xảy ra khi tải dữ liệu");
     } finally {
       setIsLoading(false);
     }
@@ -209,94 +220,139 @@ export default function DishStatusManagement() {
 
   const calculateStats = useCallback((dishesData) => {
     const total = dishesData.length;
-    const active = dishesData.filter(d => d.status === 'active').length;
-    const inactive = dishesData.filter(d => d.status === 'inactive' || d.status === 'out_of_stock').length;
-    const low_stock = dishesData.filter(d => d.stock_quantity <= 5 && d.stock_quantity > 0).length;
+    const active = dishesData.filter((d) => d.status === "active").length;
+    const inactive = dishesData.filter(
+      (d) => d.status === "inactive" || d.status === "out_of_stock"
+    ).length;
+    const low_stock = dishesData.filter(
+      (d) => d.stock_quantity <= 5 && d.stock_quantity > 0
+    ).length;
 
     setStats({ total, active, inactive, low_stock });
   }, []);
 
-  const toggleStatus = useCallback((dish) => {
-    const newStatus = dish.status === 'active' ? 'inactive' : 'active';
+    const updateDishStatus = useCallback(
+    async (dishId, newStatus, reason = null, estimatedTime = null) => {
+      try {
+        const payload = {
+          status: newStatus,
+          unavailable_reason: reason,
+          unavailable_until: estimatedTime,
+          updated_at: dishTimestamps[dishId], // ⭐ GỬI TIMESTAMP
+        };
 
-    if (newStatus === 'inactive') {
+        const response = await fetch(`${API_DISHES_URL}/${dishId}/status`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+        if (response.status === 409) {
+          handleConflict(result, dishId);
+          return;
+        }
+
+        if (result.status === "success") {
+          alert(result.message);
+          // ⭐ CẬP NHẬT TIMESTAMP MỚI
+          setDishTimestamps((prev) => ({
+            ...prev,
+            [dishId]: result.data.updated_at,
+          }));
+          await fetchDishes();
+          setIsModalOpen(false);
+          setSelectedDish(null);
+        } else {
+          alert(result.message || "Có lỗi xảy ra khi cập nhật");
+        }
+      } catch (error) {
+        console.error("Error updating status:", error);
+        alert("Có lỗi xảy ra khi cập nhật trạng thái");
+      }
+    },
+    [dishTimestamps , fetchDishes]
+  );
+
+  const toggleStatus = useCallback((dish) => {
+    const newStatus = dish.status === "active" ? "inactive" : "active";
+
+    if (newStatus === "inactive") {
       setSelectedDish(dish);
       setIsModalOpen(true);
       return;
     }
 
     updateDishStatus(dish.menu_item_id, newStatus, null, null);
-  }, []);
+  }, [updateDishStatus]);
 
-  const updateDishStatus = useCallback(async (dishId, newStatus, reason = null, estimatedTime = null) => {
-    try {
-      const payload = {
-        status: newStatus,
-        unavailable_reason: reason,
-        unavailable_until: estimatedTime
-      };
 
-      const response = await fetch(`${API_DISHES_URL}/${dishId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
 
-      const result = await response.json();
+  const [showConflictModal, setShowConflictModal] = useState(false);
+  const [conflictData, setConflictData] = useState(null);
 
-      if (result.status === 'success') {
-        alert(result.message);
-        await fetchDishes();
-        setIsModalOpen(false);
-        setSelectedDish(null);
-      } else {
-        alert(result.message || 'Có lỗi xảy ra khi cập nhật');
+  const handleConflict = (result, dishId) => {
+    setConflictData({
+      message: result.message,
+      currentData: result.current_data,
+      dishId: dishId,
+    });
+    setShowConflictModal(true);
+  };
+
+  const handleReloadAfterConflict = async () => {
+    await fetchDishes();
+    setShowConflictModal(false);
+    setConflictData(null);
+    alert("✅ Đã tải lại dữ liệu mới nhất!");
+  };
+
+  const bulkUpdateStatus = useCallback(
+    async (newStatus, reason = null) => {
+      if (selectedDishes.length === 0) {
+        alert("Vui lòng chọn ít nhất 1 món");
+        return;
       }
-    } catch (error) {
-      console.error('Error updating status:', error);
-      alert('Có lỗi xảy ra khi cập nhật trạng thái');
-    }
-  }, [fetchDishes]);
 
-  const bulkUpdateStatus = useCallback(async (newStatus, reason = null) => {
-    if (selectedDishes.length === 0) {
-      alert('Vui lòng chọn ít nhất 1 món');
-      return;
-    }
-
-    if (!window.confirm(`Bạn có chắc muốn cập nhật ${selectedDishes.length} món sang trạng thái "${statusMap[newStatus]}"?`)) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_DISHES_URL}/bulk-update-status`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dish_ids: selectedDishes,
-          status: newStatus,
-          unavailable_reason: reason
-        })
-      });
-
-      const result = await response.json();
-
-      if (result.status === 'success') {
-        alert(result.message);
-        setSelectedDishes([]);
-        await fetchDishes();
-      } else {
-        alert(result.message || 'Có lỗi xảy ra');
+      if (
+        !window.confirm(
+          `Bạn có chắc muốn cập nhật ${selectedDishes.length} món sang trạng thái "${statusMap[newStatus]}"?`
+        )
+      ) {
+        return;
       }
-    } catch (error) {
-      console.error('Error bulk updating:', error);
-      alert('Có lỗi xảy ra khi cập nhật hàng loạt');
-    }
-  }, [selectedDishes, fetchDishes]);
+
+      try {
+        const response = await fetch(`${API_DISHES_URL}/bulk-update-status`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            dish_ids: selectedDishes,
+            status: newStatus,
+            unavailable_reason: reason,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+          alert(result.message);
+          setSelectedDishes([]);
+          await fetchDishes();
+        } else {
+          alert(result.message || "Có lỗi xảy ra");
+        }
+      } catch (error) {
+        console.error("Error bulk updating:", error);
+        alert("Có lỗi xảy ra khi cập nhật hàng loạt");
+      }
+    },
+    [selectedDishes, fetchDishes]
+  );
 
   // === EFFECTS ===
   useEffect(() => {
@@ -309,15 +365,19 @@ export default function DishStatusManagement() {
 
     if (filters.keyword) {
       const kw = filters.keyword.toLowerCase();
-      result = result.filter(d => d.menu_item_name.toLowerCase().includes(kw));
+      result = result.filter((d) =>
+        d.menu_item_name.toLowerCase().includes(kw)
+      );
     }
 
     if (filters.category) {
-      result = result.filter(d => d.category_id === parseInt(filters.category));
+      result = result.filter(
+        (d) => d.category_id === parseInt(filters.category)
+      );
     }
 
     if (filters.status) {
-      result = result.filter(d => d.status === filters.status);
+      result = result.filter((d) => d.status === filters.status);
     }
 
     return result;
@@ -326,39 +386,133 @@ export default function DishStatusManagement() {
   // === PAGINATION ===
   const totalPages = Math.ceil(filteredDishes.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = filteredDishes.slice(startIndex, startIndex + itemsPerPage);
+  const currentItems = filteredDishes.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   // === HANDLERS ===
   const handleFilterChange = useCallback((e) => {
-    setFilters(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setCurrentPage(1);
   }, []);
 
   const toggleSelectDish = useCallback((dishId) => {
-    setSelectedDishes(prev =>
+    setSelectedDishes((prev) =>
       prev.includes(dishId)
-        ? prev.filter(id => id !== dishId)
+        ? prev.filter((id) => id !== dishId)
         : [...prev, dishId]
     );
   }, []);
 
   const selectAll = useCallback(() => {
-    setSelectedDishes(currentItems.map(d => d.menu_item_id));
+    setSelectedDishes(currentItems.map((d) => d.menu_item_id));
   }, [currentItems]);
 
   const deselectAll = useCallback(() => {
     setSelectedDishes([]);
   }, []);
 
-  const handleModalSave = useCallback((data) => {
-    updateDishStatus(
-      selectedDish.menu_item_id,
-      'inactive',
-      data.unavailable_reason,
-      data.unavailable_until
-    );
-  }, [selectedDish, updateDishStatus]);
+  const handleModalSave = useCallback(
+    (data) => {
+      updateDishStatus(
+        selectedDish.menu_item_id,
+        "inactive",
+        data.unavailable_reason,
+        data.unavailable_until
+      );
+    },
+    [selectedDish, updateDishStatus]
+  );
+  // Thêm vào cuối component, trước return
+  const ConflictModal = () => {
+    if (!showConflictModal || !conflictData) return null;
 
+    return (
+      <div
+        className="modal is-active"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 2000,
+        }}
+      >
+        <div className="bg-white p-6 rounded-xl max-w-md shadow-2xl">
+          {/* Header */}
+          <div className="flex items-center mb-4">
+            <span className="text-4xl mr-3">⚠️</span>
+            <h3 className="text-xl font-bold text-red-600">
+              Xung đột dữ liệu!
+            </h3>
+          </div>
+
+          {/* Message */}
+          <p className="text-gray-700 mb-4">{conflictData.message}</p>
+
+          {/* Current Data */}
+          {conflictData.currentData && (
+            <div className="bg-gray-50 p-4 rounded-lg mb-4 border-l-4 border-yellow-500">
+              <h4 className="font-semibold mb-2 text-gray-800">
+                📊 Dữ liệu hiện tại trong hệ thống:
+              </h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>
+                  • <strong>Tên:</strong>{" "}
+                  {conflictData.currentData.menu_item_name}
+                </li>
+                <li>
+                  • <strong>Trạng thái:</strong>{" "}
+                  {statusMap[conflictData.currentData.status]}
+                </li>
+                <li>
+                  • <strong>Giá:</strong>{" "}
+                  {formatCurrency(conflictData.currentData.price)}
+                </li>
+                <li>
+                  • <strong>Cập nhật lúc:</strong>{" "}
+                  {new Date(conflictData.currentData.updated_at).toLocaleString(
+                    "vi-VN"
+                  )}
+                </li>
+              </ul>
+            </div>
+          )}
+
+          {/* Info */}
+          <div className="bg-blue-50 p-3 rounded-lg mb-4 text-sm text-blue-800">
+            <strong>💡 Lý do:</strong> Có người khác đã chỉnh sửa món này khi
+            bạn đang mở form. Vui lòng tải lại để xem dữ liệu mới nhất.
+          </div>
+
+          {/* Actions */}
+          <div className="flex space-x-3">
+            <button
+              onClick={handleReloadAfterConflict}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition"
+            >
+              🔄 Tải lại dữ liệu
+            </button>
+            <button
+              onClick={() => {
+                setShowConflictModal(false);
+                setConflictData(null);
+              }}
+              className="flex-1 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 font-semibold transition"
+            >
+              Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
   // === RENDER ===
   return (
     <div className="dish-layout">
@@ -377,15 +531,21 @@ export default function DishStatusManagement() {
             </div>
             <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
               <p className="text-sm text-gray-600">Còn hàng</p>
-              <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+              <p className="text-2xl font-bold text-green-600">
+                {stats.active}
+              </p>
             </div>
             <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
               <p className="text-sm text-gray-600">Hết hàng</p>
-              <p className="text-2xl font-bold text-red-600">{stats.inactive}</p>
+              <p className="text-2xl font-bold text-red-600">
+                {stats.inactive}
+              </p>
             </div>
             <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
               <p className="text-sm text-gray-600">Sắp hết</p>
-              <p className="text-2xl font-bold text-yellow-600">{stats.low_stock}</p>
+              <p className="text-2xl font-bold text-yellow-600">
+                {stats.low_stock}
+              </p>
             </div>
           </div>
 
@@ -406,8 +566,10 @@ export default function DishStatusManagement() {
               className="dish-input"
             >
               <option value="">Tất cả Danh mục</option>
-              {Object.keys(categoryMap).map(key => (
-                <option key={key} value={key}>{categoryMap[key]}</option>
+              {Object.keys(categoryMap).map((key) => (
+                <option key={key} value={key}>
+                  {categoryMap[key]}
+                </option>
               ))}
             </select>
             <select
@@ -425,7 +587,7 @@ export default function DishStatusManagement() {
               onClick={() => setShowBulkActions(!showBulkActions)}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
             >
-              {showBulkActions ? 'Ẩn' : 'Hiện'} Cập nhật hàng loạt
+              {showBulkActions ? "Ẩn" : "Hiện"} Cập nhật hàng loạt
             </button>
           </div>
 
@@ -437,22 +599,30 @@ export default function DishStatusManagement() {
                   <span className="font-medium">
                     Đã chọn: {selectedDishes.length} món
                   </span>
-                  <button onClick={selectAll} className="text-sm text-blue-600 hover:underline">
+                  <button
+                    onClick={selectAll}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
                     Chọn tất cả
                   </button>
-                  <button onClick={deselectAll} className="text-sm text-gray-600 hover:underline">
+                  <button
+                    onClick={deselectAll}
+                    className="text-sm text-gray-600 hover:underline"
+                  >
                     Bỏ chọn
                   </button>
                 </div>
                 <div className="space-x-2">
                   <button
-                    onClick={() => bulkUpdateStatus('active')}
+                    onClick={() => bulkUpdateStatus("active")}
                     className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
                   >
                     ✓ Còn hàng
                   </button>
                   <button
-                    onClick={() => bulkUpdateStatus('inactive', 'Cập nhật hàng loạt')}
+                    onClick={() =>
+                      bulkUpdateStatus("inactive", "Cập nhật hàng loạt")
+                    }
                     className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                   >
                     ✗ Hết hàng
@@ -490,8 +660,12 @@ export default function DishStatusManagement() {
                           <td className="text-center">
                             <input
                               type="checkbox"
-                              checked={selectedDishes.includes(dish.menu_item_id)}
-                              onChange={() => toggleSelectDish(dish.menu_item_id)}
+                              checked={selectedDishes.includes(
+                                dish.menu_item_id
+                              )}
+                              onChange={() =>
+                                toggleSelectDish(dish.menu_item_id)
+                              }
                               className="w-4 h-4"
                             />
                           </td>
@@ -499,10 +673,16 @@ export default function DishStatusManagement() {
                         <td>{dish.menu_item_id}</td>
                         <td>
                           <img
-                            src={dish.image_url || "https://placehold.co/40x40/e5e7eb/4b5563?text=N/A"}
+                            src={
+                              dish.image_url ||
+                              "https://placehold.co/40x40/e5e7eb/4b5563?text=N/A"
+                            }
                             alt={dish.menu_item_name}
                             className="dish-img"
-                            onError={(e) => (e.target.src = "https://placehold.co/40x40/e5e7eb/4b5563?text=N/A")}
+                            onError={(e) =>
+                              (e.target.src =
+                                "https://placehold.co/40x40/e5e7eb/4b5563?text=N/A")
+                            }
                           />
                         </td>
                         <td>
@@ -513,14 +693,16 @@ export default function DishStatusManagement() {
                             </div>
                           )}
                         </td>
-                        <td>{categoryMap[dish.category_id] || 'N/A'}</td>
+                        <td>{categoryMap[dish.category_id] || "N/A"}</td>
                         <td>{formatCurrency(dish.price)}</td>
                         <td className="text-center">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            dish.status === "active"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}>
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              dish.status === "active"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
+                            }`}
+                          >
                             {statusMap[dish.status] || dish.status}
                           </span>
                         </td>
@@ -533,7 +715,7 @@ export default function DishStatusManagement() {
                                 : "bg-green-500 text-white hover:bg-green-600"
                             }`}
                           >
-                            {dish.status === "active" ? 'Hết hàng' : 'Còn hàng'}
+                            {dish.status === "active" ? "Hết hàng" : "Còn hàng"}
                           </button>
                         </td>
                       </tr>
@@ -554,11 +736,15 @@ export default function DishStatusManagement() {
           {!isLoading && filteredDishes.length > 0 && (
             <div className="dish-pagination-wrapper">
               <div className="text-sm text-gray-700">
-                Hiển thị {startIndex + 1} - {Math.min(startIndex + itemsPerPage, filteredDishes.length)} / {filteredDishes.length}
+                Hiển thị {startIndex + 1} -{" "}
+                {Math.min(startIndex + itemsPerPage, filteredDishes.length)} /{" "}
+                {filteredDishes.length}
               </div>
               <div className="flex space-x-2">
                 <button
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(1, prev - 1))
+                  }
                   disabled={currentPage === 1}
                   className="px-3 py-1 border rounded-lg disabled:opacity-50 hover:bg-gray-100"
                 >
@@ -568,7 +754,9 @@ export default function DishStatusManagement() {
                   {currentPage} / {totalPages}
                 </span>
                 <button
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                  }
                   disabled={currentPage === totalPages}
                   className="px-3 py-1 border rounded-lg disabled:opacity-50 hover:bg-gray-100"
                 >
@@ -590,6 +778,7 @@ export default function DishStatusManagement() {
         onSave={handleModalSave}
         dishName={selectedDish?.menu_item_name}
       />
+      <ConflictModal />
     </div>
   );
 }
