@@ -15,10 +15,9 @@ class MenuItemSeeder extends Seeder
     public function run(): void
     {
         // 1. Vô hiệu hóa Khóa ngoại để lệnh TRUNCATE không bị lỗi 1701
-        Schema::disableForeignKeyConstraints();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('menu_items')->truncate();
-        Schema::enableForeignKeyConstraints();
-        
+
         $menuItems = [
             // === 1. Món Khai Vị (Category ID: 1) ===
             [
@@ -39,7 +38,7 @@ class MenuItemSeeder extends Seeder
                 'image_url' => 'https://placehold.co/600x400/28a745/ffffff?text=Chả+Giò+HS',
                 // Đã xóa trường 'slug'
             ],
-            
+
             // === 2. Món Chính (Category ID: 2) ===
             [
                 'category_id' => 2,
@@ -120,5 +119,7 @@ class MenuItemSeeder extends Seeder
         ];
 
         DB::table('menu_items')->insert($menuItems);
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
     }
 }

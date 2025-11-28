@@ -8,11 +8,27 @@ use App\Models\MenuItem; // ⚠️ Quan trọng: import đúng model
 
 class MenuItemController extends Controller
 {
-    public function index()
-    {
-        $menuItems = MenuItem::with('category')->get();
-        return response()->json($menuItems);
+    public function index(Request $request)
+{
+    $query = MenuItem::with('category');
+
+    // Filter theo category_id nếu có
+    if ($request->has('category_id') && $request->category_id != 'all') {
+        $query->where('category_id', $request->category_id);
     }
+
+    // Pagination backend
+    $items = $query->paginate(12);
+
+    return response()->json([
+        'success' => true,
+        'data' => $items->items(),
+        'current_page' => $items->currentPage(),
+        'last_page' => $items->lastPage(),
+        'total' => $items->total()
+    ]);
+}
+
     public function show($id)
     {
     $item = MenuItem::find($id);

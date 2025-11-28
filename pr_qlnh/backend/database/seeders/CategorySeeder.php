@@ -22,8 +22,6 @@ class CategorySeeder extends Seeder
             'Món khai vị',
             'Tráng miệng',
             'Hải sản',
-            'Đồ ăn vặt', // Thêm một vài danh mục mới
-            'Khuyến mãi', // Thêm một danh mục có thể ẩn
         ];
 
         // Chuẩn bị mảng dữ liệu để chèn
@@ -39,7 +37,7 @@ class CategorySeeder extends Seeder
                 // Description: Tùy chọn, để null hoặc chuỗi rỗng
                 'description' => null, 
                 // is_hidden: Mặc định là false (Hiển thị)
-                'is_hidden' => $name === 'Khuyến mãi' ? true : false, // Đặt "Khuyến mãi" là ẩn để kiểm tra
+                'is_hidden' => false,
                 'created_at' => now(), 
                 'updated_at' => now(),
             ];

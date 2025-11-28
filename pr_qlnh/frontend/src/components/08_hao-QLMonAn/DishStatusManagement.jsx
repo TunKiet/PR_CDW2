@@ -516,7 +516,7 @@ export default function DishStatusManagement() {
                         <td>{categoryMap[dish.category_id] || 'N/A'}</td>
                         <td>{formatCurrency(dish.price)}</td>
                         <td className="text-center">
-                          <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             dish.status === "active"
                               ? "bg-green-100 text-green-800"
                               : "bg-red-100 text-red-800"

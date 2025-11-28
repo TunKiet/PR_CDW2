@@ -458,7 +458,7 @@ export default function DishCRUDTable() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                           {getCategoryName(dish.categoryKey)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-emerald-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">
                           {formatCurrency(dish.price)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">

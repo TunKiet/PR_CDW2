@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
+use Dom\Element;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
-    // ✅ Lấy danh sách tất cả các vai trò
+    // Lấy danh sách tất cả các vai trò
     public function index()
     {
-        $roles = Role::with('permissions')->get();
+        $roles = Role::getAllRoles();
         return response()->json($roles);
     }
 
-    // ✅ Tạo mới vai trò
+    // Tạo mới vai trò
     public function store(Request $request)
     {
         $request->validate([
@@ -23,7 +24,16 @@ class RoleController extends Controller
         ]);
 
         // Tạo role mới
-        $role = Role::create($request->only(['name', 'description']));
+        // kiem tra va goi ham addRole
+
+        if($request[1] = Role::getAllRoles())
+        {
+            return response()->json(['message' => 'Vai trò đã tồn tại!'], 400);
+        }
+        else
+        {
+            $role = Role::addRole($request->only(['name', 'description']));
+        }
 
         // Gán quyền nếu có
         if ($request->has('permissions')) {
@@ -36,24 +46,22 @@ class RoleController extends Controller
         ]);
     }
 
-    // ✅ Hiển thị chi tiết 1 vai trò
+    // Hiển thị chi tiết 1 vai trò
     public function show($id)
     {
         $role = Role::with('permissions')->findOrFail($id);
         return response()->json($role);
     }
 
-    // ✅ Cập nhật vai trò
+    // Cập nhật vai trò
     public function update(Request $request, $id)
     {
-        $role = Role::findOrFail($id);
-
         $request->validate([
-            'name' => 'required|max:255|unique:roles,name,' . $role->id,
+            'name' => 'required|max:255|unique:roles,name,' . $id,
             'description' => 'nullable|string|max:500'
         ]);
 
-        $role->update($request->only(['name', 'description']));
+        $role = Role::updateRole($id, $request->only(['name', 'description']));
 
         if ($request->has('permissions')) {
             $role->permissions()->sync($request->permissions);
@@ -65,12 +73,16 @@ class RoleController extends Controller
         ]);
     }
 
-    // ✅ Xóa vai trò
+    // Xóa vai trò
     public function destroy($id)
     {
-        $role = Role::findOrFail($id);
-        $role->delete();
-
-        return response()->json(['message' => 'Xóa vai trò thành công!']);
+        if($role = Role::deleteRole($id))
+        {
+            return response()->json(['message' => 'Xóa vai trò thành công!']);
+        }
+        else{
+            return response()->json(['message' => 'Xóa vai trò thất bại!'], 400);
+        }
     }
+
 }

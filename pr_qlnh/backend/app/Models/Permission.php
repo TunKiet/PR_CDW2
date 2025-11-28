@@ -15,4 +15,33 @@ class Permission extends Model
     {
         return $this->belongsToMany(Role::class, 'role_permission');
     }
+    // method
+    // get all permissions
+    public static function getAllPermissions()
+    {
+        return self::all();
+    }
+    // add permission
+    public static function addPermission(array $data)
+    {
+        return self::create($data);
+    }
+    // update permission
+    public static function updatePermission($id, array $data)
+    {
+        $permission = self::find($id);
+        if ($permission) {
+            $permission->update($data);
+            return $permission;
+        }
+    }
+    // delete permission
+    public static function deletePermission($id)
+    {
+        $permission = self::find($id);
+        if ($permission) {
+            return $permission->delete();
+        }
+    }
 }
+

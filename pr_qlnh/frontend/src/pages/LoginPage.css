@@ -281,3 +281,38 @@
   justify-content: space-between;
   align-items: center;
 }
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease forwards;
+}
+#left-me {
+  padding: 100px 20px 100px 40px;
+  border-radius: 20px 0 0 20px;
+}
+#btn-home {
+  background-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  color: white;
+  border-radius: 5px 0 5px 0;
+  padding: 10px 20px;
+  font-size: 30px;
+  font-weight: 500;
+  margin-left: 180px;
+}
+#btn-home:hover {
+  background: #2563eb;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+}
+#btn-home:active {
+  transform: scale(0.98);
+}

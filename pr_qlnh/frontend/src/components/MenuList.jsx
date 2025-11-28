@@ -1,91 +1,169 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Search } from "lucide-react";
+import SelectTableModal from "../components/Table/SelectTableModal";
 
-const MenuList = ({ onAddToCart, selectedCategory }) => {
+const MenuList = ({ 
+  selectedTable,
+  onSelectTable,
+  addOrIncrementItem,
+  tables,
+  tableStatus,
+  tableCarts      
+}) => {
+
+
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [menuItems, setMenuItems] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        const res = await axios.get("http://localhost:8000/api/menu-items");
-        setMenuItems(res.data);
-      } catch (err) {
-        console.error("Lỗi tải menu:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMenu();
+    axios.get("http://localhost:8000/api/categories").then((res) => {
+      const list = res.data?.data || [];
+      setCategories([{ category_id: "all", category_name: "Tất cả" }, ...list]);
+    });
   }, []);
 
-  // Lọc theo danh mục + tìm kiếm
-  const filteredItems = menuItems.filter((item) => {
-    const matchCategory =
-      selectedCategory === "Tất cả" ||
-      item.category?.category_name === selectedCategory;
-    const matchSearch = item.menu_item_name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    return matchCategory && matchSearch;
-  });
+  const loadMenu = async (pageNum = 1, category = selectedCategory) => {
+    setLoading(true);
+    const res = await axios.get("http://localhost:8000/api/menu-items", {
+      params: { page: pageNum, category_id: category },
+    });
 
-  // Khi đang tải dữ liệu
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-48 ml-64">
-        <p className="text-gray-500 animate-pulse text-lg">
-          Đang tải dữ liệu...
-        </p>
-      </div>
-    );
+    setMenuItems(res.data.data || []);
+    setLastPage(res.data.last_page);
+    setPage(res.data.current_page);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadMenu(1, selectedCategory);
+  }, [selectedCategory]);
+
+  const addToCart = (item) => {
+    if (!selectedTable) {
+      alert("⚠️ Vui lòng chọn bàn trước!");
+      return;
+    }
+    addOrIncrementItem(selectedTable.table_id, item);
+  };
 
   return (
-    <div className="ml-64 p-6 w-full min-h-screen bg-gray-50">
-      {/* 🔍 Thanh tìm kiếm */}
-      <div className="relative mb-5 w-full max-w-3xl mx-auto">
-        <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
-        <input
-          type="text"
-          placeholder="     Tìm kiếm món ăn, đồ uống..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white shadow-sm"
-        />
+    <div className="flex-1 ml-64 p-6">
+      <div className="bg-white rounded-2xl shadow-lg border px-5 py-4">
+
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Đơn hàng mới</h1>
+
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className={`px-4 py-2 rounded-lg text-white shadow transition
+            ${
+              selectedTable
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-indigo-600 hover:bg-indigo-700"
+            }`}
+          >
+            {selectedTable ? `${selectedTable.table_name}` : "Chọn bàn"}
+          </button>
+        </div>
+
+        {/* SEARCH */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+          <input
+            className="w-full pl-10 pr-4 py-2 border rounded-xl shadow-sm px-5 mb-3"
+            placeholder="Tìm món ăn..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* CATEGORY */}
+        <div className="flex gap-3 mb-6 flex-wrap">
+          {categories.map((c) => (
+            <button
+              key={c.category_id}
+              onClick={() => setSelectedCategory(c.category_id)}
+              className={`px-4 py-2 mb-3 rounded-full text-sm font-medium transition ${
+                selectedCategory === c.category_id
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              {c.category_name}
+            </button>
+          ))}
+        </div>
+
+        {/* MENU LIST */}
+        {loading ? (
+          <p className="text-center py-10 text-gray-500">Đang tải...</p>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5 mb-3">
+            {menuItems
+              .filter((i) =>
+                i.menu_item_name.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((item) => (
+                <div
+                  key={item.menu_item_id}
+                  onClick={() => addToCart(item)}
+                  className="p-2 bg-white border rounded-xl shadow hover:border-indigo-400 cursor-pointer transition"
+                >
+                  <img
+                    src={item.image_url}
+                    className="rounded-xl w-full h-36 object-cover mb-3"
+                  />
+                  <h5 className="font-semibold truncate">{item.menu_item_name}</h5>
+                  <p className="text-indigo-600 font-bold">
+                    {Number(item.price).toLocaleString()}đ
+                  </p>
+                </div>
+              ))}
+          </div>
+        )}
+
+        {/* PAGINATION */}
+        <div className="flex justify-center mt-6 gap-4">
+          <button
+            disabled={page <= 1}
+            onClick={() => loadMenu(page - 1)}
+            className="px-4 py-2 border rounded-lg disabled:opacity-50"
+          >
+            Trang trước
+          </button>
+
+          <button
+            disabled={page >= lastPage}
+            onClick={() => loadMenu(page + 1)}
+            className="px-4 py-2 border rounded-lg disabled:opacity-50"
+          >
+            Trang sau
+          </button>
+        </div>
       </div>
 
-      {/* 🍽️ Danh sách món */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5 px-2">
-        {filteredItems.length > 0 ? (
-          filteredItems.map((item) => (
-            <div
-              key={item.menu_item_id}
-              onClick={() => onAddToCart(item)}
-              className="bg-white hover:bg-indigo-50 cursor-pointer rounded-2xl p-4 shadow-sm border border-gray-200 hover:border-indigo-400 transition transform hover:-translate-y-1 hover:shadow-md"
-            >
-              {item.image_url && (
-                <img
-                  src={item.image_url}
-                  alt={item.menu_item_name}
-                  className="rounded-xl mb-3 w-full h-36 object-cover"
-                />
-              )}
-              <h3 className="font-semibold text-gray-800 truncate text-base">
-                {item.menu_item_name}
-              </h3>
-              <p className="text-indigo-600 font-semibold mt-1 text-sm">
-                {item.price.toLocaleString()}đ
-              </p>
-            </div>
-          ))
-        ) : (
-          <p className="text-gray-500 text-center col-span-full py-10">
-            Không tìm thấy món nào phù hợp.
-          </p>
-        )}
-      </div>
+      <SelectTableModal
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  onSelectTable={(table) => {
+    onSelectTable(table);
+    setIsModalOpen(false);
+  }}
+  selectedTable={selectedTable}
+  tableCarts={tableCarts}
+  tableStatus={tableStatus}
+/>
+
     </div>
   );
 };
