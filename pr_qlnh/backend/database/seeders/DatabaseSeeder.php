@@ -31,8 +31,8 @@ class DatabaseSeeder extends Seeder
             ReservationSeeder::class,
 
             // 5️⃣ Đơn hàng & chi tiết đơn hàng
+            // OrderDetailSeeder::class,
             OrderSeeder::class,
-            OrderDetailSeeder::class,
 
             // 6️⃣ Thanh toán (phụ thuộc orders)
             PaymentSeeder::class,

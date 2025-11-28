@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import "./Sales_Statistics_Dashboard.css";
 import Sidebar from "../../components/Sidebar";
-import { BarChart2, Users, Coffee, User, Info, Calendar, } from "lucide-react";
+import { BarChart2, Users, Coffee, User, Info, Calendar } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -17,7 +17,6 @@ import {
 
 // === API CONFIGURATION ===
 const API_BASE_URL = "http://127.0.0.1:8000/api/statistics";
-
 
 // === HELPER FUNCTIONS ===
 const formatCurrency = (amount) => {
