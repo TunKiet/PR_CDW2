@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, Users, Settings, Building, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import axios from 'axios';
@@ -38,7 +38,7 @@ const menuItems = [
   },
   { title: "Quản lý đơn online", icon: <ShoppingCart size={20} />, path: '/order-online' },
   { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
-  { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },
+  { title: "Hệ thống", icon: <Settings size={20} />, path: '/system-settings' },
   { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/restaurant-info' },
   { title: "Đăng xuất", icon: <LogOut size={20} />, action: "logout" }, // thêm action
 ];
@@ -47,7 +47,34 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [openSubMenu, setOpenSubMenu] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const submenuRefs = useRef({});
+
+  useEffect(() => {
+    // Lấy thông tin user từ localStorage
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setCurrentUser(user);
+      } catch (err) {
+        console.error('Lỗi parse user:', err);
+      }
+    }
+  }, []);
+
+  // Kiểm tra vai trò của user
+  const getUserRoles = () => {
+    try {
+      const rolesStr = localStorage.getItem('roles');
+      return rolesStr ? JSON.parse(rolesStr) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const userRoles = getUserRoles();
+  const isStaff = userRoles.includes('Staff') && !userRoles.includes('ADMIN');
 
   const isActive = (path) => location.pathname.startsWith(path);
   const isParentActive = (item) =>
@@ -70,17 +97,25 @@ const Sidebar = () => {
       console.error("Logout error:", err);
     } finally {
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("roles");
       navigate("/");
     }
   };
 
+  // Lấy tên hiển thị và chữ cái đầu
+  const displayName = currentUser?.full_name || currentUser?.username || 'Chưa có tên';
+  const initials = displayName === 'Chưa có tên' 
+    ? '?' 
+    : displayName.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
+
   return (
     <div className="w-64 h-screen bg-white border-r flex flex-col">
       <div className="flex items-center p-4 border-b">
-        <div className="bg-indigo-600 text-white w-10 h-10 flex items-center justify-center rounded-full font-semibold">
-          Ad
+        <div className="bg-indigo-600 text-white w-10 h-10 flex items-center justify-center rounded-full font-semibold text-sm">
+          {initials}
         </div>
-        <h1 className="ml-3 text-lg font-bold text-gray-800">Admin</h1>
+        <h1 className="ml-3 text-xs font-medium text-gray-800 truncate">{displayName}</h1>
       </div>
 
       <div className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -146,17 +181,28 @@ const Sidebar = () => {
                   </div>
                 </>
               ) : (
-                <Link
-                  to={item.path}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition
-                    ${isActive(item.path)
-                      ? "bg-indigo-100 text-indigo-700"
-                      : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                >
-                  {item.icon}
-                  <span>{item.title}</span>
-                </Link>
+                // Kiểm tra nếu là "Thiết lập nhà hàng" và user là Staff thì vô hiệu hóa
+                item.title === "Thiết lập nhà hàng" && isStaff ? (
+                  <div
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm opacity-50 cursor-not-allowed"
+                    title="Bạn không có quyền truy cập chức năng này"
+                  >
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </div>
+                ) : (
+                  <Link
+                    to={item.path}
+                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition
+                      ${isActive(item.path)
+                        ? "bg-indigo-100 text-indigo-700"
+                        : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                  >
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </Link>
+                )
               )}
             </div>
           );

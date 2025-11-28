@@ -10,7 +10,6 @@ import {
   addRole,
   updateRole,
   deleteRole,
-  searchRole,
 } from "../data/RoleData";
 
 const RoleManagementPage = () => {
@@ -80,27 +79,10 @@ const RoleManagementPage = () => {
   };
 
   // local filter OR server search by phone
-  const handleSearch = async (value) => {
+  const handleSearch = (value) => {
     setSearchTerm(value);
     const trimmed = value.trim();
-    // if looks like a phone (digits and length >= 6) then call API search
-    const digits = trimmed.replace(/\D/g, "");
-    if (digits.length >= 6) {
-      try {
-        const res = await searchRole(digits);
-        const data = res?.data ?? res;
-        const item = data?.data ?? data;
-        if (item && !Array.isArray(item)) {
-          setRole([item]);
-          return;
-        }
-      } catch (err) {
-        // if not found, just fallback to client filtering
-        // console.warn("Search API failed, fallback to client filter", err);
-      }
-    }
 
-    // fallback client-side filter on loaded Role
     if (!trimmed) {
       loadRole();
     } else {
@@ -109,8 +91,8 @@ const RoleManagementPage = () => {
         prev.filter(
           (c) =>
             (c.name || "").toLowerCase().includes(lower) ||
-            (c.phone || "").includes(trimmed) ||
-            (String(c.Role_id || c.id || "") || "").includes(trimmed)
+            (c.description || "").toLowerCase().includes(lower) ||
+            (String(c.id || "") || "").includes(trimmed)
         )
       );
     }

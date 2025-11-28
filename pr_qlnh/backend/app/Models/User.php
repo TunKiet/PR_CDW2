@@ -34,6 +34,7 @@ class User extends Authenticatable implements JWTSubject
         'full_name',
         'phone',
         'status',
+        'two_factor_enabled',
     ];
 
     // Ẩn password khi trả về JSON
@@ -119,7 +120,7 @@ class User extends Authenticatable implements JWTSubject
     public static function addUser($data)
     {
         return self::create([
-            'full_name' => $data['username'] ?? null,
+            'full_name' => $data['full_name'] ?? null,
             'email' => $data['email'],
             'password' => $data['password'],
             'phone' => $data['phone'],

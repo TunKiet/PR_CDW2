@@ -77,6 +77,7 @@ Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAll
 */
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/verify-login-otp', [AuthController::class, 'verifyLoginOTP']);
 
 Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
@@ -89,17 +90,24 @@ Route::middleware(['jwt.auth'])->group(function () {
 | 🛡️ Roles & Permissions
 |--------------------------------------------------------------------------
 */
-Route::middleware(['jwt.auth'])->group(function () {
-
-
-    Route::apiResource('permissions', PermissionController::class);
+Route::prefix('roles')->group(function () {
+    Route::get('/', [RoleController::class, 'index']);
+    Route::get('/{id}', [RoleController::class, 'show']);
+    Route::post('/', [RoleController::class, 'store']);
+    Route::put('/{id}', [RoleController::class, 'update']);
+    Route::delete('/{id}', [RoleController::class, 'destroy']);
+    Route::post('/{id}/permissions', [RoleController::class, 'assignPermissions']);
+    Route::get('/{id}/users', [RoleController::class, 'getUsersByRole']);
 });
- Route::prefix('roles')->group(function () {
-        Route::get('/', [RoleController::class, 'index']);
-        Route::get('/{id}', [RoleController::class, 'show']);
-        Route::post('/', [RoleController::class, 'store']);
-        Route::delete('/{id}', [RoleController::class, 'destroy']);
-    });
+
+Route::prefix('permissions')->group(function () {
+    Route::get('/', [PermissionController::class, 'index']);
+    Route::get('/{id}', [PermissionController::class, 'show']);
+    Route::post('/', [PermissionController::class, 'store']);
+    Route::put('/{id}', [PermissionController::class, 'update']);
+    Route::delete('/{id}', [PermissionController::class, 'destroy']);
+    Route::get('/{id}/roles', [PermissionController::class, 'getRolesByPermission']);
+});
 /**
  * User Management
  */
@@ -107,6 +115,7 @@ Route::prefix('users')->group(function () {
     Route::get('/', [UserController::class, 'index']);
     Route::get('/{id}', [UserController::class, 'show']);
     Route::post('/', [UserController::class, 'store']);
+    Route::put('/{id}', [UserController::class, 'update']);
     Route::delete('/del/{id}', [UserController::class, 'destroy']);
     Route::get('/role-names/{id}', [UserController::class, 'getRoleNames']);
 });
@@ -119,6 +128,18 @@ Route::prefix('users')->group(function () {
 Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
 Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
 Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);
+
+/*
+|--------------------------------------------------------------------------
+| 🔒 Two-Factor Authentication (2FA)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('2fa')->group(function () {
+    Route::post('/send-otp/{userId}', [App\Http\Controllers\TwoFactorController::class, 'sendOTP']);
+    Route::post('/verify-otp/{userId}', [App\Http\Controllers\TwoFactorController::class, 'verifyOTP']);
+    Route::post('/disable/{userId}', [App\Http\Controllers\TwoFactorController::class, 'disable2FA']);
+    Route::get('/status/{userId}', [App\Http\Controllers\TwoFactorController::class, 'check2FAStatus']);
+});
 
 
 /*
