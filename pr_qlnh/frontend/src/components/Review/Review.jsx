@@ -54,9 +54,7 @@ const Review = () => {
             setLoading(true);
             try {
                 const res = await axios.get(`${endPoint}/reviews/item/${menuItemId}`);
-                setReviews(res.data.data);
-
-                console.log(res.data.data);
+                setReviews(res.data.reviews);
                 setTotal(res.data.total);
                 setAverage(res.data.average);
                 setRatingCounts(res.data.rating_counts);

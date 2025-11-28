@@ -11,7 +11,7 @@ class ReviewController extends Controller
 {
     public function getDataReview($menuItemId)
     {
-        $reviews = Review::getReviewByMenuItemId($menuItemId, 5);
+        $reviews = Review::getReviewByMenuItemId($menuItemId);
 
         $totalReviews = Review::totalReviewOfOneMenuItem($menuItemId);
 

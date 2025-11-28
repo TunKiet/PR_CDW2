@@ -51,13 +51,13 @@ class Review extends Model
 
     //Input menuItemId, limit = 5 review
     //Get review with user, cache Redis
-    public static function getReviewByMenuItemId($menuItemId, $limit = 5)
+    public static function getReviewByMenuItemId($menuItemId)
     {
         return self::with(['user', 'replies'])
             ->where('menu_item_id', $menuItemId)
-            ->where('status', 'pending')
+            ->where('status', 'approved')
             ->orderBy('created_at', 'desc')
-            ->take($limit)
+            
             ->get();
     }
 
