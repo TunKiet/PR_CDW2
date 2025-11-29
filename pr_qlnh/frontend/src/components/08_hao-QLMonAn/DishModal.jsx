@@ -298,7 +298,7 @@ export default function DishModal({
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm dish-modal-backdrop-blur">
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[1000] flex items-center justify-center p-4 backdrop-blur-md dish-modal-backdrop-blur">
       <div className="bg-white p-6 rounded-xl w-full max-w-xl shadow-2xl transform transition-all duration-300 max-h-[90vh] flex flex-col">
         <h3 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-3 flex-shrink-0">
           {title}

@@ -18,7 +18,7 @@ class MenuItemController extends Controller
     }
 
     // Pagination backend
-    $items = $query->paginate(12);
+    $items = $query->paginate(perPage: 12);
 
     return response()->json([
         'success' => true,

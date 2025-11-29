@@ -63,6 +63,30 @@ class PromotionController extends Controller
     public function update(Request $req, string $id)
     {
         $promo = Promotion::findOrFail($id);
+        // ✅ TC-002: KIỂM TRA TỒN TẠI
+        if (!$promo) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ưu đãi không tồn tại (có thể đã bị xóa)!'
+            ], 404);
+        }
+
+        // ✅ TC-001: KIỂM TRA CONFLICT
+    $clientUpdatedAt = $req->input('updated_at');
+    
+    if ($clientUpdatedAt) {
+        $dbTimestamp = $promo->updated_at->format('Y-m-d H:i:s');
+        $clientTimestamp = date('Y-m-d H:i:s', strtotime($clientUpdatedAt));
+        
+        if ($clientTimestamp !== $dbTimestamp) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Dữ liệu đã bị thay đổi bởi người dùng khác. Vui lòng tải lại trang!',
+                'error_code' => 'DATA_CONFLICT',
+                'current_data' => $promo,
+            ], 409);
+        }
+    }
 
         $validated = $req->validate([
             // 'sometimes' chỉ kiểm tra nếu trường này có mặt trong request
@@ -76,11 +100,15 @@ class PromotionController extends Controller
             'max_uses' => 'nullable|integer|min:0',
             'status' => ['sometimes', 'required', 'string', 'max:30']
         ]);
-
+        unset($validated['updated_at']);
         $promo->update($validated);
 
         // Trả về đối tượng đã cập nhật
-        return response()->json($promo);
+        return response()->json([
+        'success' => true,
+        'message' => 'Cập nhật ưu đãi thành công!',
+        'data' => $promo->fresh()
+    ]);
     }
 
     /**
