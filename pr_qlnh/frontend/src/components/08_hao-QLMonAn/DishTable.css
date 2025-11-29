@@ -77,19 +77,13 @@
     border: none;
     padding: 0;
 }
-
+/* ✅ CSS MỚI CHO NÚT ĐÓNG */
 .dish-modal-close-btn:hover {
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(2px);
-    z-index: 1000;
-    position: fixed;
-    inset: 0;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-    
-    /* Mặc định là ẩn */
-    display: none;
+    color: #374151; /* Gray 700 - Đậm hơn khi hover */
+}
+
+.dish-modal-close-btn:active {
+    color: #1f2937; /* Gray 800 - Đậm hơn nữa khi click */
 }
 
 .dish-modal-header {
