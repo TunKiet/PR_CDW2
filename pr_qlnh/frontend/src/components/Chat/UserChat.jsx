@@ -144,6 +144,7 @@ const UserChat = () => {
             notify.dismiss();
 
             await axios.delete(`${endPoint}/delete-message/${messageId}`);
+            setMessages(prev => prev.filter(msg => msg.message_id !== messageId));
             notify.success('Xóa tin nhắn thành công');
         } catch (error) {
             notify.error('Xóa tin nhắn không hợp lệ. Vui lòng tải lại trang');
@@ -187,6 +188,7 @@ const UserChat = () => {
                                     key={`${msg.conversation_id}-${msg.message_id}`}
                                     content={msg.message}
                                     time={msg.created_at}
+                                    messageId={msg.message_id}
                                     handleDelete={handleDelete}
                                 />
                             ) : (
@@ -194,6 +196,8 @@ const UserChat = () => {
                                     key={`${msg.conversation_id}-${msg.message_id}`}
                                     content={msg.message}
                                     time={msg.created_at}
+                                    messageId={msg.message_id}
+                                    handleDelete={handleDelete}
                                 />
                             )
                         )}

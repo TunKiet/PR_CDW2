@@ -22,6 +22,7 @@ const AdminChat = () => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const messagesEndRef = useRef(null);
+    const [isSending, setIsSending] = useState(false);
     const adminId = 101;
 
     // Load danh sách conversations
@@ -82,6 +83,13 @@ const AdminChat = () => {
             return;
         }
 
+        if (isSending) {
+            console.log("⚠️ Message is being sent, please wait...");
+            return;
+        }
+
+        setIsSending(true);
+
         console.log("📤 Sending message:", {
             conversation_id: selectedConversation.conversation_id,
             user_id: adminId,
@@ -110,7 +118,8 @@ const AdminChat = () => {
 
                 setInput('');
             })
-            .catch(err => console.error("❌ Error sending message:", err));
+            .catch(err => console.error("❌ Error sending message:", err))
+            .finally(() => setIsSending(false));
     };
 
     const handleEmojiClick = (emojiData) => {
@@ -248,7 +257,7 @@ const AdminChat = () => {
                                                 <CiPaperplane
                                                     onClick={sendMessage}
                                                     size={23}
-                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600"
+                                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600`}
                                                 />
                                             </div>
                                         </div>

@@ -1,20 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MdMoreVert } from "react-icons/md";
 import Dialog from '@mui/material/Dialog';
 
-const Sender = ({ content, time, handleDelete }) => {
+const Sender = ({ content, time, messageId, handleDelete }) => {
     const [showMenu, setShowMenu] = useState(false);
     const formattedTime = new Date(time).toLocaleTimeString();
+    const menuRef = useRef(null);
 
     const handleMenuClick = (action) => {
-        console.log(`Chọn: ${action}`);
         setShowMenu(false);
+        if (action === 'Xóa') {
+            handleDelete(messageId);
+        }
     };
 
-    
+    // Đóng menu khi click ra ngoài
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setShowMenu(false);
+            }
+        };
 
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
     return (
-        <div className="box-content relative max-w-[75%] bg-blue-200 rounded-md p-2 mb-2 inline-block wrap-break-word self-end">
+        <div className="box-content relative max-w-[75%] bg-blue-200! rounded-md p-2 mb-2 inline-block wrap-break-word self-end">
             <div className="content text-base leading-relaxed">{content}</div>
             <div className="time text-xs text-gray-500 mt-1 text-left">{formattedTime}</div>
 
@@ -26,13 +40,7 @@ const Sender = ({ content, time, handleDelete }) => {
             </div>
 
             {showMenu && (
-                <div className="absolute -left-30 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-md py-1 w-28 z-10">
-                    <div
-                        className="px-3 py-1 hover:bg-gray-100 cursor-pointer"
-                        onClick={() => handleMenuClick('Sửa')}
-                    >
-                        Sửa
-                    </div>
+                <div ref={menuRef} className="absolute -left-30 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-md py-1 w-28 z-10">
                     <div
                         className="px-3 py-1 hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleMenuClick('Xóa')}

@@ -863,3 +863,7 @@
 [2025-11-29 01:21:02] local.INFO: 🟢 Event MessageSent created: {"conversation_id":101,"message_id":56,"user_id":101,"message":"gì vậy"} 
 [2025-11-29 01:21:02] local.INFO: Broadcasting as {"event":"message"} 
 [2025-11-29 01:21:02] local.INFO: 🟢 Broadcasting on channel: conversation.101  
+[2025-11-29 03:56:34] local.INFO: ▶ [API] sendMessage RECEIVED {"conversation_id":101,"user_id":102,"sender_type":"user","message":"alo😀"} 
+[2025-11-29 03:56:34] local.INFO: 🟢 Event MessageSent created: {"conversation_id":101,"message_id":57,"user_id":102,"message":"alo😀"} 
+[2025-11-29 03:56:34] local.INFO: Broadcasting as {"event":"message"} 
+[2025-11-29 03:56:34] local.INFO: 🟢 Broadcasting on channel: conversation.101  
