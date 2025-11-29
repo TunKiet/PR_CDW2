@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx (ĐÃ CẬP NHẬT để tạo hiệu ứng ĐỘNG)
 import React, { useState, useEffect, useRef } from 'react'; // IMPORT useRef
 import { Link, useLocation } from 'react-router-dom';
-import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, User, Users, Settings, Building, ChevronDown, ChevronUp } from "lucide-react";
+import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, User, Users, Settings, Building, ChevronDown, ChevronUp, Clock } from "lucide-react";
 
 const menuItems = [
    { title: "Đơn hàng mới", icon: <ClipboardList size={20} />, path: '/order-page' },
@@ -23,6 +23,16 @@ const menuItems = [
     { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
     { title: "Nhân viên", icon: <User size={20} />, path: '/staff' },
     { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },
+    { 
+      title: "Chấm công", 
+      icon: <Clock size={20} />, 
+      path: '/attendance-placeholder', 
+      isParent: true,
+      subItems: [
+        { title: "Chấm công nhân viên", path: '/attendance' },
+        { title: "Quản lý chấm công", path: '/attendance-management' },
+      ] 
+    },
     { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },
     { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/restaurant-info' },
 ];

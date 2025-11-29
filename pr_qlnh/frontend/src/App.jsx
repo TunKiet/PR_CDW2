@@ -44,6 +44,8 @@ import UserChat from "./components/Chat/UserChat";
 import AdminChat from "./components/Chat/AdminChat";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
 import OrderOnlineAdmin from "./pages/OrderOnlineAdmin";
+import AttendancePage from "./pages/AttendancePage";
+import AttendanceManagementPage from "./pages/AttendanceManagementPage";
 
 function App() {
   return (
@@ -162,10 +164,25 @@ function App() {
           }
         />
 
+<<<<<<< HEAD
         <Route path="/customers" element={<CustomerManagementPage />} />
 
         {/* Thêm các route khác nếu có: /invoices, /menu, ... */}
         {/* <Route path="/invoices" element={<InvoicePage />} /> */}
+=======
+        {/* ROUTE: Trang Chấm Công */}
+        <Route path="/attendance" element={<AttendancePage />} />
+        
+        {/* ROUTE: Trang Quản Lý Chấm Công */}
+        <Route
+          path="/attendance-management"
+          element={
+            <ProtectedRoute>
+              <AttendanceManagementPage />
+            </ProtectedRoute>
+          }
+        />
+>>>>>>> 18-kiet/RE-Role
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
         {/* <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} /> */}

@@ -139,7 +139,7 @@ export default function LoginPage() {
       alert(res.data.message);
 
       // Điều hướng
-      if (roles.includes("ADMIN") || roles.includes("staff")) {
+      if (roles.includes("ADMIN") || roles.includes("STAFF")) {
         navigate("/admin/dashboard");
       } else {
         navigate("/user/homepage");

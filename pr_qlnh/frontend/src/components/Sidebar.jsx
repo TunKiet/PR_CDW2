@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, Users, Settings, Building, ChevronDown, ChevronUp, LogOut } from "lucide-react";
+import { ClipboardList, BarChart2, Clock, FileText, Calendar, ShoppingCart, Menu, Zap, Users, Settings, Building, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import axios from 'axios';
 
 const menuItems = [
@@ -8,6 +8,16 @@ const menuItems = [
   { title: "Thống kê", icon: <BarChart2 size={20} />, path: '/analytics' },
   { title: "Hóa đơn", icon: <FileText size={20} />, path: '/order-management' },
   { title: "Đặt bàn", icon: <Calendar size={20} />, path: '/tables' },
+  { 
+      title: "Chấm công", 
+      icon: <Clock size={20} />, 
+      path: '/attendance-placeholder', 
+      isParent: true,
+      subItems: [
+        { title: "Chấm công nhân viên", path: '/attendance' },
+        { title: "Quản lý chấm công", path: '/attendance-management' },
+      ] 
+    },
   {
     title: "Thực đơn",
     icon: <Menu size={20} />,

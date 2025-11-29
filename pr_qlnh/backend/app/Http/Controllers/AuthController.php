@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\LoginLog;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 
@@ -66,8 +67,15 @@ class AuthController extends Controller
 
         // Lấy user
         $user = User::getUserbyEmailOrPhone($loginField, $identifier);
+        
+        // Lấy IP address
+        $ipAddress = $request->ip();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            // Lưu log đăng nhập thất bại nếu tìm thấy user
+            if ($user) {
+                LoginLog::createLog($user->user_id, $ipAddress, 'failed');
+            }
             return response()->json(['message' => 'Email/SĐT hoặc mật khẩu không đúng!'], 401);
         }
 
@@ -110,6 +118,9 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             return response()->json(['message' => 'Không thể tạo token!'], 500);
         }
+
+        // Lưu log đăng nhập thành công
+        LoginLog::createLog($user->user_id, $ipAddress, 'success');
 
         // Lấy danh sách role và permission
         $roles = $user->roles()->pluck('name');
@@ -160,6 +171,10 @@ class AuthController extends Controller
             return response()->json(['message' => 'Không thể tạo token!'], 500);
         }
 
+        // Lưu log đăng nhập thành công (với 2FA)
+        $ipAddress = $request->ip();
+        LoginLog::createLog($user->user_id, $ipAddress, 'success');
+
         // Lấy danh sách role và permission
         $roles = $user->roles()->pluck('name');
         $permissions = $user->getAllPermissions();
@@ -196,9 +211,15 @@ class AuthController extends Controller
     /**
      * Đăng xuất (hủy token)
      */
-    public function logout()
+    public function logout(Request $request)
     {
         try {
+            $user = JWTAuth::parseToken()->authenticate();
+            $ipAddress = $request->ip();
+            
+            // Lưu log đăng xuất
+            LoginLog::createLog($user->user_id, $ipAddress, 'logout');
+            
             JWTAuth::invalidate(JWTAuth::getToken());
             return response()->json(['message' => 'Đăng xuất thành công!']);
         } catch (JWTException $e) {

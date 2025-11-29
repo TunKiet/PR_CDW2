@@ -1,10 +1,11 @@
 // src/components/SystemSettings.jsx
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
-import { User, Lock, Shield, Settings } from "lucide-react";
+import { User, Lock, Shield, Settings, History } from "lucide-react";
 import "../pages/Dashboard/Sales_Statistics_Dashboard.css";
 import ProfileSection from "./Settings/ProfileSection";
 import SecuritySection from "./Settings/SecuritySection";
+import ActivityLogSection from "./Settings/ActivityLogSection";
 
 const SystemSettings = () => {
   const [activeTab, setActiveTab] = useState("profile");
@@ -39,6 +40,12 @@ const SystemSettings = () => {
       name: "Mật khẩu & Bảo mật",
       icon: Lock,
       description: "Thay đổi mật khẩu và cài đặt xác thực 2 yếu tố",
+    },
+    {
+      id: "activity",
+      name: "Nhật ký hoạt động",
+      icon: History,
+      description: "Xem lịch sử đăng nhập và hoạt động tài khoản",
     },
   ];
 
@@ -132,6 +139,9 @@ const SystemSettings = () => {
                   )}
                   {activeTab === "security" && (
                     <SecuritySection user={currentUser} />
+                  )}
+                  {activeTab === "activity" && (
+                    <ActivityLogSection user={currentUser} />
                   )}
                 </div>
               </div>
