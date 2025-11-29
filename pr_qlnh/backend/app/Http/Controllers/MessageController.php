@@ -71,4 +71,20 @@ class MessageController extends Controller
         return response()->json(['status' => 'marked']);
     }
 
+    public function delete($messageId)
+    {
+        $delete = Message::deleteMessage($messageId);
+
+        if ($delete) {
+            return response()->json([
+                'data' => true,
+                'message' => 'Xóa thành công'
+            ]);
+        }
+
+        return response()->json([
+            'data' => false,
+            'message' => 'Xóa không hợp lệ'
+        ], 404);
+    }
 }

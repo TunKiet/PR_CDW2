@@ -6,8 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import "react-toastify/dist/ReactToastify.css";
 // import React from 'react'
 import "./App.css";
 import MenuList from "./components/MenuList";
@@ -49,7 +48,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/" element={<LoginPage />} />
         <Route path="/dish-status-management" element={<DishStatusManagement />} />
         <Route path="/category-manager" element={<CategoryManager />} />

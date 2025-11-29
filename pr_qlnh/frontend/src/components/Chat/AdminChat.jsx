@@ -22,7 +22,7 @@ const AdminChat = () => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const messagesEndRef = useRef(null);
-    const adminId = 1;
+    const adminId = 101;
 
     // Load danh sách conversations
     useEffect(() => {

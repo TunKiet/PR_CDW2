@@ -36,6 +36,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Models\Ingredient;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ReviewReplyController;
 use App\Models\Review;
@@ -242,6 +243,10 @@ Route::prefix('reply')->group(function () {
     Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);
     Route::patch('/{replyId}/approve', [ReviewReplyController::class, 'approved']);
 });
+Route::post('/create-conversation', [ConversationController::class, 'createConversation']);
+Route::delete('/delete-message/{messageId}', [MessageController::class, 'delete']);
+
+
 
 /*
 |--------------------------------------------------------------------------
