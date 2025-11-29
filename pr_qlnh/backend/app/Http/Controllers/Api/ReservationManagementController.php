@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ReservationManagementController extends Controller
 {
@@ -75,9 +76,40 @@ class ReservationManagementController extends Controller
             'status' => 'required|in:Pending,Confirmed,Completed,Cancelled'
         ]);
 
-        $item = Reservation::findOrFail($id);
+        $item = Reservation::with('user')->findOrFail($id);
+        $oldStatus = $item->status;  
         $item->status = $request->status;
         $item->save();
+
+        // ============================
+        // Gửi email khi XÁC NHẬN đơn
+        // ============================
+        if ($request->status === "Confirmed" && $item->user && $item->user->email) {
+
+            $email = $item->user->email;
+            $username = $item->user->username;
+            $reservationId = $item->reservation_id;
+
+            Mail::send([], [], function ($message) use ($email, $username, $reservationId) {
+                $message->to($email)
+                    ->subject("Đơn đặt bàn #$reservationId đã được xác nhận")
+                    ->html("
+                        <div style='font-family: Arial, sans-serif; padding: 20px'>
+                            <h2 style='color:#2563eb;'>Xin chào $username!</h2>
+                            <p>Đơn đặt bàn của bạn đã được <strong>xác nhận thành công</strong>.</p>
+
+                            <p>Cảm ơn bạn đã đặt bàn tại nhà hàng của chúng tôi.</p>
+
+                            <p>Mã đơn đặt bàn: <strong>$reservationId</strong></p>
+
+                            <p style='margin-top: 20px;'>
+                                Trân trọng!<br>
+                                <strong>Nhà hàng của bạn</strong>
+                            </p>
+                        </div>
+                    ");
+            });
+        }
 
         return response()->json([
             "message" => "Cập nhật trạng thái thành công.",

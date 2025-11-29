@@ -1,18 +1,8 @@
-// src/pages/ReservationCenter/HistoryPanel.jsx
-import React from "react";
-import { Search as SearchIcon } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import axiosClient from "../../api/axiosClient";
 
-/**
- * HistoryPanel
- * Props:
- *  - filteredReservations: array
- *  - searchTerm,setSearchTerm,statusFilter,setStatusFilter,dateFilter,setDateFilter
- *
- * Pure UI.
- */
-
-export default function HistoryPanel({
-  filteredReservations,
+export default function HistoryReservations({
   searchTerm,
   setSearchTerm,
   statusFilter,
@@ -20,88 +10,221 @@ export default function HistoryPanel({
   dateFilter,
   setDateFilter,
 }) {
-  return (
-    <section className="bg-white p-6 rounded-xl shadow-inner min-h-[420px] border border-gray-300">
-      <h2 className="text-xl font-semibold mb-4 text-gray-700">Lịch Sử Đặt Bàn (Đã Hủy & Hoàn Tất)</h2>
+  const [rawData, setRawData] = useState([]);
+  const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-      <div className="flex flex-wrap md:flex-nowrap gap-4 mb-6">
-        <div className="flex-grow relative">
-          <SearchIcon className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
+  // tooltip note khi click
+  const [openedNoteId, setOpenedNoteId] = useState(null);
+
+  // ================================================
+  // LOAD API
+  // ================================================
+  const loadReservations = async () => {
+    setLoading(true);
+
+    try {
+      const res = await axiosClient.get("/reservation-management", {
+        params: {
+          search: searchTerm,
+          date: dateFilter,
+          per_page: 200,
+        },
+      });
+
+      const data = res.data.data.data || [];
+      setRawData(data);
+
+    } catch (err) {
+      console.error("Lỗi tải lịch sử:", err);
+    }
+
+    setLoading(false);
+  };
+
+  // gọi API nếu search/date thay đổi
+  useEffect(() => {
+    const t = setTimeout(loadReservations, 300);
+    return () => clearTimeout(t);
+  }, [searchTerm, dateFilter]);
+
+  // ================================================
+  // FILTER FE: Lịch sử = Completed + Cancelled
+  // ================================================
+  useEffect(() => {
+    let result = rawData.map(item => ({
+      ...item,
+      status: item.status?.toLowerCase(),
+    }));
+
+    result = result.filter(item =>
+      ["completed", "cancelled"].includes(item.status)
+    );
+
+    if (statusFilter !== "All") {
+      result = result.filter(
+        item => item.status === statusFilter.toLowerCase()
+      );
+    }
+
+    setReservations(result);
+  }, [rawData, statusFilter]);
+
+
+  // ================================================
+  // UI
+  // ================================================
+  return (
+    <section className="bg-white p-6 rounded-xl shadow-inner border border-gray-300">
+
+      <h2 className="text-xl font-semibold mb-4 text-gray-700">
+        Lịch sử đặt bàn
+      </h2>
+
+      {/* FILTER */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+        {/* SEARCH */}
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
           <input
-            type="text"
-            placeholder="Tìm kiếm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg"
+            className="pl-10 pr-4 w-full border rounded-lg py-2 focus:ring-2 focus:ring-indigo-500"
+            placeholder="Tìm kiếm..."
           />
         </div>
 
-        <div className="w-full md:w-56">
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="w-full py-2.5 px-3 border border-gray-300 bg-white rounded-lg">
-            <option value="All">Lọc theo Trạng Thái</option>
-            <option value="Completed">Hoàn Tất</option>
-            <option value="Cancelled">Đã Hủy</option>
-            <option value="Pending">Chờ Xử Lý</option>
-            <option value="Confirmed">Đã Xác Nhận</option>
-          </select>
-        </div>
+        {/* STATUS */}
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="border rounded-lg px-3 py-2 w-full bg-white"
+        >
+          <option value="All">Tất cả trạng thái</option>
+          <option value="Completed">Hoàn tất</option>
+          <option value="Cancelled">Đã huỷ</option>
+        </select>
 
-        <div className="w-full md:w-56">
-          <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="w-full py-2.5 px-3 border border-gray-300 rounded-lg" />
-        </div>
+        {/* DATE */}
+        <input
+          type="date"
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="border rounded-lg px-3 py-2 w-full bg-white"
+        />
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-md">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+
+      {/* TABLE */}
+      <div className="border rounded-xl overflow-auto shadow-sm">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-50 text-gray-600">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã ĐB</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Khách Hàng</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bàn & Số Lượng</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thời Gian</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng Thái</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ghi Chú</th>
+              <th className="px-4 py-3 text-left">Mã</th>
+              <th className="px-4 py-3 text-left">Khách hàng</th>
+              <th className="px-4 py-3 text-left">Bàn & số lượng</th>
+              <th className="px-4 py-3 text-left">Thời gian</th>
+              <th className="px-4 py-3 text-left">Trạng thái</th>
+              <th className="px-4 py-3 text-center">Ghi chú</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-          {filteredReservations.length === 0 ? (
-            <tr>
-              <td colSpan="6" className="px-6 py-4 text-center text-gray-500 italic">Không có lịch sử</td>
-            </tr>
-          ) : (
-            filteredReservations.map(item => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{item.id}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                  <div className="font-medium">{item.customer}</div>
-                  <div className="text-xs text-gray-500">{item.phone}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <span className="font-mono text-indigo-600">{item.tableId}</span> - {item.pax} Khách
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.time} ({item.date.split('-').reverse().join('/')})</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${item.status === "Completed" ? "bg-gray-200 text-gray-800" : item.status === "Cancelled" ? "bg-red-50 text-red-800" : "bg-gray-100 text-gray-800"}`}>
-                    {item.status === "Completed" ? "Hoàn Tất" : item.status === "Cancelled" ? "Đã Hủy" : item.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 italic">
-                  {item.status === "Cancelled" ? "Khách hàng hủy" : item.status === "Completed" ? "Đã thanh toán" : ""}
+
+          <tbody>
+            {loading && (
+              <tr>
+                <td colSpan="6" className="text-center py-6 text-gray-500">
+                  Đang tải dữ liệu...
                 </td>
               </tr>
-            ))
-          )}
+            )}
+
+            {!loading && reservations.length === 0 && (
+              <tr>
+                <td colSpan="6" className="text-center py-6 text-gray-500">
+                  Không có lịch sử đặt bàn
+                </td>
+              </tr>
+            )}
+
+            {!loading &&
+              reservations.map((item) => (
+                <tr
+                  key={item.reservation_id}
+                  className="border-t hover:bg-gray-50 relative cursor-pointer"
+                  onClick={() =>
+                    setOpenedNoteId(
+                      openedNoteId === item.reservation_id
+                        ? null
+                        : item.reservation_id
+                    )
+                  }
+                >
+
+                  {/* NOTE POPUP */}
+                  {item.note && openedNoteId === item.reservation_id && (
+                    <div
+                      className="
+                        absolute left-1/2 -top-2 -translate-x-1/2 -translate-y-full
+                        bg-black text-white text-xs px-3 py-2 rounded shadow-lg
+                        z-50 w-max max-w-xs
+                      "
+                    >
+                      {item.note}
+                    </div>
+                  )}
+
+                  {/* Mã */}
+                  <td className="px-4 py-3">{item.reservation_id}</td>
+
+                  {/* Khách */}
+                  <td className="px-4 py-3">
+                    <div className="font-medium">{item.user?.username}</div>
+                    <div className="text-xs text-gray-500">{item.user?.phone}</div>
+                  </td>
+
+                  {/* Bàn */}
+                  <td className="px-4 py-3">
+                    <span className="text-indigo-600 font-medium">
+                      {item.table?.table_name || item.table_id}
+                    </span>
+                    {" – "}
+                    <span className="text-gray-700">{item.num_guests} Khách</span>
+                  </td>
+
+                  {/* Thời gian */}
+                  <td className="px-4 py-3">
+                    {item.reservation_time} ({item.reservation_date})
+                  </td>
+
+                  {/* Trạng thái */}
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                        item.status === "completed"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </td>
+
+                  {/* Ghi chú (nút xem ghi chú) */}
+                  <td className="px-4 py-3 text-center">
+                    {item.note ? (
+                      <button className="text-indigo-600 underline text-sm">
+                        Xem ghi chú
+                      </button>
+                    ) : (
+                      <span className="text-gray-400 text-sm">Không có</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+
           </tbody>
         </table>
-      </div>
-
-      <div className="mt-6 flex justify-between items-center text-sm text-gray-600">
-        <span>Tìm thấy {filteredReservations.length} đơn</span>
-        <div className="space-x-2">
-          <button className="px-3 py-1 border rounded-lg bg-gray-100 text-gray-500">Trước</button>
-          <span className="px-3 py-1 border rounded-lg bg-indigo-50 text-indigo-600">1</span>
-          <button className="px-3 py-1 border rounded-lg bg-white hover:bg-gray-50 disabled:cursor-not-allowed" disabled>Tiếp</button>
-        </div>
       </div>
     </section>
   );

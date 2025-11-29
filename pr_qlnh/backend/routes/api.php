@@ -137,6 +137,8 @@ Route::prefix('reservation-management')->group(function () {
 
     Route::delete('/{id}', [ReservationManagementController::class, 'destroy']);          // xóa đơn
 });
+Route::get('/floorplan', [TableController::class, 'floorplan']);
+
 //login mới được đặt bàn
 //Route::middleware('auth:sanctum')->post('/reservations', [ReservationController::class, 'store']);
 
