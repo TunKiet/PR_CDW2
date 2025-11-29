@@ -295,12 +295,14 @@ export default function DishCRUDTable() {
   // 4. LOGIC MODAL
   // =========================================================
 
-  const handleAddDish = () => {
+  const handleAddDish = async () => {
+    await fetchCategories();
     setEditingDish(null);
     setIsEditModalOpen(true);
   };
 
-  const handleEditDish = (dish) => {
+  const handleEditDish = async (dish) => {
+    await fetchCategories();
     setEditingDish(dish);
     setIsEditModalOpen(true);
   };

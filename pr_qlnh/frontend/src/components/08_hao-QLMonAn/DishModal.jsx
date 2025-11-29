@@ -107,12 +107,18 @@ export default function DishModal({
         categories && categories.length > 0
           ? String(categories[0].category_id)
           : "";
+
+      const validCategoryIds = categories.map((cat) => String(cat.category_id));
+      const safeCategory = validCategoryIds.includes(defaultCategory)
+        ? defaultCategory
+        : validCategoryIds[0] || "";
+
       if (isMounted) {
         setFormData({
           id: "",
           name: "",
           price: 0,
-          categoryKey: defaultCategory,
+          categoryKey: safeCategory,
           statusKey: "active",
           description: "",
           image: "",
@@ -141,6 +147,24 @@ export default function DishModal({
       if (id === "price") {
         finalValue = parseInt(value) >= 0 ? parseInt(value) : 0;
       }
+      if (id === "categoryKey") {
+        const validCategoryIds = categories.map((cat) =>
+          String(cat.category_id)
+        );
+        if (!validCategoryIds.includes(String(value))) {
+          console.warn("⚠️ Category không hợp lệ, bỏ qua!");
+          return; // Không cho phép set giá trị không hợp lệ
+        }
+      }
+
+      // ✅ THÊM: Validate statusKey
+      if (id === "statusKey") {
+        const validStatuses = Object.keys(statusMap);
+        if (!validStatuses.includes(value)) {
+          console.warn("⚠️ Status không hợp lệ, bỏ qua!");
+          return;
+        }
+      }
       setFormData((prev) => ({
         ...prev,
         [id]: finalValue,
@@ -165,9 +189,47 @@ export default function DishModal({
   };
   // =======================================
 
-  const handleSubmit = (e) => {
+const handleSubmit = (e) => {
     e.preventDefault();
 
+    // 1. LẤY GIÁ TRỊ THỰC TẾ TỪ DOM (Đã đúng)
+    const actualCategoryValue = e.target.categoryKey.value;
+    const actualStatusValue = e.target.statusKey.value;
+
+    // DEBUG LOGS (Giữ nguyên)
+    console.log("🐛 DEBUG CATEGORY VALUE (DOM):", actualCategoryValue);
+    console.log("🐛 DEBUG STATUS VALUE (DOM):", actualStatusValue);
+
+    // =============================================
+    // ⭐ BẢO VỆ 1: KIỂM TRA CATEGORY (SỬ DỤNG GIÁ TRỊ TỪ DOM) ⭐
+    // =============================================
+    const validCategoryIds = categories.map((cat) => String(cat.category_id));
+
+    // SỬA LỖI 1: Dùng actualCategoryValue thay vì formData.categoryKey
+    if (!validCategoryIds.includes(actualCategoryValue)) {
+      alert("❌ Danh mục không hợp lệ! Vui lòng chọn lại.");
+      return; // CHẶN SUBMIT
+    }
+
+    // =============================================
+    // ⭐ BẢO VỆ 2: KIỂM TRA STATUS (SỬ DỤNG GIÁ TRỊ TỪ DOM) ⭐
+    // =============================================
+    const validStatuses = Object.keys(statusMap); // ['active', 'inactive', 'draft']
+
+    // SỬA LỖI 2 & 3: Dùng actualStatusValue thay vì formData.statusKey và bỏ setFormData
+    if (!validStatuses.includes(actualStatusValue)) {
+      alert("⚠️ Trạng thái không hợp lệ! Vui lòng chọn lại.");
+      return; // CHẶN SUBMIT
+    }
+    
+    // 4. ĐỒNG BỘ STATE (Chỉ chạy khi Validation PASS)
+    // Cập nhật State với giá trị hợp lệ vừa đọc từ DOM
+    setFormData((prev) => ({
+      ...prev,
+      categoryKey: actualCategoryValue,
+      statusKey: actualStatusValue,
+    }));
+    
     // Cảnh báo nếu mô tả quá dài (>45KB)
     if (formData.description && formData.description.length > 45000) {
       if (!window.confirm("⚠️ Mô tả rất dài (>45KB). Bạn có chắc muốn lưu?")) {
@@ -190,12 +252,14 @@ export default function DishModal({
 
     // Thêm trường cơ bản
     data.append("menu_item_name", formData.name);
-    data.append("category_id", formData.categoryKey);
+    // ⭐ SỬA LỖI 4: Dùng actualCategoryValue đã được validate
+    data.append("category_id", actualCategoryValue);
     // === GỬI NỘI DUNG DƯỚI DẠNG CHUỖI JSON ===
     data.append("description", formData.description || "{}");
     // ===========================================
     data.append("price", formData.price);
-    data.append("status", formData.statusKey);
+    // ⭐ SỬA LỖI 5: Dùng actualStatusValue đã được validate
+    data.append("status", actualStatusValue);
 
     if (isEditMode) {
       data.append("_method", "PUT");
@@ -294,6 +358,10 @@ export default function DishModal({
                 className="dish-modal-input"
                 value={formData.categoryKey}
                 onChange={handleChange}
+                onContextMenu={(e) => e.preventDefault()}
+                onCopy={(e) => e.preventDefault()}
+                onCut={(e) => e.preventDefault()}
+                title="Vui lòng chọn từ danh sách có sẵn"
               >
                 {categories.map((cat) => (
                   <option key={cat.category_id} value={String(cat.category_id)}>
