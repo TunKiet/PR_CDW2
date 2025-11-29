@@ -13,6 +13,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\LoginLogController;
 use App\Http\Controllers\Api\DishController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Api\CategoryController;
@@ -32,6 +33,9 @@ use App\Http\Controllers\Api\OrderOnlineController;
 
 // Online Order (Admin)
 use App\Http\Controllers\Api\OrderOnlineAdminController;
+
+// Attendance (Chấm công)
+use App\Http\Controllers\AttendanceController;
 
 
 /*
@@ -82,6 +86,9 @@ Route::post('/verify-login-otp', [AuthController::class, 'verifyLoginOTP']);
 Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    
+    // Login Logs
+    Route::get('/login-logs', [LoginLogController::class, 'getUserLogs']);
 });
 
 
@@ -225,4 +232,29 @@ Route::put('/order-online/{id}', [OrderOnlineController::class, 'update']);
 Route::get('/admin/order-online', [OrderOnlineAdminController::class, 'index']);
 Route::get('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'show']);
 Route::put('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'updateStatus']);
+
+
+/*
+|--------------------------------------------------------------------------
+| ⏰ ATTENDANCE (Chấm công)
+|--------------------------------------------------------------------------
+*/
+// Chấm công cho nhân viên
+Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn']);
+Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut']);
+Route::post('/attendance/today-status', [AttendanceController::class, 'getTodayStatus']);
+
+// Xem chấm công của nhân viên
+Route::get('/attendance/monthly', [AttendanceController::class, 'getMonthlyAttendance']);
+Route::get('/attendance/weekly', [AttendanceController::class, 'getWeeklyHours']);
+
+// Quản lý chấm công (Admin/Manager)
+Route::prefix('attendance')->group(function () {
+    Route::get('/', [AttendanceController::class, 'index']); // Lấy tất cả
+    Route::get('/report', [AttendanceController::class, 'getReport']); // Báo cáo tổng hợp
+    Route::get('/{id}', [AttendanceController::class, 'show']); // Chi tiết
+    Route::post('/', [AttendanceController::class, 'store']); // Tạo mới
+    Route::put('/{id}', [AttendanceController::class, 'update']); // Cập nhật
+    Route::delete('/{id}', [AttendanceController::class, 'destroy']); // Xóa
+});
 

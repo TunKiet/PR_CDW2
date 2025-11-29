@@ -41,6 +41,8 @@ import RestaurantInfoManage from "./components/08_hao-QLMonAn/restaurant_infor_m
 import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
 import OrderOnlineAdmin from "./pages/OrderOnlineAdmin";
+import AttendancePage from "./pages/AttendancePage";
+import AttendanceManagementPage from "./pages/AttendanceManagementPage";
 
 function App() {
   return (
@@ -147,6 +149,19 @@ function App() {
           element={
             <ProtectedRoute>
               <CustomerManagementPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ROUTE: Trang Chấm Công */}
+        <Route path="/attendance" element={<AttendancePage />} />
+        
+        {/* ROUTE: Trang Quản Lý Chấm Công */}
+        <Route
+          path="/attendance-management"
+          element={
+            <ProtectedRoute>
+              <AttendanceManagementPage />
             </ProtectedRoute>
           }
         />
