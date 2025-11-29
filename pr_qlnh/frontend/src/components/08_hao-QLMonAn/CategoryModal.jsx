@@ -13,13 +13,16 @@ export default function CategoryModal({
     isHidden: false,
     updatedAt: null,
   });
+  
+  // ⭐ BỔ SUNG: State để quản lý việc đang lưu
+  const [isSaving, setIsSaving] = useState(false); 
 
   useEffect(() => {
     if (category) {
       // Chế độ Sửa
       setFormData({
         ...category,
-        // ⭐ LẤY updated_at
+        // LẤY updated_at
         updatedAt: category.updated_at || null,
       });
     } else {
@@ -44,34 +47,32 @@ export default function CategoryModal({
     }));
   };
 
-  const handleSubmit = (e) => {
+  // ⭐ CẬP NHẬT: Hàm handleSubmit phải là async và sử dụng isSaving
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // ⭐ BƯỚC 1: NGĂN NGỪA DOUBLE SUBMISSION
+    if (isSaving) return; 
+
     if (!formData.name || !formData.slug) {
       alert("Vui lòng điền đầy đủ Tên danh mục và Slug.");
       return;
     }
-    const isEditMode = category && category.id;
-    // 2. Chuẩn bị dữ liệu gửi đi
-    const dataToSend = { ...formData };
 
-    // ⭐ QUAN TRỌNG: Chỉ thêm trường kiểm tra xung đột khi đang ở chế độ SỬA
-    if (isEditMode) {
-      const originalTimestamp = category.updated_at || formData.updatedAt;
-      if (originalTimestamp) {
-        // 2. Đổi tên thành original_updated_at cho Backend
-        dataToSend.original_updated_at = originalTimestamp;
-      } else {
-        // Trường hợp KHẨN CẤP: Nếu vẫn không có, gửi "" để tránh lỗi 'required'
-        // (Mặc dù sẽ dẫn đến 409, nhưng ít nhất cho phép test các trường khác)
-        dataToSend.original_updated_at = "";
-        console.error(
-          "Lỗi nghiêm trọng: updated_at bị thiếu. Gửi chuỗi rỗng để tránh lỗi 422."
-        );
-      }
-      // 2. Xóa trường updatedAt cũ để tránh dư thừa và gửi sai
-      delete dataToSend.updatedAt;
+    try {
+        // ⭐ BƯỚC 2: BẮT ĐẦU LƯU & VÔ HIỆU HÓA NÚT
+        setIsSaving(true); 
+        await onSave(formData); // CHỜ (await) API call hoàn tất ở CategoryManager
+        // Sau khi onSave thành công, CategoryManager sẽ gọi setIsModalOpen(false)
+        
+    } catch (error) {
+        // Lỗi đã được xử lý ở CategoryManager, không cần xử lý thêm ở đây
+        console.error("Lỗi khi gọi onSave từ CategoryModal:", error);
+    } finally {
+        // ⭐ BƯỚC 3: BẬT LẠI NÚT DÙ THÀNH CÔNG HAY THẤT BẠI
+        // (Nếu thành công, modal sẽ đóng, isSaving sẽ tự reset khi modal mở lại)
+        setIsSaving(false); 
     }
-    onSave(dataToSend);
   };
 
   const title = category ? "Chỉnh sửa Danh mục" : "Thêm Danh mục Mới";
@@ -80,30 +81,15 @@ export default function CategoryModal({
 
   return (
     <div id="category-edit-modal" className="modal is-active">
-      <div className="modal-content" id="cat-modal-content">
-        <h3 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-3">
-          {title}
-        </h3>
-
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          {formData.id && (
-            <div>
-              <label
-                htmlFor="cat-id"
-                className="block text-sm font-medium text-gray-700"
-              >
-                ID Danh mục
-              </label>
-              <input
-                type="text"
-                id="cat-id"
-                className="modal-input-readonly"
-                value={formData.id}
-                readOnly
-              />
-            </div>
-          )}
-
+      <div className="modal-content">
+        <div className="modal-header">
+          <h4 className="modal-title">{title}</h4>
+          <span className="modal-close" onClick={onClose}>
+            &times;
+          </span>
+        </div>
+        <form onSubmit={handleSubmit}>
+          {/* Tên Danh mục */}
           <div>
             <label
               htmlFor="cat-name"
@@ -121,6 +107,7 @@ export default function CategoryModal({
             />
           </div>
 
+          {/* Slug */}
           <div>
             <label
               htmlFor="cat-slug"
@@ -138,6 +125,7 @@ export default function CategoryModal({
             />
           </div>
 
+          {/* Ẩn/Hiện */}
           <div className="flex items-center">
             <input
               id="cat-isHidden"
@@ -154,16 +142,36 @@ export default function CategoryModal({
             </label>
           </div>
 
+          {/* Nút Thao tác */}
           <div className="mt-6 flex justify-end space-x-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={onClose}
               className="category-button-secondary"
+              disabled={isSaving} // Vô hiệu hóa khi đang lưu
             >
               Hủy
             </button>
-            <button type="submit" className="category-button-primary">
-              Lưu Danh mục
+            
+            {/* ⭐ CẬP NHẬT: Thêm disabled và Loading UI */}
+            <button 
+                type="submit" 
+                className="category-button-primary"
+                disabled={isSaving} // Vô hiệu hóa nút Lưu
+            >
+              {isSaving ? (
+                <>
+                  Đang Lưu...
+                  {/* Loading Spinner */}
+                  <span className="ml-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                      Loading...
+                    </span>
+                  </span>
+                </>
+              ) : (
+                "Lưu Danh mục"
+              )}
             </button>
           </div>
         </form>

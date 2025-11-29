@@ -43,6 +43,7 @@ export default function DishModal({
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const isEditMode = !!dish;
   const title = isEditMode ? "Chỉnh Sửa Món Ăn" : "Thêm Món Ăn Mới";
@@ -189,12 +190,14 @@ export default function DishModal({
   };
   // =======================================
 
-const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSaving) return;
 
     // 1. LẤY GIÁ TRỊ THỰC TẾ TỪ DOM (Đã đúng)
     const actualCategoryValue = e.target.categoryKey.value;
     const actualStatusValue = e.target.statusKey.value;
+    const isEditMode = !!dish;
 
     // DEBUG LOGS (Giữ nguyên)
     console.log("🐛 DEBUG CATEGORY VALUE (DOM):", actualCategoryValue);
@@ -204,7 +207,8 @@ const handleSubmit = (e) => {
     // ⭐ BẢO VỆ 1: KIỂM TRA CATEGORY (SỬ DỤNG GIÁ TRỊ TỪ DOM) ⭐
     // =============================================
     const validCategoryIds = categories.map((cat) => String(cat.category_id));
-
+    if (isSaving) return;
+    setIsSaving(true);
     // SỬA LỖI 1: Dùng actualCategoryValue thay vì formData.categoryKey
     if (!validCategoryIds.includes(actualCategoryValue)) {
       alert("❌ Danh mục không hợp lệ! Vui lòng chọn lại.");
@@ -221,7 +225,7 @@ const handleSubmit = (e) => {
       alert("⚠️ Trạng thái không hợp lệ! Vui lòng chọn lại.");
       return; // CHẶN SUBMIT
     }
-    
+
     // 4. ĐỒNG BỘ STATE (Chỉ chạy khi Validation PASS)
     // Cập nhật State với giá trị hợp lệ vừa đọc từ DOM
     setFormData((prev) => ({
@@ -229,7 +233,7 @@ const handleSubmit = (e) => {
       categoryKey: actualCategoryValue,
       statusKey: actualStatusValue,
     }));
-    
+
     // Cảnh báo nếu mô tả quá dài (>45KB)
     if (formData.description && formData.description.length > 45000) {
       if (!window.confirm("⚠️ Mô tả rất dài (>45KB). Bạn có chắc muốn lưu?")) {
@@ -246,6 +250,15 @@ const handleSubmit = (e) => {
       alert("Vui lòng chọn hình ảnh cho món ăn.");
       return;
     }
+    // 3. BẮT ĐẦU TIẾN TRÌNH LƯU
+    setIsSaving(true); // ⭐ VÔ HIỆU HÓA NÚT NGAY
+
+    // 4. ĐỒNG BỘ STATE (Chỉ chạy khi Validation PASS)
+    setFormData((prev) => ({
+      ...prev,
+      categoryKey: actualCategoryValue,
+      statusKey: actualStatusValue,
+    }));
 
     // TẠO FORM DATA để gửi multipart/form-data
     const data = new FormData();
@@ -263,19 +276,29 @@ const handleSubmit = (e) => {
 
     if (isEditMode) {
       data.append("_method", "PUT");
+      if (dish && dish.updated_at) {
+        data.append("original_updated_at", dish.updated_at);
+      }
     }
 
     if (imageFile) {
       data.append("image_file", imageFile);
     }
 
-    onSave(data, isEditMode ? formData.id : null);
+    try {
+      await onSave(data, isEditMode ? formData.id : null); // ⭐ THÊM 'await'
+    } catch (error) {
+      console.error("Lỗi khi gọi onSave từ DishModal:", error);
+    } finally {
+      // ⭐ ĐẢM BẢO NÚT ĐƯỢC BẬT LẠI TRONG MỌI TRƯỜNG HỢP
+      setIsSaving(false);
+    }
   };
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm dish-modal-backdrop-blur">
       <div className="bg-white p-6 rounded-xl w-full max-w-xl shadow-2xl transform transition-all duration-300 max-h-[90vh] flex flex-col">
         <h3 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-3 flex-shrink-0">
           {title}
@@ -465,12 +488,33 @@ const handleSubmit = (e) => {
             <button
               type="button"
               onClick={onClose}
-              className="dish-button-secondary"
+              className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
             >
               Hủy
             </button>
-            <button type="submit" className="dish-button-primary">
-              {isEditMode ? "Cập Nhật Món Ăn" : "Thêm Món Ăn"}
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition duration-150 shadow-md disabled:opacity-50"
+              disabled={isSaving} // ⭐ THÊM DISABLED
+            >
+              {isSaving ? (
+                <>
+                  Đang Lưu...
+                  {/* Tùy chọn: Thêm hiệu ứng loading spinner */}
+                  <span
+                    className="ml-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                    role="status"
+                  >
+                    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                      Loading...
+                    </span>
+                  </span>
+                </>
+              ) : isEditMode ? (
+                "Cập Nhật Món Ăn"
+              ) : (
+                "Thêm Món Ăn"
+              )}
             </button>
           </div>
         </form>
