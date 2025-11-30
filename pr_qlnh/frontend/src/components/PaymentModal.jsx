@@ -7,15 +7,23 @@ const PaymentModal = ({
   onClose,
   orderItems = [],
   customer,
-  onCompletePayment,
   note,
+  tableId,        
+  tableName,      
+  onCompletePayment,
 }) => {
+
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ type: "", message: "" });
   const [showSuccess, setShowSuccess] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [discount, setDiscount] = useState(0);
+
+  // Format tiền
+  const formatCurrency = (number) => {
+    return Number(number).toLocaleString("vi-VN") + "đ";
+  };
 
   if (!isOpen) return null;
 
@@ -24,18 +32,36 @@ const PaymentModal = ({
     setTimeout(() => setToast({ type: "", message: "" }), 2500);
   };
 
+  // 🎖️ Rank + % giảm giá theo Rank
+  const getRankDiscount = (points) => {
+    if (points >= 50000) {
+      return { rank: "Kim Cương", percent: 10 };
+    } else if (points >= 15000) {
+      return { rank: "Vàng", percent: 5 };
+    } else if (points >= 5000) {
+      return { rank: "Bạc", percent: 3 };
+    } else {
+      return { rank: "Đồng", percent: 0 };
+    }
+  };
+
   // 🧮 Tính tổng tiền hàng
   const subtotal = orderItems.reduce((s, i) => s + i.price * i.qty, 0);
-  const total = subtotal - discount;
 
-  // 🏷️ Áp dụng voucher (đơn giản — có thể thay bằng gọi API thực tế)
+  // Rank discount
+  const rankInfo = getRankDiscount(customer?.points || 0);
+  const rankDiscount = (subtotal * rankInfo.percent) / 100;
+
+  // Tổng cuối
+  const total = subtotal - discount - rankDiscount;
+
+  // 🏷️ Áp dụng voucher
   const handleApplyVoucher = () => {
     if (!voucherCode.trim()) {
       showToast("error", "Vui lòng nhập mã voucher!");
       return;
     }
 
-    // Demo: mã "GIAM10" giảm 10%, mã "GIAM50K" giảm 50k
     let newDiscount = 0;
     if (voucherCode.toUpperCase() === "GIAM10") {
       newDiscount = subtotal * 0.1;
@@ -47,7 +73,8 @@ const PaymentModal = ({
     }
 
     setDiscount(newDiscount);
-    showToast("success", `Áp dụng voucher thành công! Giảm ${newDiscount.toLocaleString()}đ`);
+    setVoucherCode(voucherCode.trim());
+    showToast("success", `Áp dụng voucher thành công! Giảm ${formatCurrency(newDiscount)}`);
   };
 
   const handleCompletePayment = async () => {
@@ -55,13 +82,15 @@ const PaymentModal = ({
     try {
       const orderData = {
         customer_id: customer?.customer_id || null,
+        table_id: tableId || null,
         note: note?.trim() || "",
         items: orderItems.map((i) => ({
           menu_item_id: i.menu_item_id,
           quantity: i.qty,
         })),
         voucher: voucherCode || null,
-        discount: discount,
+        discount: discount, // voucher
+        rank_discount: rankDiscount, // giảm giá theo rank
       };
 
       console.log("📦 Sending order:", orderData);
@@ -80,10 +109,22 @@ const PaymentModal = ({
       console.log("💳 Sending payment:", paymentPayload);
       await axiosClient.post("/payments", paymentPayload);
 
-      showToast("success", "✅ Thanh toán thành công!");
-      setShowSuccess(true);
+      // showToast("success", "✅ Thanh toán thành công!");
+      // setShowSuccess(true);
 
-      if (onCompletePayment) onCompletePayment(orderRes.data);
+      if (onCompletePayment)
+  onCompletePayment({
+    ...orderRes.data,
+    table_id: tableId,
+    table: tableName,
+    items: orderItems,
+    total: total,
+    note: note,
+    customer: customer,
+    voucher: voucherCode,
+    discount: discount,
+    rank_discount: rankDiscount
+  });
 
       setTimeout(() => {
         setShowSuccess(false);
@@ -114,7 +155,7 @@ const PaymentModal = ({
       )}
 
       {/* Success popup */}
-      {showSuccess && (
+      {/* {showSuccess && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-[99999]">
           <div className="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center animate-bounce">
             <CheckCircle className="text-green-500" size={60} />
@@ -123,7 +164,7 @@ const PaymentModal = ({
             </p>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Loading overlay */}
       {loading && (
@@ -138,9 +179,7 @@ const PaymentModal = ({
       <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex justify-center items-center z-[9999]">
         <div className="bg-white rounded-2xl shadow-xl w-[850px] max-h-[90vh] overflow-auto p-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Xác nhận thanh toán
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800">Xác nhận thanh toán</h2>
             <button className="p-2 hover:bg-gray-100 rounded-full" onClick={onClose}>
               <X size={22} />
             </button>
@@ -155,13 +194,13 @@ const PaymentModal = ({
                   className="flex justify-between items-center bg-gray-50 p-4 rounded-xl mb-3 shadow-sm"
                 >
                   <div>
-                    <h4 className="font-semibold">{item.menu_item_name}</h4>
+                    <h5 className="font-semibold">{item.menu_item_name}</h5>
                     <p className="text-gray-500 text-sm">
-                      {item.price.toLocaleString()}đ x {item.qty}
+                      {formatCurrency(item.price)} x {item.qty}
                     </p>
                   </div>
                   <div className="font-semibold">
-                    {(item.price * item.qty).toLocaleString()}đ
+                    {formatCurrency(item.price * item.qty)}
                   </div>
                 </div>
               ))}
@@ -169,10 +208,10 @@ const PaymentModal = ({
               <div className="mt-4 space-y-1 text-gray-700">
                 <div className="flex justify-between">
                   <span>Tổng tiền hàng</span>
-                  <b>{subtotal.toLocaleString()}đ</b>
+                  <b>{formatCurrency(subtotal)}</b>
                 </div>
 
-                {/* VOUCHER input */}
+                {/* Voucher */}
                 <div className="mt-3 flex items-center gap-2">
                   <div className="flex items-center gap-2 flex-1 border rounded-lg px-3 py-2">
                     <Tag className="text-indigo-600" size={18} />
@@ -192,20 +231,29 @@ const PaymentModal = ({
                   </button>
                 </div>
 
+                {/* Giảm giá theo voucher */}
                 {discount > 0 && (
-                  <div className="flex justify-between text-green-600 mt-2">
-                    <span>Giảm giá</span>
-                    <b>-{discount.toLocaleString()}đ</b>
+                  <div className="flex justify-between text-green-600 mt-1">
+                    <span>Giảm giá voucher</span>
+                    <b>-{formatCurrency(discount)}</b>
+                  </div>
+                )}
+
+                {/* Giảm giá theo rank */}
+                {rankInfo.percent > 0 && (
+                  <div className="flex justify-between text-blue-600 mt-1">
+                    <span>Giảm giá hạng {rankInfo.rank} ({rankInfo.percent}%)</span>
+                    <b>-{formatCurrency(rankDiscount)}</b>
                   </div>
                 )}
 
                 <div className="border-t pt-3 flex justify-between text-xl font-bold text-gray-900">
                   <span>Thành tiền</span>
-                  <span>{total.toLocaleString()}đ</span>
+                  <span>{formatCurrency(total)}</span>
                 </div>
               </div>
 
-              {/* Ghi chú */}
+              {/* Note */}
               {note && note.trim() !== "" && (
                 <div className="mt-4 bg-yellow-50 border border-yellow-300 rounded-lg p-3 text-gray-700 text-sm">
                   <b>Ghi chú đơn hàng:</b>
@@ -220,9 +268,13 @@ const PaymentModal = ({
 
               {customer ? (
                 <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm mb-4">
-                  <p className="font-bold text-gray-800">{customer.name}</p>
+                  <p className="font-bold text-gray-800">{customer.customer_name}</p>
+                  <p className="text-gray-600">📞 {customer.phone}</p>
                   <p className="text-yellow-600 font-semibold mt-1">
                     ⭐ Điểm tích luỹ: {customer.points ?? 0}
+                  </p>
+                  <p className="text-blue-600 font-medium mt-1">
+                    🎖️ Hạng: {rankInfo.rank}
                   </p>
                 </div>
               ) : (

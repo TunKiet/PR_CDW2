@@ -11,7 +11,9 @@ class Order extends Model
 
     protected $table = 'orders';
     protected $primaryKey = 'order_id';
-    protected $fillable = ['customer_id', 'total_price', 'note'];
+    protected $fillable = ['customer_id', 'table_id', 'total_price', 'note', 'voucher',        // <── CÓ DÒNG NÀY?
+    'discount',
+    'rank_discount'];
 
     public function customer()
     {
@@ -32,4 +34,9 @@ class Order extends Model
     {
         return $this->hasMany(Point::class, 'order_id', 'order_id');
     }
+    public function table()
+    {
+        return $this->belongsTo(Table::class, 'table_id', 'table_id');
+    }
+
 }
