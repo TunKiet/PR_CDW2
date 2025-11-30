@@ -161,6 +161,10 @@ Route::prefix('orders')->group(function () {
     Route::get('/{id}', [OrderController::class, 'show']);
     Route::post('/', [OrderController::class, 'store']);
     Route::delete('/{id}', [OrderController::class, 'destroy']);
+    Route::put('/{id}', [OrderController::class, 'update']);
+    Route::get('/{id}/export', [OrderController::class, 'exportData']);
+
+
 });
 
 Route::get('/menu', [OrderController::class, 'menu']);

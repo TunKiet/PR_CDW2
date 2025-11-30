@@ -115,21 +115,36 @@ export default function OrderOnlineAdmin() {
       <Sidebar />
 
       <div className="admin-content">
-        <h2 className="title">Quản lý Đơn Hàng Online</h2>
+        <h1 className=" text-2xl font-semibold text-gray-800 mb-6">Quản lý Đơn Hàng Online</h1>
 
         {/* BỘ LỌC */}
-        <div className="filter-row">
+        <div className="filter-row flex flex-wrap items-center rounded-lg mb-3 gap-2">
+
+          {/* Ô tìm kiếm */}
           <input
-            placeholder="Tìm theo tên, SĐT, ID..."
+            placeholder="Tìm theo tên, số điện thoại, ID..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && fetchOrders(1)}
+            className="flex-1 min-w-[250px] px-4  border border-gray-300 rounded-lg 
+               focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
           />
-          <button onClick={() => fetchOrders(1)}>Tìm</button>
 
+          {/* Nút tìm */}
+          <button
+            onClick={() => fetchOrders(1)}
+            className="px-5 py-2 bg-indigo-600 text-white font-medium rounded-lg shadow 
+               hover:bg-indigo-700 active:scale-95 transition gap-4"
+          >
+            Tìm
+          </button>
+
+          {/* Lọc trạng thái */}
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg bg-white
+               focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition min-w-[180px]"
           >
             <option value="">Tất cả trạng thái</option>
             <option value="pending">Chờ xác nhận</option>
@@ -140,9 +155,18 @@ export default function OrderOnlineAdmin() {
           </select>
         </div>
 
+
         {/* BẢNG ĐƠN */}
         <table className="order-table">
-          {loading && <p className="loading-msg">🔄 Đang tải dữ liệu...</p>}
+          {loading && (
+            <tbody>
+              <tr>
+                <td colSpan={7} className="text-center py-6 loading-msg">
+                  🔄 Đang tải dữ liệu...
+                </td>
+              </tr>
+            </tbody>
+          )}
 
           <thead>
             <tr>
@@ -254,8 +278,8 @@ export default function OrderOnlineAdmin() {
                     <b>Tạm tính:</b>{" "}
                     {formatCurrency(
                       selectedOrder.total -
-                        selectedOrder.ship_fee +
-                        selectedOrder.discount
+                      selectedOrder.ship_fee +
+                      selectedOrder.discount
                     )}
                   </p>
 

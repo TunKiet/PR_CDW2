@@ -158,7 +158,7 @@ const CustomerManagementPage = () => {
           Quản Lý Khách Hàng & Tích Điểm
         </h1>
 
-        <div className="flex justify-between items-center mb-6 space-x-4">
+        <div className="flex justify-between items-center mb-6 space-x-4 pb-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
 

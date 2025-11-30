@@ -73,6 +73,7 @@ const PaymentModal = ({
     }
 
     setDiscount(newDiscount);
+    setVoucherCode(voucherCode.trim());
     showToast("success", `Áp dụng voucher thành công! Giảm ${formatCurrency(newDiscount)}`);
   };
 
@@ -119,7 +120,10 @@ const PaymentModal = ({
     items: orderItems,
     total: total,
     note: note,
-    customer: customer
+    customer: customer,
+    voucher: voucherCode,
+    discount: discount,
+    rank_discount: rankDiscount
   });
 
       setTimeout(() => {

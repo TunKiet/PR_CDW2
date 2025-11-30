@@ -12,7 +12,7 @@ return new class extends Migration
             $table->bigIncrements('order_id');
             $table->unsignedBigInteger('customer_id')->nullable(); 
             $table->decimal('total_price', 10, 2)->default(0);
-            $table->string('note')->nullable(); // ✅ Đặt trước hoặc sau cũng không sao
+            $table->string('note')->nullable(); 
             $table->timestamps();
 
             $table->foreign('customer_id')
