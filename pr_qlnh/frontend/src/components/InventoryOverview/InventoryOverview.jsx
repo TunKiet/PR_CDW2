@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../Sidebar/Sidebar';
+import Sidebar from '../Sidebar';
 import { PieChart, RadarChart, BarChart } from '@mui/x-charts';
 import Stack from '@mui/material/Stack';
 import ToggleButton from '@mui/material/ToggleButton';

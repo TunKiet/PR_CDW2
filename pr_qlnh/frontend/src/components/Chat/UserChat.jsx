@@ -29,6 +29,7 @@ const UserChat = () => {
 
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
+   
 
     // Load conversation
     useEffect(() => {
@@ -197,13 +198,14 @@ const UserChat = () => {
                                     content={msg.message}
                                     time={msg.created_at}
                                     messageId={msg.message_id}
-                                    handleDelete={handleDelete}
                                 />
                             )
                         )}
 
                         <div ref={messagesEndRef} />
                     </div>
+
+                    
 
                     {/* Input */}
                     <div className="chat-option flex items-center gap-2 p-2 border-t border-gray-300">

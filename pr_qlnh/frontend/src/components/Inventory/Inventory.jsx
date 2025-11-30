@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import Sidebar from '../Sidebar/Sidebar'
+import Sidebar from '../Sidebar'
 import Ingredient from './Ingredient'
 import IngredientAlert from './IngredientAlert'
 import IngredientInOut from './IngredientInOut'
