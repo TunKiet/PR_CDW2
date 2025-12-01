@@ -11,7 +11,7 @@ import axios from 'axios';
 import Pusher from 'pusher-js';
 import EmojiPicker from 'emoji-picker-react';
 import { Popover } from '@headlessui/react';
-import { notify, confirmAction } from '../../utils/notify'
+import { notify, confirmAction, confirmDialog } from '../../utils/notify'
 
 
 const endPoint = 'http://localhost:8000/api';
@@ -26,10 +26,11 @@ const UserChat = () => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [conversationId, setConversationId] = useState(null);
+    const [isSending, setIsSending] = useState(false);
 
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
-   
+
 
     // Load conversation
     useEffect(() => {
@@ -79,12 +80,23 @@ const UserChat = () => {
 
 
     // Send message
-    const sendMessage = () => {
-        if (!input.trim()) return;
+    const sendMessage = async () => {
+        if (!input.trim() || isSending) {
+            await confirmDialog('Không thể gửi', 'Vui lòng nhập nội dung.');
+            return;
+        }
+
+        if (input.length > 1000) {
+            await confirmDialog('Không thể gửi', 'Vui lòng rút ngắn nội dung.');
+            return;
+        }
+
         if (!conversationId) {
             console.log("⚠️ Conversation chưa sẵn");
             return;
         }
+
+        setIsSending(true);
 
         axios.post(`${endPoint}/send-message`, {
             conversation_id: conversationId,
@@ -93,9 +105,9 @@ const UserChat = () => {
             message: input
         })
             .then(() => setInput(''))
-            .catch(err => console.error(err));
+            .catch(err => console.error(err))
+            .finally(() => setIsSending(false));
     };
-
 
     const handleEmojiClick = (emojiData) => {
         setInput(prev => prev + emojiData.emoji);
@@ -120,7 +132,6 @@ const UserChat = () => {
             })
             .catch(err => console.error("❌ Send emoji error:", err));
     };
-
 
     //Open select file image
     const handleImage = () => {
@@ -205,7 +216,7 @@ const UserChat = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    
+
 
                     {/* Input */}
                     <div className="chat-option flex items-center gap-2 p-2 border-t border-gray-300">
@@ -233,9 +244,11 @@ const UserChat = () => {
 
                             <CiPaperplane
                                 size={23}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600"
-                                onClick={sendMessage}
+                                className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600 transition
+                                    ${isSending ? "opacity-40 cursor-not-allowed" : "opacity-100"}`}
+                                onClick={!isSending ? sendMessage : undefined}
                             />
+
                         </div>
 
                         <div className="flex gap-2">

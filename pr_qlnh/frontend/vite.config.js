@@ -1,11 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';  // Plugin cho Tailwind v4
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss(),  // Tích hợp Tailwind trực tiếp
+    tailwindcss(),
   ],
   server: {
     host: '0.0.0.0',
@@ -13,6 +13,10 @@ export default defineConfig({
     strictPort: true,
     fs: {
       allow: ['.'],
+    },
+
+    watch: {
+      ignored: ['**/node_modules/**', '**/dist/**'],
     },
   },
   base: '/',

@@ -12,7 +12,7 @@ import { useRef } from "react";
 import Pusher from 'pusher-js';
 import EmojiPicker from 'emoji-picker-react';
 import { Popover } from '@headlessui/react';
-
+import { confirmDialog } from '../../utils/notify'
 
 const endPoint = 'http://localhost:8000/api';
 
@@ -47,7 +47,6 @@ const AdminChat = () => {
     }, [messages]);
 
     // Load messages khi chọn conversation
-
     useEffect(() => {
         if (!selectedConversation) return;
 
@@ -80,30 +79,20 @@ const AdminChat = () => {
             pusher.unsubscribe(`conversation.${selectedConversation.conversation_id}`);
         };
     }, [selectedConversation]);
-    // AdminChat.jsx
-
 
     // Gửi tin nhắn
-    const sendMessage = () => {
-
-        if (!input.trim() || !selectedConversation) {
-            console.log("⚠️ Cannot send: input empty or no conversation selected");
+    const sendMessage = async () => {
+        if (!input.trim() || !selectedConversation || isSending) {
+            await confirmDialog('Không thể gửi', 'Vui lòng nhập nội dung.');
             return;
         }
 
-        if (isSending) {
-            console.log("⚠️ Message is being sent, please wait...");
+        if (input.length > 1000) {
+            await confirmDialog('Không thể gửi', 'Vui lòng rút ngắn nội dung.');
             return;
         }
 
         setIsSending(true);
-
-        console.log("📤 Sending message:", {
-            conversation_id: selectedConversation.conversation_id,
-            user_id: adminId,
-            sender_type: 'admin',
-            message: input
-        });
 
         axios.post(`${endPoint}/send-message`, {
             conversation_id: selectedConversation.conversation_id,
@@ -222,7 +211,7 @@ const AdminChat = () => {
                                     </div>
 
 
-                                    
+
                                     {/* Danh sách tin nhắn */}
                                     <div className="flex flex-col flex-1 bg-gray-200 p-2 overflow-y-auto 
                   [&::-webkit-scrollbar]:w-1 
@@ -270,9 +259,10 @@ const AdminChat = () => {
                                                     placeholder="Nhập tin nhắn..."
                                                 />
                                                 <CiPaperplane
-                                                    onClick={sendMessage}
                                                     size={23}
-                                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600`}
+                                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600 transition
+                                                    ${isSending ? "opacity-40 cursor-not-allowed" : "opacity-100"}`}
+                                                    onClick={!isSending ? sendMessage : undefined}
                                                 />
                                             </div>
                                         </div>

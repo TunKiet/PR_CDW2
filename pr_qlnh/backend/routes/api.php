@@ -236,7 +236,7 @@ Route::prefix('reply')->group(function () {
 });
 Route::post('/create-conversation', [ConversationController::class, 'createConversation']);
 Route::delete('/delete-message/{messageId}', [MessageController::class, 'delete']);
-
+Route::post('/send-image', [MessageController::class, 'sendImage']);
 
 
 /*
