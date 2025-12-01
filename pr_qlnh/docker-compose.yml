@@ -30,8 +30,8 @@ services:
     container_name: react_app
     restart: unless-stopped
     volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/index.html:/app/index.html
+      - ./frontend:/app
+      - /app/node_modules
     networks:
       - app-network
     ports:
@@ -39,13 +39,7 @@ services:
     environment:
       - VITE_API_URL=http://localhost:8000/api
       - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=500
       - WATCHPACK_POLLING=true
-      - WATCHPACK_POLLING_INTERVAL=500
-      
-    mem_limit: 2g
-    memswap_limit: 3g
-
     command: npm run dev -- --host 0.0.0.0 --port 3000
     stdin_open: true
     tty: true

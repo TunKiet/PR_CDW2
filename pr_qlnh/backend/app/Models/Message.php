@@ -50,6 +50,4 @@ class Message extends Model
 
         return $message->delete();
     }
-
-    
 }
