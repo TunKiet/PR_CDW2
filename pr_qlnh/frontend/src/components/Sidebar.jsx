@@ -124,7 +124,7 @@ const Sidebar = () => {
         <h1 className="ml-3 text-xs font-medium text-gray-800 truncate">{displayName}</h1>
       </div>
 
-      <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+      <div className="flex-1 p-4 space-y-2 overflow-y-auto [&::-webkit-scrollbar]:w-0">
         {menuItems.map((item, index) => {
           const isMenuOpen = openSubMenu === item.title;
           const activeParent = isParentActive(item);

@@ -211,7 +211,6 @@ Route::post('/send-message', [MessageController::class, 'sendMessage']);
 Route::get('/conversations', [MessageController::class, 'getConversations']);
 Route::get('/messages/{conversationId}', [MessageController::class, 'getMessages']);
 Route::post('/mark-read', [MessageController::class, 'markAsRead']);
-Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::post('/chat', [ChatController::class, 'message']);
 
 //Review
