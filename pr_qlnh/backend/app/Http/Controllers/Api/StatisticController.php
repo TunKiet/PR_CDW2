@@ -38,7 +38,7 @@ class StatisticController extends Controller
 
         // 3. MÓN ĂN BÁN CHẠY NHẤT
         $topDish = OrderDetail::select('menu_item_id', DB::raw('SUM(quantity) as total_sold'))
-            ->whereHas('order', function($query) use ($startDate, $endDate) {
+            ->whereHas('order', function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('created_at', [$startDate, $endDate]);
             })
             ->groupBy('menu_item_id')
@@ -88,16 +88,16 @@ class StatisticController extends Controller
 
         // Lấy doanh thu theo ngày
         $revenueByDay = Order::select(
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COALESCE(SUM(total_price), 0) as total')
-            )
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('COALESCE(SUM(total_price), 0) as total')
+        )
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
 
         // Format dữ liệu cho chart (giống Frontend mẫu của bạn)
-        $chartData = $revenueByDay->map(function($item) {
+        $chartData = $revenueByDay->map(function ($item) {
             return [
                 'name' => Carbon::parse($item->date)->format('d M'), // "26 Nov"
                 'value' => round((float) $item->total / 1000000, 2) // Đổi sang triệu
@@ -122,7 +122,7 @@ class StatisticController extends Controller
         $endDate = Carbon::now()->endOfDay();
 
         $topDishes = OrderDetail::select('menu_item_id', DB::raw('SUM(quantity) as total_sold'))
-            ->whereHas('order', function($query) use ($startDate, $endDate) {
+            ->whereHas('order', function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('created_at', [$startDate, $endDate]);
             })
             ->groupBy('menu_item_id')
@@ -132,7 +132,7 @@ class StatisticController extends Controller
             ->get();
 
         // Format dữ liệu cho chart (khớp với Frontend)
-        $chartData = $topDishes->map(function($item) {
+        $chartData = $topDishes->map(function ($item) {
             return [
                 'name' => $item->menuItem->menu_item_name,
                 'sold' => (int) $item->total_sold
@@ -154,7 +154,7 @@ class StatisticController extends Controller
         // Tháng này
         $thisMonthStart = Carbon::now()->startOfMonth();
         $thisMonthEnd = Carbon::now()->endOfMonth();
-        
+
         $thisMonthRevenue = Order::whereBetween('created_at', [$thisMonthStart, $thisMonthEnd])
             ->sum('total_price');
 
@@ -166,7 +166,7 @@ class StatisticController extends Controller
         // Tháng trước
         $lastMonthStart = Carbon::now()->subMonth()->startOfMonth();
         $lastMonthEnd = Carbon::now()->subMonth()->endOfMonth();
-        
+
         $lastMonthRevenue = Order::whereBetween('created_at', [$lastMonthStart, $lastMonthEnd])
             ->sum('total_price');
 
@@ -176,7 +176,7 @@ class StatisticController extends Controller
             ->count('customer_id');
 
         // Tính % tăng/giảm
-        $revenueChange = $lastMonthRevenue > 0 
+        $revenueChange = $lastMonthRevenue > 0
             ? round((($thisMonthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100, 1)
             : 0;
 
@@ -213,10 +213,10 @@ class StatisticController extends Controller
         $endDate = Carbon::now()->endOfDay();
 
         $topCustomers = Order::select(
-                'customer_id', 
-                DB::raw('SUM(total_price) as total_spent'), 
-                DB::raw('COUNT(*) as order_count')
-            )
+            'customer_id',
+            DB::raw('SUM(total_price) as total_spent'),
+            DB::raw('COUNT(*) as order_count')
+        )
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereNotNull('customer_id')
             ->groupBy('customer_id')
@@ -225,7 +225,7 @@ class StatisticController extends Controller
             ->with('customer')
             ->get();
 
-        $data = $topCustomers->map(function($item, $index) {
+        $data = $topCustomers->map(function ($item, $index) {
             return [
                 'rank' => $index + 1,
                 'customer_id' => $item->customer_id,
@@ -255,7 +255,7 @@ class StatisticController extends Controller
         $totalOrders = Order::whereBetween('created_at', [$startDate, $endDate])->count();
         $totalRevenue = Order::whereBetween('created_at', [$startDate, $endDate])->sum('total_price');
         $averageOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
-        
+
         $totalDishes = MenuItem::count();
         $totalCustomers = Customer::count();
 
