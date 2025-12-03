@@ -43,6 +43,7 @@ export default function DishModal({
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const isEditMode = !!dish;
   const title = isEditMode ? "Chỉnh Sửa Món Ăn" : "Thêm Món Ăn Mới";
@@ -107,12 +108,18 @@ export default function DishModal({
         categories && categories.length > 0
           ? String(categories[0].category_id)
           : "";
+
+      const validCategoryIds = categories.map((cat) => String(cat.category_id));
+      const safeCategory = validCategoryIds.includes(defaultCategory)
+        ? defaultCategory
+        : validCategoryIds[0] || "";
+
       if (isMounted) {
         setFormData({
           id: "",
           name: "",
           price: 0,
-          categoryKey: defaultCategory,
+          categoryKey: safeCategory,
           statusKey: "active",
           description: "",
           image: "",
@@ -141,6 +148,24 @@ export default function DishModal({
       if (id === "price") {
         finalValue = parseInt(value) >= 0 ? parseInt(value) : 0;
       }
+      if (id === "categoryKey") {
+        const validCategoryIds = categories.map((cat) =>
+          String(cat.category_id)
+        );
+        if (!validCategoryIds.includes(String(value))) {
+          console.warn("⚠️ Category không hợp lệ, bỏ qua!");
+          return; // Không cho phép set giá trị không hợp lệ
+        }
+      }
+
+      // ✅ THÊM: Validate statusKey
+      if (id === "statusKey") {
+        const validStatuses = Object.keys(statusMap);
+        if (!validStatuses.includes(value)) {
+          console.warn("⚠️ Status không hợp lệ, bỏ qua!");
+          return;
+        }
+      }
       setFormData((prev) => ({
         ...prev,
         [id]: finalValue,
@@ -165,8 +190,49 @@ export default function DishModal({
   };
   // =======================================
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSaving) return;
+
+    // 1. LẤY GIÁ TRỊ THỰC TẾ TỪ DOM (Đã đúng)
+    const actualCategoryValue = e.target.categoryKey.value;
+    const actualStatusValue = e.target.statusKey.value;
+    const isEditMode = !!dish;
+
+    // DEBUG LOGS (Giữ nguyên)
+    console.log("🐛 DEBUG CATEGORY VALUE (DOM):", actualCategoryValue);
+    console.log("🐛 DEBUG STATUS VALUE (DOM):", actualStatusValue);
+
+    // =============================================
+    // ⭐ BẢO VỆ 1: KIỂM TRA CATEGORY (SỬ DỤNG GIÁ TRỊ TỪ DOM) ⭐
+    // =============================================
+    const validCategoryIds = categories.map((cat) => String(cat.category_id));
+    if (isSaving) return;
+    setIsSaving(true);
+    // SỬA LỖI 1: Dùng actualCategoryValue thay vì formData.categoryKey
+    if (!validCategoryIds.includes(actualCategoryValue)) {
+      alert("❌ Danh mục không hợp lệ! Vui lòng chọn lại.");
+      return; // CHẶN SUBMIT
+    }
+
+    // =============================================
+    // ⭐ BẢO VỆ 2: KIỂM TRA STATUS (SỬ DỤNG GIÁ TRỊ TỪ DOM) ⭐
+    // =============================================
+    const validStatuses = Object.keys(statusMap); // ['active', 'inactive', 'draft']
+
+    // SỬA LỖI 2 & 3: Dùng actualStatusValue thay vì formData.statusKey và bỏ setFormData
+    if (!validStatuses.includes(actualStatusValue)) {
+      alert("⚠️ Trạng thái không hợp lệ! Vui lòng chọn lại.");
+      return; // CHẶN SUBMIT
+    }
+
+    // 4. ĐỒNG BỘ STATE (Chỉ chạy khi Validation PASS)
+    // Cập nhật State với giá trị hợp lệ vừa đọc từ DOM
+    setFormData((prev) => ({
+      ...prev,
+      categoryKey: actualCategoryValue,
+      statusKey: actualStatusValue,
+    }));
 
     // Cảnh báo nếu mô tả quá dài (>45KB)
     if (formData.description && formData.description.length > 45000) {
@@ -184,34 +250,55 @@ export default function DishModal({
       alert("Vui lòng chọn hình ảnh cho món ăn.");
       return;
     }
+    // 3. BẮT ĐẦU TIẾN TRÌNH LƯU
+    setIsSaving(true); // ⭐ VÔ HIỆU HÓA NÚT NGAY
+
+    // 4. ĐỒNG BỘ STATE (Chỉ chạy khi Validation PASS)
+    setFormData((prev) => ({
+      ...prev,
+      categoryKey: actualCategoryValue,
+      statusKey: actualStatusValue,
+    }));
 
     // TẠO FORM DATA để gửi multipart/form-data
     const data = new FormData();
 
     // Thêm trường cơ bản
     data.append("menu_item_name", formData.name);
-    data.append("category_id", formData.categoryKey);
+    // ⭐ SỬA LỖI 4: Dùng actualCategoryValue đã được validate
+    data.append("category_id", actualCategoryValue);
     // === GỬI NỘI DUNG DƯỚI DẠNG CHUỖI JSON ===
     data.append("description", formData.description || "{}");
     // ===========================================
     data.append("price", formData.price);
-    data.append("status", formData.statusKey);
+    // ⭐ SỬA LỖI 5: Dùng actualStatusValue đã được validate
+    data.append("status", actualStatusValue);
 
     if (isEditMode) {
       data.append("_method", "PUT");
+      if (dish && dish.updated_at) {
+        data.append("original_updated_at", dish.updated_at);
+      }
     }
 
     if (imageFile) {
       data.append("image_file", imageFile);
     }
 
-    onSave(data, isEditMode ? formData.id : null);
+    try {
+      await onSave(data, isEditMode ? formData.id : null); // ⭐ THÊM 'await'
+    } catch (error) {
+      console.error("Lỗi khi gọi onSave từ DishModal:", error);
+    } finally {
+      // ⭐ ĐẢM BẢO NÚT ĐƯỢC BẬT LẠI TRONG MỌI TRƯỜNG HỢP
+      setIsSaving(false);
+    }
   };
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black/75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm dish-modal-backdrop-blur">
       <div className="bg-white p-6 rounded-xl w-full max-w-xl shadow-2xl transform transition-all duration-300 max-h-[90vh] flex flex-col">
         <h3 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-3 flex-shrink-0">
           {title}
@@ -294,6 +381,10 @@ export default function DishModal({
                 className="dish-modal-input"
                 value={formData.categoryKey}
                 onChange={handleChange}
+                onContextMenu={(e) => e.preventDefault()}
+                onCopy={(e) => e.preventDefault()}
+                onCut={(e) => e.preventDefault()}
+                title="Vui lòng chọn từ danh sách có sẵn"
               >
                 {categories.map((cat) => (
                   <option key={cat.category_id} value={String(cat.category_id)}>
@@ -397,12 +488,33 @@ export default function DishModal({
             <button
               type="button"
               onClick={onClose}
-              className="dish-button-secondary"
+              className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
             >
               Hủy
             </button>
-            <button type="submit" className="dish-button-primary">
-              {isEditMode ? "Cập Nhật Món Ăn" : "Thêm Món Ăn"}
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition duration-150 shadow-md disabled:opacity-50"
+              disabled={isSaving} // ⭐ THÊM DISABLED
+            >
+              {isSaving ? (
+                <>
+                  Đang Lưu...
+                  {/* Tùy chọn: Thêm hiệu ứng loading spinner */}
+                  <span
+                    className="ml-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                    role="status"
+                  >
+                    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                      Loading...
+                    </span>
+                  </span>
+                </>
+              ) : isEditMode ? (
+                "Cập Nhật Món Ăn"
+              ) : (
+                "Thêm Món Ăn"
+              )}
             </button>
           </div>
         </form>

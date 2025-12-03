@@ -18,8 +18,8 @@ class CategoryController extends Controller
         // Lấy tất cả danh mục, sắp xếp theo ID giảm dần, 
         // và đếm số lượng món ăn trong mỗi danh mục (withCount)
         $categories = Category::withCount('menuItems')
-                                ->orderBy('category_id', 'desc')
-                                ->get();
+            ->orderBy('category_id', 'desc')
+            ->get();
 
         return response()->json([
             'status' => 'success',
@@ -34,9 +34,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        // 1. Validation
         $validated = $request->validate([
             'category_name' => 'required|string|max:255|unique:categories,category_name',
-            // Slug là tùy chọn, nếu không có, sẽ tự động tạo
             'slug' => 'nullable|string|max:255|unique:categories,slug',
             'is_hidden' => 'nullable|boolean',
         ]);
@@ -46,14 +46,17 @@ class CategoryController extends Controller
             $validated['slug'] = Str::slug($validated['category_name']);
         }
 
+        // 2. Tạo bản ghi
         $category = Category::create($validated);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Thêm danh mục thành công!',
             'data' => $category
-        ], 201); // 201 Created
+        ], 201);
     }
+
+    // ------------------------------------------------------------------
 
     /**
      * Cập nhật danh mục (UPDATE)
@@ -61,23 +64,60 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // ⭐ TC-002: 1. Kiểm tra tồn tại danh mục (Stale Data Check)
         $category = Category::find($id);
 
         if (!$category) {
-            return response()->json(['status' => 'error', 'message' => 'Không tìm thấy danh mục!'], 404);
+            // Trả về 410 Gone khi danh mục đã bị xóa
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Danh mục không tồn tại hoặc đã bị xóa.'
+            ], 410);
         }
 
+        // 2. Validation
         $validated = $request->validate([
             'category_name' => 'sometimes|string|max:255|unique:categories,category_name,' . $id . ',category_id',
             'slug' => 'nullable|string|max:255|unique:categories,slug,' . $id . ',category_id',
             'is_hidden' => 'nullable|boolean',
+            // ⭐ TC-001: Lấy timestamp gốc từ Frontend
+            'original_updated_at' => 'required|date',
         ]);
-        
+
+        // ⭐ TC-001: 3. Kiểm tra xung đột (Optimistic Locking)
+        // Lưu ý: $category->updated_at là đối tượng Carbon, cần chuyển về chuỗi để so sánh
+        $currentUpdatedAt = $category->updated_at->toDateTimeString();
+        $originalUpdatedAt = $validated['original_updated_at'];
+
+        try {
+            $originalUpdatedAt = \Carbon\Carbon::parse($validated['original_updated_at'])->toDateTimeString();
+        } catch (\Exception $e) {
+            // Phòng hờ nếu format quá lạ, gửi lỗi 400 Bad Request
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Định dạng thời gian không hợp lệ.'
+            ], 400);
+        }
+
+        // So sánh hai chuỗi đã được đồng bộ hóa
+        if ($currentUpdatedAt !== $originalUpdatedAt) {
+            // Trả về 409 Conflict khi phát hiện xung đột
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cập nhật thất bại. Danh mục đã được người dùng khác chỉnh sửa.',
+                'latest_data' => $category // Tùy chọn: trả về dữ liệu mới nhất
+            ], 409);
+        }
+
         // Tự động tạo slug nếu category_name được cập nhật và slug không có
         if (isset($validated['category_name']) && (empty($validated['slug']) && !isset($request->slug))) {
             $validated['slug'] = Str::slug($validated['category_name']);
         }
-        
+
+        // Loại bỏ trường kiểm tra xung đột trước khi update
+        unset($validated['original_updated_at']);
+
+        // 4. Tiến hành cập nhật
         $category->update($validated);
 
         return response()->json([

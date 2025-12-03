@@ -33,6 +33,7 @@ const mapApiDataToReact = (item) => ({
   image: item.image_url,
   description: item.description,
   statusKey: item.status,
+  updated_at: item.updated_at,
 });
 export default function DishCRUDTable() {
   // === STATES DỮ LIỆU ===
@@ -295,12 +296,14 @@ export default function DishCRUDTable() {
   // 4. LOGIC MODAL
   // =========================================================
 
-  const handleAddDish = () => {
+  const handleAddDish = async () => {
+    await fetchCategories();
     setEditingDish(null);
     setIsEditModalOpen(true);
   };
 
-  const handleEditDish = (dish) => {
+  const handleEditDish = async (dish) => {
+    await fetchCategories();
     setEditingDish(dish);
     setIsEditModalOpen(true);
   };

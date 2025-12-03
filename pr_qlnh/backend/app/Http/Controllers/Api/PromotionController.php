@@ -10,6 +10,10 @@ use Illuminate\Http\JsonResponse;
 
 class PromotionController extends Controller
 {
+    // ✅ DANH SÁCH GIỚI HẠN CHO TC-004
+    private const VALID_DISCOUNT_TYPES = ['percent', 'fixed'];
+    private const VALID_STATUSES = ['active', 'inactive'];
+    
     /**
      * Display a listing of promotions
      */
@@ -61,18 +65,20 @@ class PromotionController extends Controller
 
     /**
      * Store a newly created promotion
+     * ✅ TC-004: Validation chặt chẽ
      */
     public function store(Request $request): JsonResponse
     {
+        // ✅ TC-004: Validation với giới hạn cụ thể
         $validator = Validator::make($request->all(), [
             'code' => 'required|string|max:50|unique:promotions,code',
             'title' => 'required|string|max:150',
-            'description' => 'nullable|string',
-            'discount_type' => 'required|in:percent,fixed',
-            'discount_value' => 'required|numeric|min:0',
-            'max_uses' => 'nullable|integer|min:1',
+            'description' => 'nullable|string|max:65535', // TEXT field limit
+            'discount_type' => 'required|in:' . implode(',', self::VALID_DISCOUNT_TYPES),
+            'discount_value' => 'required|numeric|min:0|max:99999999',
+            'max_uses' => 'nullable|integer|min:1|max:999999',
             'expired_at' => 'nullable|date|after:now',
-            'status' => 'nullable|string|max:30'
+            'status' => 'nullable|in:' . implode(',', self::VALID_STATUSES),
         ]);
 
         if ($validator->fails()) {
@@ -83,15 +89,24 @@ class PromotionController extends Controller
             ], 422);
         }
 
-        // Validate discount_value based on discount_type
+        // ✅ TC-004: Kiểm tra discount_value dựa trên discount_type
         if ($request->discount_type === 'percent' && $request->discount_value > 100) {
             return response()->json([
                 'success' => false,
-                'message' => 'Discount value cannot exceed 100% for percent type'
+                'message' => 'Discount value cannot exceed 100% for percent type',
+                'errors' => [
+                    'discount_value' => ['Giá trị giảm giá không được vượt quá 100% cho loại phần trăm.']
+                ]
             ], 422);
         }
 
-        $promotion = Promotion::create($request->all());
+        // ✅ Set default status nếu không có
+        $data = $request->all();
+        if (!isset($data['status'])) {
+            $data['status'] = 'active';
+        }
+
+        $promotion = Promotion::create($data);
 
         return response()->json([
             'success' => true,
@@ -102,11 +117,13 @@ class PromotionController extends Controller
 
     /**
      * Display the specified promotion
+     * ✅ TC-002: Kiểm tra tồn tại
      */
     public function show(string $id): JsonResponse
     {
         $promotion = Promotion::find($id);
 
+        // ✅ TC-002: Kiểm tra tồn tại
         if (!$promotion) {
             return response()->json([
                 'success' => false,
@@ -122,27 +139,52 @@ class PromotionController extends Controller
 
     /**
      * Update the specified promotion
+     * ✅ TC-001: Optimistic Locking
+     * ✅ TC-002: Kiểm tra tồn tại
+     * ✅ TC-004: Validation chặt chẽ
      */
     public function update(Request $request, string $id): JsonResponse
     {
         $promotion = Promotion::find($id);
 
+        // ✅ TC-002: Kiểm tra tồn tại (Stale Data Check)
         if (!$promotion) {
             return response()->json([
                 'success' => false,
-                'message' => 'Promotion not found'
+                'message' => 'Ưu đãi không tồn tại (có thể đã bị xóa)!',
+                'error_code' => 'NOT_FOUND'
             ], 404);
         }
 
+        // ✅ TC-001: Kiểm tra Conflict (Optimistic Locking)
+        $clientUpdatedAt = $request->input('updated_at');
+
+        if ($clientUpdatedAt) {
+            $dbTimestamp = $promotion->updated_at->format('Y-m-d H:i:s');
+            $clientTimestamp = date('Y-m-d H:i:s', strtotime($clientUpdatedAt));
+
+            if ($clientTimestamp !== $dbTimestamp) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Dữ liệu đã bị thay đổi bởi người dùng khác. Vui lòng tải lại trang!',
+                    'error_code' => 'DATA_CONFLICT',
+                    'current_data' => $promotion,
+                    'client_timestamp' => $clientTimestamp,
+                    'server_timestamp' => $dbTimestamp,
+                ], 409);
+            }
+        }
+
+        // ✅ TC-004: Validation chặt chẽ
         $validator = Validator::make($request->all(), [
             'code' => 'sometimes|required|string|max:50|unique:promotions,code,' . $id . ',promotion_id',
             'title' => 'sometimes|required|string|max:150',
-            'description' => 'nullable|string',
-            'discount_type' => 'sometimes|required|in:percent,fixed',
-            'discount_value' => 'sometimes|required|numeric|min:0',
-            'max_uses' => 'nullable|integer|min:1',
+            'description' => 'nullable|string|max:65535',
+            'discount_type' => 'sometimes|required|in:' . implode(',', self::VALID_DISCOUNT_TYPES),
+            'discount_value' => 'sometimes|required|numeric|min:0|max:99999999',
+            'max_uses' => 'nullable|integer|min:1|max:999999',
             'expired_at' => 'nullable|date',
-            'status' => 'nullable|string|max:30'
+            'status' => 'nullable|in:' . implode(',', self::VALID_STATUSES),
         ]);
 
         if ($validator->fails()) {
@@ -153,30 +195,41 @@ class PromotionController extends Controller
             ], 422);
         }
 
-        // Validate discount_value based on discount_type
-        if ($request->has('discount_type') && $request->discount_type === 'percent' && $request->discount_value > 100) {
+        // ✅ TC-004: Kiểm tra discount_value dựa trên discount_type
+        $discountType = $request->has('discount_type') ? $request->discount_type : $promotion->discount_type;
+        $discountValue = $request->has('discount_value') ? $request->discount_value : $promotion->discount_value;
+
+        if ($discountType === 'percent' && $discountValue > 100) {
             return response()->json([
                 'success' => false,
-                'message' => 'Discount value cannot exceed 100% for percent type'
+                'message' => 'Discount value cannot exceed 100% for percent type',
+                'errors' => [
+                    'discount_value' => ['Giá trị giảm giá không được vượt quá 100% cho loại phần trăm.']
+                ]
             ], 422);
         }
 
-        $promotion->update($request->all());
+        // Loại bỏ updated_at khỏi request data
+        $dataToUpdate = $request->except(['updated_at']);
+        
+        $promotion->update($dataToUpdate);
 
         return response()->json([
             'success' => true,
             'message' => 'Promotion updated successfully',
-            'data' => $promotion
+            'data' => $promotion->fresh() // Trả về data mới nhất kèm updated_at mới
         ], 200);
     }
 
     /**
      * Remove the specified promotion
+     * ✅ TC-002: Kiểm tra tồn tại
      */
     public function destroy(string $id): JsonResponse
     {
         $promotion = Promotion::find($id);
 
+        // ✅ TC-002: Kiểm tra tồn tại
         if (!$promotion) {
             return response()->json([
                 'success' => false,
@@ -202,6 +255,7 @@ class PromotionController extends Controller
 
     /**
      * Verify promotion code
+     * ✅ TC-002: Kiểm tra tồn tại
      */
     public function verifyCode(Request $request): JsonResponse
     {
@@ -221,6 +275,7 @@ class PromotionController extends Controller
             ->where('status', 'active')
             ->first();
 
+        // ✅ TC-002: Kiểm tra tồn tại
         if (!$promotion) {
             return response()->json([
                 'success' => false,
@@ -253,11 +308,13 @@ class PromotionController extends Controller
 
     /**
      * Apply promotion (increment used_count)
+     * ✅ TC-002: Kiểm tra tồn tại
      */
     public function apply(string $id): JsonResponse
     {
         $promotion = Promotion::find($id);
 
+        // ✅ TC-002: Kiểm tra tồn tại
         if (!$promotion) {
             return response()->json([
                 'success' => false,
@@ -274,6 +331,9 @@ class PromotionController extends Controller
         ], 200);
     }
 
+    /**
+     * Get active promotions
+     */
     public function getActive()
     {
         $promotions = Promotion::where('status', 'active')

@@ -308,7 +308,13 @@ const PromoEditModal = ({ isVisible, onClose, onSave, promotion }) => {
 };
 
 // === COMPONENT MODAL CHỌN MÓN ĂN NỔI BẬT ===
-const DishSelectorModal = ({ isVisible, onClose, dishList, onSave }) => {
+const DishSelectorModal = ({
+  isVisible,
+  onClose,
+  dishList,
+  onSave,
+  isLoading,
+}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [localDishList, setLocalDishList] = useState(dishList);
 
@@ -435,6 +441,7 @@ const DishSelectorModal = ({ isVisible, onClose, dishList, onSave }) => {
             <button
               type="button"
               onClick={onClose}
+              disabled={isLoading}
               className="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 font-medium transition duration-150"
             >
               Hủy
@@ -442,9 +449,36 @@ const DishSelectorModal = ({ isVisible, onClose, dishList, onSave }) => {
             <button
               type="button"
               onClick={handleSave}
+              disabled={isLoading}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition duration-150 shadow-md"
             >
-              Lưu Món nổi bật
+              {isLoading ? ( // ← THÊM
+                <span className="flex items-center">
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Đang lưu...
+                </span>
+              ) : (
+                "Lưu Món nổi bật"
+              )}
             </button>
           </div>
         </div>
@@ -461,6 +495,8 @@ export default function QuanLyTrangThongTin() {
   // State cho Promotions
   const [promotions, setPromotions] = useState([]);
   const [isLoadingPromotions, setIsLoadingPromotions] = useState(false);
+  const [promoTimestamps, setPromoTimestamps] = useState({});
+  const [dishTimestamps, setDishTimestamps] = useState({});
   const [promoSearchTerm, setPromoSearchTerm] = useState("");
   const [pagination, setPagination] = useState({
     current_page: 1,
@@ -477,6 +513,7 @@ export default function QuanLyTrangThongTin() {
   // State cho Featured Dishes
   const [dishList, setDishList] = useState([]);
   const [isLoadingDishes, setIsLoadingDishes] = useState(false);
+  const [isSavingFeatured, setIsSavingFeatured] = useState(false);
 
   // === API FUNCTIONS ===
 
@@ -504,6 +541,12 @@ export default function QuanLyTrangThongTin() {
           total: result.pagination.total,
           last_page: result.pagination.last_page,
         });
+        // ✅ THÊM: Lưu timestamps
+        const timestamps = {};
+        result.data.forEach((promo) => {
+          timestamps[promo.promotion_id] = promo.updated_at;
+        });
+        setPromoTimestamps(timestamps);
       } else {
         alert("Không thể tải danh sách ưu đãi");
       }
@@ -531,6 +574,11 @@ export default function QuanLyTrangThongTin() {
 
       if (result.status === "success") {
         setDishList(result.data);
+        const timestamps = {};
+        result.data.forEach((dish) => {
+          timestamps[dish.menu_item_id] = dish.updated_at;
+        });
+        setDishTimestamps(timestamps);
       } else {
         alert("Không thể tải danh sách món ăn");
       }
@@ -581,13 +629,17 @@ export default function QuanLyTrangThongTin() {
       let response;
 
       if (promotionId) {
+        const dataToSend = { ...formData };
+        if (promoTimestamps[promotionId]) {
+          dataToSend.updated_at = promoTimestamps[promotionId];
+        }
         // Update existing promotion
         response = await fetch(`${API_BASE_URL}/promotions/${promotionId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(dataToSend),
         });
       } else {
         // Create new promotion
@@ -601,6 +653,29 @@ export default function QuanLyTrangThongTin() {
       }
 
       const result = await response.json();
+      if (response.status === 404) {
+        alert("⚠️ Ưu đãi không tồn tại (có thể đã bị xóa). Tải lại danh sách!");
+        closePromoModal();
+        fetchPromotions(pagination.current_page, promoSearchTerm);
+        return;
+      }
+
+      // ✅ TC-001: Xử lý 409 (Conflict)
+      if (response.status === 409) {
+        if (
+          window.confirm(
+            `⚠️ ${result.message}\n\n` +
+              `Dữ liệu hiện tại:\n` +
+              `- Tiêu đề: ${result.current_data?.title}\n` +
+              `- Giá trị: ${result.current_data?.discount_value}\n\n` +
+              `Bạn có muốn tải lại dữ liệu mới nhất không?`
+          )
+        ) {
+          closePromoModal();
+          fetchPromotions(pagination.current_page, promoSearchTerm);
+        }
+        return;
+      }
 
       if (result.success) {
         alert(result.message);
@@ -660,46 +735,107 @@ export default function QuanLyTrangThongTin() {
   };
 
   const saveFeaturedDishes = async (updatedDishList) => {
+    setIsSavingFeatured(true);
     try {
-      // BƯỚC 0: Reset TẤT CẢ món trong database về 0 (dùng vòng lặp qua dishList gốc)
-      console.log("Đang reset tất cả món về 0...");
-      const allResetPromises = dishList.map(async (dish) => {
-        await fetch(`${API_URL}/${dish.menu_item_id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ is_featured: 0 }),
-        });
-      });
-      await Promise.all(allResetPromises);
-
-      // BƯỚC 1: Set 3 món được chọn = 1
-      console.log("Đang set món được chọn = 1...");
       const featuredDishes = updatedDishList.filter((d) => d.is_featured);
+      const featuredIds = featuredDishes.map((d) => d.menu_item_id);
 
-      const setFeaturedPromises = featuredDishes.map(async (dish) => {
-        console.log(`→ Gửi request món ${dish.menu_item_id}`); // ← THÊM
+      console.log("🚀 Bắt đầu cập nhật món nổi bật...");
+      console.log("Món được chọn:", featuredIds);
+
+      // ✅ CHỈ CẬP NHẬT NHỮNG MÓN CÓ THAY ĐỔI
+      const updatedDishes = [];
+      const updatePromises = dishList.map(async (dish) => {
+        const shouldBeFeatured = featuredIds.includes(dish.menu_item_id);
+        const currentlyFeatured =
+          dish.is_featured == 1 || dish.is_featured === true;
+
+        // Bỏ qua nếu trạng thái không thay đổi
+        if (shouldBeFeatured === currentlyFeatured) {
+          console.log(`⏭️ Bỏ qua món ${dish.menu_item_id} (không đổi)`);
+          return { success: true, skipped: true };
+        }
+
+        // Cập nhật món có thay đổi
+        const payload = {
+          is_featured: shouldBeFeatured ? 1 : 0,
+          updated_at: dishTimestamps[dish.menu_item_id] || dish.updated_at,
+        };
+
+        console.log(`📤 Cập nhật món ${dish.menu_item_id}:`, payload);
 
         const response = await fetch(`${API_URL}/${dish.menu_item_id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ is_featured: 1 }),
+          body: JSON.stringify(payload),
         });
 
         const result = await response.json();
-        console.log(`← Response món ${dish.menu_item_id}:`, result); // ← THÊM
-        return result;
+
+        // Xử lý lỗi
+        if (response.status === 409) {
+          console.error(`⚠️ Conflict món ${dish.menu_item_id}`);
+          throw new Error(
+            `Món "${dish.menu_item_name}" đã bị thay đổi bởi người khác. Vui lòng thử lại!`
+          );
+        }
+        if (response.status === 404) {
+          throw new Error(
+            `Món "${dish.menu_item_name}" không tồn tại (có thể đã bị xóa).`
+          );
+        }
+        if (!response.ok) {
+          throw new Error(
+            `Lỗi khi cập nhật món ${dish.menu_item_name}: ${
+              result.message || "Unknown error"
+            }`
+          );
+        }
+
+        console.log(`✅ Thành công món ${dish.menu_item_id}`);
+
+        // Lưu dish đã update để cập nhật local state
+        if (result.data) {
+          updatedDishes.push(result.data);
+        }
+
+        return { success: true, data: result.data };
       });
 
-      await Promise.all(setFeaturedPromises);
-      console.log("✅ Hoàn thành set featured"); // ← THÊM
+      // Đợi tất cả requests hoàn thành
+      await Promise.all(updatePromises);
 
-      alert(`Đã lưu ${featuredDishes.length} món ăn làm nổi bật.`);
+      console.log("✅ Hoàn thành cập nhật món nổi bật");
 
-      await fetchDishes();
+      // ✅ CẬP NHẬT LOCAL STATE THAY VÌ GỌI API LẠI
+      setDishList((prevList) => {
+        const updatedMap = new Map(
+          updatedDishes.map((d) => [d.menu_item_id, d])
+        );
+        return prevList.map(
+          (dish) => updatedMap.get(dish.menu_item_id) || dish
+        );
+      });
+
+      // ✅ CẬP NHẬT TIMESTAMPS
+      const newTimestamps = {};
+      updatedDishes.forEach((dish) => {
+        if (dish.updated_at) {
+          newTimestamps[dish.menu_item_id] = dish.updated_at;
+        }
+      });
+      setDishTimestamps((prev) => ({ ...prev, ...newTimestamps }));
+
+      alert(`Đã lưu ${featuredDishes.length} món ăn làm nổi bật thành công!`);
       closeDishSelectorModal();
     } catch (error) {
-      console.error("Error updating featured dishes:", error);
-      alert("Có lỗi xảy ra khi cập nhật món nổi bật");
+      console.error("❌ Error updating featured dishes:", error);
+      alert(error.message || "Có lỗi xảy ra khi cập nhật món nổi bật");
+
+      // ✅ CHỈ RELOAD KHI CÓ LỖI
+      await fetchDishes();
+    } finally {
+      setIsSavingFeatured(false); // ← THÊM dòng này
     }
   };
   const featuredDishes = React.useMemo(() => {
@@ -1112,6 +1248,7 @@ export default function QuanLyTrangThongTin() {
         onClose={closeDishSelectorModal}
         dishList={dishList}
         onSave={saveFeaturedDishes}
+        isLoading={isSavingFeatured}
       />
     </div>
   );
