@@ -6,24 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id('message_id');
-            $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade');
-            $table->string('sender_type', 10);
-            $table->text('message');
-            $table->string('status', 20)->default('sent');
+            $table->unsignedBigInteger('user_id');
+
+            // Cột conversation_id tham chiếu đúng cột id trong conversations
+            $table->unsignedBigInteger('conversation_id');
+            $table->foreign('conversation_id')
+                ->references('conversation_id')
+                ->on('conversations')
+                ->onDelete('cascade');
+            $table->string('sender_type')->nullable();
+
+            $table->boolean('is_read')->default(false);
+            $table->text('message')->nullable();
+            $table->enum('status', ['sending', 'sent', 'read', 'failed'])->default('sending');
             $table->timestamps();
+
+            // Indexes
+            $table->index(['conversation_id', 'created_at']);
+            $table->index('user_id');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('messages');

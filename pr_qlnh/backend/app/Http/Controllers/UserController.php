@@ -14,18 +14,40 @@ class UserController extends Controller
     // Lấy danh sách tất cả người dùng
     public function index()
     {
-        $users = User::getAllUsers();
+        $users = User::with('roles')->get()->map(function ($user) {
+            return [
+                'user_id' => $user->user_id,
+                'full_name' => $user->full_name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'status' => $user->status,
+                'created_at' => $user->created_at,
+                'roles' => $user->roles->pluck('name')->implode(', '),
+                'role_id' => $user->roles->first()?->id, // Lấy role_id đầu tiên
+            ];
+        });
         return response()->json($users);
     }
     // Lấy chi tiết người dùng theo ID
     public function show($id)
     {
-        $user = User::getUserById($id);
+        $user = User::with('roles')->find($id);
         if (!$user) {
             return response()->json(['message' => 'Người dùng không tồn tại!'], 404);
-        } else {
-            return response()->json($user);
         }
+        
+        $userData = [
+            'user_id' => $user->user_id,
+            'full_name' => $user->full_name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'status' => $user->status,
+            'created_at' => $user->created_at,
+            'roles' => $user->roles->pluck('name')->implode(', '),
+            'role_id' => $user->roles->first()?->id,
+        ];
+        
+        return response()->json($userData);
     }
     // Them nguoi dung
     public function store(Request $request)
@@ -62,22 +84,33 @@ class UserController extends Controller
     // Cập nhật người dùng
     public function update(Request $request, $id)
     {
-        $id = User::find($id);
-        if (!$id) {
+        $user = User::find($id);
+        if (!$user) {
             return response()->json(['message' => 'Người dùng không tồn tại!'], 404);
         }
 
         $request->validate([
             'full_name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $id,
-            'phone' => 'sometimes|required|unique:users,phone,' . $id
+            'email' => 'sometimes|required|email|unique:users,email,' . $id . ',user_id',
+            'phone' => 'sometimes|required|unique:users,phone,' . $id . ',user_id',
+            'status' => 'sometimes|required|in:0,1',
+            'role_id' => 'sometimes|nullable|exists:roles,id'
         ]);
 
-        $user = User::updateUser($id, $request->all());
+        $updatedUser = User::updateUser($id, $request->all());
+
+        // Cập nhật vai trò trong bảng user_roles nếu có role_id
+        if ($request->has('role_id') && $request->role_id) {
+            // Xóa tất cả vai trò cũ và gán vai trò mới
+            $user->roles()->sync([$request->role_id]);
+        }
+
+        // Load lại user với roles để trả về
+        $updatedUser = User::with('roles')->find($id);
 
         return response()->json([
             'message' => 'Cập nhật người dùng thành công!',
-            'user' => $user
+            'user' => $updatedUser
         ]);
     }
     // Xóa người dùng

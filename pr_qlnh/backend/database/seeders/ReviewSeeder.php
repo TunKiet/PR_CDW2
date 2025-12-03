@@ -51,7 +51,7 @@ class ReviewSeeder extends Seeder
                 'image_url' => $imageUrl,
                 'like' => $like,
                 'dislike' => $dislike,
-                'status' => 'pending',
+                'status' => 'appored',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

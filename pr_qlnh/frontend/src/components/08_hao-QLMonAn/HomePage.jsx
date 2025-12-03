@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import "./ReservationForm.css";
 import MenuItemModal from "../MenuItemModal";
+import OrderOnlineForm from "../OrderOnlineForm";
+import UserChat from "../Chat/UserChat";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
 
@@ -12,9 +15,10 @@ const formatCurrency = (amount) =>
     currency: "VND",
   }).format(amount);
 
-// ReservationForm Component (giữ nguyên)
+// ===================================================================
+// ReservationForm Component
+// ===================================================================
 function ReservationForm({ cart, onClose, formatCurrency }) {
-  // ... code cũ giữ nguyên
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -54,7 +58,6 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
         </button>
         <h2 className="reservation-title">Đặt Bàn Ngay</h2>
         <form onSubmit={handleSubmit}>
-          {/* Form fields giữ nguyên */}
           <div className="form-grid">
             <div>
               <label>Tên *</label>
@@ -84,35 +87,15 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
             </div>
             <div>
               <label>Ngày *</label>
-              <input
-                type="date"
-                min={today}
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                required
-              />
+              <input type="date" min={today} name="date" value={formData.date} onChange={handleChange} required />
             </div>
             <div>
               <label>Giờ *</label>
-              <input
-                type="time"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-                required
-              />
+              <input type="time" name="time" value={formData.time} onChange={handleChange} required />
             </div>
             <div className="full">
               <label>Số lượng khách *</label>
-              <input
-                type="number"
-                min="1"
-                name="guests"
-                value={formData.guests}
-                onChange={handleChange}
-                required
-              />
+              <input type="number" min="1" name="guests" value={formData.guests} onChange={handleChange} required />
             </div>
           </div>
           <fieldset className="seating">
@@ -133,42 +116,42 @@ function ReservationForm({ cart, onClose, formatCurrency }) {
               ))}
             </div>
           </fieldset>
+
           {cart.length > 0 && (
             <div className="preorder-summary">
               <h3>🍽️ Tóm Tắt Đặt Món Trước</h3>
-              <p>
-                Tổng: <strong>{formatCurrency(total)}</strong>
-              </p>
-              <p>
-                Cọc 50%:{" "}
-                <strong className="text-red">{formatCurrency(deposit)}</strong>
-              </p>
+              <p>Tổng: <strong>{formatCurrency(total)}</strong></p>
+              <p>Cọc 50%: <strong className="text-red">{formatCurrency(deposit)}</strong></p>
             </div>
           )}
+
           <div className="notes">
             <label>Ghi chú</label>
-            <textarea
-              rows="3"
-              name="notes"
-              value={formData.notes}
-              onChange={handleChange}
-            />
+            <textarea rows="3" name="notes" value={formData.notes} onChange={handleChange} />
           </div>
-          <button type="submit" className="submit-btn">
-            Gửi Yêu Cầu Đặt Bàn
-          </button>
+
+          <button type="submit" className="submit-btn">Gửi Yêu Cầu Đặt Bàn</button>
         </form>
       </div>
     </div>
   );
 }
 
+// ===================================================================
 // HomePage Component
+// ===================================================================
 export default function HomePage() {
-  // States
+  const navigate = useNavigate();
+  
+  // User state
+  const [user, setUser] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  // Modal & Cart state
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
   const [showReservation, setShowReservation] = useState(false);
+  const [showOrderOnline, setShowOrderOnline] = useState(false);
   const [toast, setToast] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -189,6 +172,29 @@ export default function HomePage() {
   const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [isLoadingPromotions, setIsLoadingPromotions] = useState(true);
+
+  // ================= CHECK LOGIN =================
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+    if (storedUser && token) {
+      setUser(JSON.parse(storedUser));
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  // ================= LOGOUT HANDLER =================
+  const handleLogout = () => {
+    if (window.confirm("Bạn có chắc muốn đăng xuất?")) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("roles");
+      setUser(null);
+      setIsLoggedIn(false);
+      alert("Đã đăng xuất thành công!");
+      navigate("/");
+    }
+  };
 
   // ================= FETCH DATA =================
   useEffect(() => {
@@ -229,14 +235,10 @@ export default function HomePage() {
     fetch(`${API_BASE_URL}/menu-items`)
       .then((res) => res.json())
       .then((data) => {
-        console.log("Menu API response:", data);
-
         if (Array.isArray(data)) {
-          // Trường hợp API trả về array trực tiếp
           setMenuItems(data);
           setFilteredItems(data);
         } else if (data.success === true && Array.isArray(data.data)) {
-          // ⭐ SỬA: success thay vì status
           setMenuItems(data.data);
           setFilteredItems(data.data);
         } else {
@@ -252,7 +254,7 @@ export default function HomePage() {
       });
   }, []);
 
-  // Filter by category
+  // ================= FILTER BY CATEGORY =================
   const filterByCategory = (catId) => {
     setSelectedCategory(catId);
     if (catId === "all") {
@@ -263,7 +265,7 @@ export default function HomePage() {
     setCurrentPage(1);
   };
 
-  // Pagination
+  // ================= PAGINATION =================
   const lastIndex = currentPage * itemsPerPage;
   const firstIndex = lastIndex - itemsPerPage;
   const currentItems = Array.isArray(filteredItems)
@@ -271,11 +273,10 @@ export default function HomePage() {
     : [];
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
-  const nextPage = () =>
-    currentPage < totalPages && setCurrentPage(currentPage + 1);
+  const nextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
   const prevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
 
-  // Cart functions
+  // ================= CART FUNCTIONS =================
   const onAddToCart = (item) => {
     setCart((prev) => {
       const exists = prev.find((x) => x.menu_item_id === item.menu_item_id);
@@ -297,7 +298,9 @@ export default function HomePage() {
     setCart((prev) =>
       prev
         .map((i) =>
-          i.menu_item_id === id ? { ...i, quantity: i.quantity + amount } : i
+          i.menu_item_id === id
+            ? { ...i, quantity: i.quantity + amount }
+            : i
         )
         .filter((i) => i.quantity > 0)
     );
@@ -318,24 +321,38 @@ export default function HomePage() {
         <nav className="home-navbar">
           <div className="nav-logo">🍜 Nhà Hàng Nhóm D</div>
           <ul className="nav-links">
-            <li>
-              <a href="#home">Trang chủ</a>
-            </li>
-            <li>
-              <a href="#featured">Món nổi bật</a>
-            </li>
-            <li>
-              <a href="#menu">Thực đơn</a>
-            </li>
-            <li>
-              <a href="#promotions">Ưu đãi</a>
-            </li>
-            <li>
-              <a href="#reservation">Đặt bàn</a>
-            </li>
+            <li><a href="#home">Trang chủ</a></li>
+            <li><a href="#featured">Món nổi bật</a></li>
+            <li><a href="#menu">Thực đơn</a></li>
+            <li><a href="#promotions">Ưu đãi</a></li>
+            <li><a href="#reservation">Đặt bàn</a></li>
           </ul>
-          <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
-            🛒 <span>{cart.reduce((s, i) => s + i.quantity, 0)}</span>
+
+          <div className="flex items-center gap-4">
+            {isLoggedIn && user && (
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-gray-700">
+                  <span className="font-medium">👤 {user.full_name || user.username || "Khách"}</span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition text-sm font-medium"
+                >
+                  Đăng xuất
+                </button>
+              </div>
+            )}
+            {!isLoggedIn && (
+              <button
+                onClick={() => navigate("/")}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition text-sm font-medium"
+              >
+                Đăng nhập
+              </button>
+            )}
+            <div className="cart-icon" onClick={() => setShowCart(!showCart)}>
+              🛒 <span>{cart.reduce((s, i) => s + i.quantity, 0)}</span>
+            </div>
           </div>
         </nav>
       </header>
@@ -423,7 +440,7 @@ export default function HomePage() {
           🍽️ Thực Đơn Đầy Đủ
         </h2>
 
-        {/* CATEGORY FILTER - DYNAMIC FROM API */}
+        {/* CATEGORY FILTER */}
         <div className="flex flex-wrap justify-center gap-3 mb-8 px-4">
           <button
             className={`px-5 py-2 rounded-full transition ${
@@ -501,6 +518,9 @@ export default function HomePage() {
           )}
         </div>
 
+        {/* UserChat Component */}
+        <UserChat />
+
         {/* PAGINATION */}
         {totalPages > 1 && (
           <div className="flex justify-center items-center gap-4 mt-8">
@@ -533,7 +553,7 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* ===== PROMOTIONS SECTION - DYNAMIC FROM API ===== */}
+      {/* ===== PROMOTIONS SECTION ===== */}
       <section
         id="promotions"
         className="promo-section py-12 bg-gradient-to-r from-purple-50 to-pink-50"
@@ -629,17 +649,9 @@ export default function HomePage() {
                     <li key={item.menu_item_id}>
                       <span>{item.menu_item_name}</span>
                       <div className="quantity-control">
-                        <button
-                          onClick={() => updateQuantity(item.menu_item_id, -1)}
-                        >
-                          -
-                        </button>
+                        <button onClick={() => updateQuantity(item.menu_item_id, -1)}>-</button>
                         <span>{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.menu_item_id, +1)}
-                        >
-                          +
-                        </button>
+                        <button onClick={() => updateQuantity(item.menu_item_id, +1)}>+</button>
                       </div>
                       <span>{formatCurrency(item.price * item.quantity)}</span>
                     </li>
@@ -649,7 +661,15 @@ export default function HomePage() {
                   Tổng cộng: {formatCurrency(totalAmount)}
                 </p>
                 <div className="cart-actions">
-                  <button className="checkout-btn">Thanh toán</button>
+                  <button 
+                    className="checkout-btn"
+                    onClick={() => {
+                      setShowCart(false);
+                      setShowOrderOnline(true);
+                    }}
+                  >
+                    Đặt hàng online
+                  </button>
                   <button
                     className="book-btn"
                     onClick={() => {
@@ -671,16 +691,30 @@ export default function HomePage() {
         <MenuItemModal
           item={selectedItem}
           onClose={() => setShowModal(false)}
+          onAddToCart={onAddToCart}
         />
       )}
 
-      {/* Reservation Form */}
+      {/* Form đặt bàn */}
       {showReservation && (
         <ReservationForm
           cart={cart}
           onClose={() => setShowReservation(false)}
           formatCurrency={formatCurrency}
         />
+      )}
+
+      {/* Form đặt hàng online */}
+      {showOrderOnline && (
+        <div className="order-online-overlay" onClick={() => setShowOrderOnline(false)}>
+          <div className="order-online-box" onClick={(e) => e.stopPropagation()}>
+            <OrderOnlineForm
+              cart={cart}
+              onClose={() => setShowOrderOnline(false)}
+              formatCurrency={formatCurrency}
+            />
+          </div>
+        </div>
       )}
 
       {/* Toast */}

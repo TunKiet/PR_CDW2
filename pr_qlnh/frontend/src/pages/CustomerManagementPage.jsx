@@ -13,15 +13,12 @@ import {
   searchCustomers,
 } from "../data/customerData";
 
-
 const CustomerManagementPage = () => {
   const [customers, setCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  
-  // =========== LOAD CUSTOMER ===========
   useEffect(() => {
     loadCustomers();
   }, []);
@@ -119,13 +116,12 @@ const CustomerManagementPage = () => {
     setSearchTerm(value);
     const trimmed = value.trim();
     const digits = trimmed.replace(/\D/g, "");
-
     if (digits.length >= 6) {
       try {
         const res = await searchCustomers(digits);
         const data = res?.data ?? res;
-        const item = data?.data ?? data;
-
+        const item = data?.data ?? data; // support payload shapes
+        // If backend returns single customer object, display that single one
         if (item && !Array.isArray(item)) {
           setCustomers([item]);
           return;
@@ -148,7 +144,6 @@ const CustomerManagementPage = () => {
     }
   };
 
-  // =========== UI ===========
   return (
     <div className="flex min-h-screen bg-gray-50">
     <Sidebar />
@@ -158,17 +153,18 @@ const CustomerManagementPage = () => {
           Quản Lý Khách Hàng & Tích Điểm
         </h1>
 
-        <div className="flex justify-between items-center mb-6 space-x-4">
+        <div className="flex justify-between items-center mb-6 space-x-4 pb-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
 
             <input
               type="text"
-              placeholder="Tìm khách hàng theo tên hoặc SĐT..."
+              placeholder=" Tìm khách hàng theo tên hoặc SĐT..." 
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-3 px-5 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700"
             />
+            
           </div>
 
           <div className="flex gap-3">

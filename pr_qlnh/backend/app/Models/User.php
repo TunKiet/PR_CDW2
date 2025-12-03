@@ -28,12 +28,13 @@ class User extends Authenticatable implements JWTSubject
 
     //Các cột có thể gán hàng loạt (mass assignment)
     protected $fillable = [
-        'username', // Đã thay thế 'name' bằng 'username'
+        'full_name', // Đã thay thế 'name' bằng 'username'
         'email',
         'password',
-        'full_name',
         'phone',
+        'role',
         'status',
+        'two_factor_enabled',
     ];
 
     // Ẩn password khi trả về JSON
@@ -119,7 +120,7 @@ class User extends Authenticatable implements JWTSubject
     public static function addUser($data)
     {
         return self::create([
-            'full_name' => $data['username'] ?? null,
+            'full_name' => $data['full_name'] ?? null,
             'email' => $data['email'],
             'password' => $data['password'],
             'phone' => $data['phone'],

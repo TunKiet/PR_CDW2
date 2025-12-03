@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import UserTable from "../components/UserTable";
 import UserDetailsModal from "../components/UserDetailsModal";
+import AddUserModal from "../components/AddUserModal";
 import { Search } from "lucide-react";
 import "../pages/Dashboard/Sales_Statistics_Dashboard.css";
 import {
@@ -17,6 +18,7 @@ const UserManagementPage = () => {
   const [User, setUser] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -36,19 +38,20 @@ const UserManagementPage = () => {
     }
   };
 
-  const handleAddUser = async () => {
+  const handleAddUser = async (userData) => {
     try {
-      const payload = { name: "nhân viên mới", phone: "" };
-      const res = await addUser(payload);
+      const res = await addUser(userData);
       // support different shapes
       const newUser = res?.data ?? res;
-      // if wrapper { data: User }:
-      const item = newUser?.data ?? newUser;
-      setUser((prev) => [item, ...prev]);
-      setSelectedUser(item);
+      const item = newUser?.user ?? newUser?.data ?? newUser;
+      
+      setShowAddModal(false);
+      await loadUser();
+      alert("Thêm nhân viên thành công!");
     } catch (err) {
       console.error("Lỗi thêm nhân viên:", err);
-      alert("Thêm nhân viên lỗi. Kiểm tra console.");
+      const errorMsg = err.response?.data?.message || "Thêm nhân viên lỗi. Kiểm tra console.";
+      alert(errorMsg);
     }
   };
 
@@ -62,20 +65,25 @@ const UserManagementPage = () => {
       await updateUser(id, updatedFields);
       setSelectedUser(null);
       await loadUser();
+      alert("Cập nhật nhân viên thành công!");
     } catch (err) {
       console.error("Lỗi cập nhật nhân viên:", err);
-      alert("Cập nhật lỗi. Kiểm tra console.");
+      const errorMsg = err.response?.data?.message || "Cập nhật lỗi. Kiểm tra console.";
+      alert(errorMsg);
     }
   };
 
   const handleDeleteUser = async (id) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa nhân viên có mã ${id} này không?`)) return;
+    if (!window.confirm(`Bạn có chắc muốn xóa vĩnh viễn nhân viên có mã ${id} này không?`)) return;
     try {
       await deleteUser(id);
+      setSelectedUser(null);
       await loadUser();
+      alert("Xóa nhân viên thành công!");
     } catch (err) {
       console.error("Lỗi xóa nhân viên:", err);
-      alert("Xóa lỗi. Kiểm tra console.");
+      const errorMsg = err.response?.data?.message || "Xóa lỗi. Kiểm tra console.";
+      alert(errorMsg);
     }
   };
 
@@ -150,7 +158,7 @@ const UserManagementPage = () => {
               </button>
 
               <button
-                onClick={handleAddUser}
+                onClick={() => setShowAddModal(true)}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg shadow-md transition"
               >
                 + Thêm nhân viên
@@ -172,6 +180,13 @@ const UserManagementPage = () => {
           onClose={() => setSelectedUser(null)}
           onSave={handleSaveUser}
           onDelete={() => handleDeleteUser(selectedUser.user_id)}
+        />
+      )}
+
+      {showAddModal && (
+        <AddUserModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleAddUser}
         />
       )}
     </div>

@@ -90,11 +90,21 @@ class IngredientController extends Controller
         return response()->json($dataExport);
     }
 
-    public function alertIngredient()
+    public function getUsedIngredients()
     {
-        $alerts = Ingredient::getIngredientAlert();
-        return response()->json([
-            'data' => $alerts
-        ]);
+        try {
+            $ingredientExport = Ingredient::getIngredientExports();
+
+            return response()->json([
+                'data' => $ingredientExport
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Ingredient Usage Error: ' . $e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Server error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

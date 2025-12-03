@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx (ĐÃ CẬP NHẬT để tạo hiệu ứng ĐỘNG)
 import React, { useState, useEffect, useRef } from 'react'; // IMPORT useRef
 import { Link, useLocation } from 'react-router-dom';
-import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, User, Users, Settings, Building, ChevronDown, ChevronUp } from "lucide-react";
+import { ClipboardList, BarChart2, FileText, Calendar, ShoppingCart, Menu, Zap, User, Users, Settings, Building, ChevronDown, ChevronUp, Clock } from "lucide-react";
 
 const menuItems = [
    { title: "Đơn hàng mới", icon: <ClipboardList size={20} />, path: '/order-page' },
@@ -23,6 +23,16 @@ const menuItems = [
     { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
     { title: "Nhân viên", icon: <User size={20} />, path: '/staff' },
     { title: "Khách hàng", icon: <Users size={20} />, path: '/customers' },
+    { 
+      title: "Chấm công", 
+      icon: <Clock size={20} />, 
+      path: '/attendance-placeholder', 
+      isParent: true,
+      subItems: [
+        { title: "Chấm công nhân viên", path: '/attendance' },
+        { title: "Quản lý chấm công", path: '/attendance-management' },
+      ] 
+    },
     { title: "Hệ thống", icon: <Settings size={20} />, path: '/system' },
     { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/restaurant-info' },
 ];
@@ -69,7 +79,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-64 shadow-lg border bg-white rounded-2xl flex flex-col">
+    <div className="w-64 h-screen bg-white border-r flex flex-col">
       {/* Header */}
       <div className="flex items-center p-4 border-b">
         <div className="bg-indigo-600 text-white w-10 h-10 flex items-center justify-center rounded-full font-semibold">
@@ -78,7 +88,7 @@ const Sidebar = () => {
         <h1 className="ml-3 text-lg font-bold text-gray-800">Admin</h1>
       </div>
 
-      <div className="flex-1 p-4 space-y-2  overflow-y-auto">
+      <div className="flex-1 p-4 space-y-2 overflow-y-auto">
         {menuItems.map((item, index) => {
             const currentItemActive = isActive(item.path) && !item.isParent;
             const isParentActiveState = isParentActive(item);

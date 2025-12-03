@@ -1,5 +1,4 @@
-// src/components/OrderSummary.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PaymentModal from "./PaymentModal";
 import axiosClient from "../api/axiosClient";
@@ -13,6 +12,8 @@ const OrderSummary = ({
   onUpdateQty,
   onRemoveItem,
   transferItem,
+  clearTableCart,    
+  setSelectedTable    
 }) => {
   const navigate = useNavigate();
 
@@ -73,7 +74,6 @@ const OrderSummary = ({
         setCustomerForTable(table.table_id, res.data);
         setSearchMessage("");
       }
-
     } catch (err) {
       console.error(err);
       setCustomerForTable(table.table_id, null);
@@ -122,7 +122,7 @@ const OrderSummary = ({
           </span>
         </div>
 
-        {/* CUSTOMER SEARCH */}
+        {/* Nhập SĐT khách hàng */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-600">Thành viên:</label>
 
@@ -297,10 +297,19 @@ const OrderSummary = ({
         customer={assignedCustomer}
         note={note}
         tableId={table?.table_id}
+        tableName={table?.table_name}
         onCompletePayment={(order) => {
-          localStorage.setItem("lastOrder", JSON.stringify(order));
-          navigate("/order-management");
-        }}
+    if (table?.table_id) {
+        clearTableCart(table.table_id);   // <<< DÙNG ĐÚNG
+    }
+
+    setSelectedTable(null);
+
+    localStorage.setItem("lastOrder", JSON.stringify(order));
+
+    navigate("/order-management");
+}}
+
       />
     </>
   );

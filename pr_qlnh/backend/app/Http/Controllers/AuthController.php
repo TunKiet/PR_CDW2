@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\Role;
+use App\Models\LoginLog;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use PHPOpenSourceSaver\JWTAuth\Exceptions\JWTException;
 
@@ -64,16 +67,113 @@ class AuthController extends Controller
 
         // Lấy user
         $user = User::getUserbyEmailOrPhone($loginField, $identifier);
+        
+        // Lấy IP address
+        $ipAddress = $request->ip();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
+            // Lưu log đăng nhập thất bại nếu tìm thấy user
+            if ($user) {
+                LoginLog::createLog($user->user_id, $ipAddress, 'failed');
+            }
             return response()->json(['message' => 'Email/SĐT hoặc mật khẩu không đúng!'], 401);
         }
 
+        // Kiểm tra tài khoản có bị vô hiệu hóa không
+        if ($user->status == 0) {
+            return response()->json(['message' => 'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên!'], 403);
+        }
+
+        // Kiểm tra nếu user đã bật 2FA
+        if ($user->two_factor_enabled) {
+            // Tạo mã OTP 6 chữ số
+            $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            
+            // Lưu OTP vào cache với thời gian hết hạn 5 phút
+            $cacheKey = "otp_login_{$user->user_id}";
+            Cache::put($cacheKey, $otp, now()->addMinutes(5));
+            
+            // Gửi email OTP
+            try {
+                Mail::send('emails.login-otp', ['otp' => $otp, 'user' => $user], function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('Mã xác thực đăng nhập');
+                });
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Có lỗi khi gửi email OTP!'], 500);
+            }
+            
+            // Trả về yêu cầu nhập OTP (không tạo token ngay)
+            return response()->json([
+                'message' => 'Vui lòng nhập mã OTP đã được gửi đến email của bạn',
+                'requires_2fa' => true,
+                'user_id' => $user->user_id,
+                'email' => $user->email
+            ], 200);
+        }
+
+        // Nếu không bật 2FA, đăng nhập bình thường
         try {
             $token = JWTAuth::fromUser($user);
         } catch (JWTException $e) {
             return response()->json(['message' => 'Không thể tạo token!'], 500);
         }
+
+        // Lưu log đăng nhập thành công
+        LoginLog::createLog($user->user_id, $ipAddress, 'success');
+
+        // Lấy danh sách role và permission
+        $roles = $user->roles()->pluck('name');
+        $permissions = $user->getAllPermissions();
+
+        return response()->json([
+            'message' => 'Đăng nhập thành công!',
+            'user' => $user,
+            'roles' => $roles,
+            'permissions' => $permissions,
+            'token' => $token,
+        ], 200);
+    }
+
+    /**
+     * Xác thực OTP khi đăng nhập (cho user đã bật 2FA)
+     */
+    public function verifyLoginOTP(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,user_id',
+            'otp' => 'required|digits:6'
+        ]);
+
+        $user = User::find($request->user_id);
+        if (!$user) {
+            return response()->json(['message' => 'Người dùng không tồn tại!'], 404);
+        }
+
+        $cacheKey = "otp_login_{$user->user_id}";
+        $cachedOTP = Cache::get($cacheKey);
+
+        if (!$cachedOTP) {
+            return response()->json(['message' => 'Mã OTP đã hết hạn!'], 400);
+        }
+
+        if ($cachedOTP !== $request->otp) {
+            return response()->json(['message' => 'Mã OTP không chính xác!'], 400);
+        }
+
+        // Xóa OTP sau khi xác thực thành công
+        Cache::forget($cacheKey);
+
+        // Tạo token JWT
+        try {
+            $token = JWTAuth::fromUser($user);
+        } catch (JWTException $e) {
+            return response()->json(['message' => 'Không thể tạo token!'], 500);
+        }
+
+        // Lưu log đăng nhập thành công (với 2FA)
+        $ipAddress = $request->ip();
+        LoginLog::createLog($user->user_id, $ipAddress, 'success');
 
         // Lấy danh sách role và permission
         $roles = $user->roles()->pluck('name');
@@ -111,9 +211,15 @@ class AuthController extends Controller
     /**
      * Đăng xuất (hủy token)
      */
-    public function logout()
+    public function logout(Request $request)
     {
         try {
+            $user = JWTAuth::parseToken()->authenticate();
+            $ipAddress = $request->ip();
+            
+            // Lưu log đăng xuất
+            LoginLog::createLog($user->user_id, $ipAddress, 'logout');
+            
             JWTAuth::invalidate(JWTAuth::getToken());
             return response()->json(['message' => 'Đăng xuất thành công!']);
         } catch (JWTException $e) {

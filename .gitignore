@@ -1,55 +1,46 @@
-# Node.js dependencies
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Build output (React/Vite)
 dist/
 build/
 .cache/
 .vite/
 
-# Laravel dependencies
-/vendor/
-.env
-.env.*
-.phpunit.result.cache
+/backend/vendor/
+/backend/storage/*
+!/backend/storage/app/public/
+!/backend/storage/framework/cache/data/
+!/backend/storage/logs/   # Lưu folder, bỏ file
 
-# Laravel specific
-/storage/*.key
-/public/storage
-Homestead.yaml
-Homestead.json
+# Laravel env files
+/backend/.env
+/backend/.env.*
+/phpunit.result.cache
+
+# Laravel IDE
 .idea/
 .vscode/
 
-# Logs
-*.log
-storage/logs/
-npm-debug.log
-yarn-error.log
+/socket-io/node_modules/
+socket-io/npm-debug.log*
 
-# OS junk files
+*.log
+
 .DS_Store
 Thumbs.db
 
-# IDE/editor files
-*.sublime-workspace
-*.sublime-project
-
-# Composer / PHP stuff
-composer.lock
 composer.phar
 
-# Misc
 *.exe
 esbuild.exe
 
-# Local environment
 docker-compose.override.yml
 .env.local
 .env.development.local
 .env.production.local
 .env.test.local
+
+.gitignore

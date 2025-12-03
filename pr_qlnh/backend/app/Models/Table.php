@@ -12,10 +12,7 @@ class Table extends Model
     protected $table = 'tables';
     protected $primaryKey = 'table_id';
     protected $fillable = ['table_name', 'table_type', 'capacity', 'note', 'status'];
-	public $incrementing = true;
-    protected $keyType = 'int';
 
-   
     public function reservations()
     {
         return $this->hasMany(Reservation::class, 'table_id', 'table_id');

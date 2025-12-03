@@ -7,9 +7,12 @@ const PaymentModal = ({
   onClose,
   orderItems = [],
   customer,
-  onCompletePayment,
   note,
+  tableId,        
+  tableName,      
+  onCompletePayment,
 }) => {
+
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ type: "", message: "" });
@@ -70,6 +73,7 @@ const PaymentModal = ({
     }
 
     setDiscount(newDiscount);
+    setVoucherCode(voucherCode.trim());
     showToast("success", `Áp dụng voucher thành công! Giảm ${formatCurrency(newDiscount)}`);
   };
 
@@ -78,6 +82,7 @@ const PaymentModal = ({
     try {
       const orderData = {
         customer_id: customer?.customer_id || null,
+        table_id: tableId || null,
         note: note?.trim() || "",
         items: orderItems.map((i) => ({
           menu_item_id: i.menu_item_id,
@@ -104,10 +109,22 @@ const PaymentModal = ({
       console.log("💳 Sending payment:", paymentPayload);
       await axiosClient.post("/payments", paymentPayload);
 
-      showToast("success", "✅ Thanh toán thành công!");
-      setShowSuccess(true);
+      // showToast("success", "✅ Thanh toán thành công!");
+      // setShowSuccess(true);
 
-      if (onCompletePayment) onCompletePayment(orderRes.data);
+      if (onCompletePayment)
+  onCompletePayment({
+    ...orderRes.data,
+    table_id: tableId,
+    table: tableName,
+    items: orderItems,
+    total: total,
+    note: note,
+    customer: customer,
+    voucher: voucherCode,
+    discount: discount,
+    rank_discount: rankDiscount
+  });
 
       setTimeout(() => {
         setShowSuccess(false);
@@ -138,7 +155,7 @@ const PaymentModal = ({
       )}
 
       {/* Success popup */}
-      {showSuccess && (
+      {/* {showSuccess && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-[99999]">
           <div className="bg-white p-6 rounded-2xl shadow-lg flex flex-col items-center animate-bounce">
             <CheckCircle className="text-green-500" size={60} />
@@ -147,7 +164,7 @@ const PaymentModal = ({
             </p>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Loading overlay */}
       {loading && (

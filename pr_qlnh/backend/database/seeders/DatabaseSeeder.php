@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
             PointSeeder::class,
 
             // 8️⃣ Các phần phụ (review, công thức, tin nhắn, v.v.)
+            ConversationSeeder::class,
             MessageSeeder::class,
             CookingRecipeSeeder::class,
             ReviewSeeder::class,
