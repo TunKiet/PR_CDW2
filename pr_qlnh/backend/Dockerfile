@@ -51,7 +51,8 @@ COPY . /var/www
 
 COPY composer.json composer.lock ./
 
-COPY .env ./
+# COPY .env ./
+COPY .env.example .env
 
 # Install dependencies
 RUN composer install --no-interaction --optimize-autoloader

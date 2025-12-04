@@ -1,0 +1,10 @@
+@"
+vendor
+.env
+storage/framework/cache
+storage/framework/sessions  
+storage/framework/views
+storage/logs
+public/storage
+node_modules
+"@ | Out-File -FilePath "backend\.dockerignore" -Encoding ascii
