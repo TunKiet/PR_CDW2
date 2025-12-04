@@ -193,7 +193,11 @@ export default function CategoryManager() {
 
   // Hàm mở modal để chỉnh sửa
   const handleEdit = (category) => {
-    setEditingCategory(category);
+    setEditingCategory({
+      ...category,
+      // Thêm trường mới chứa giá trị updated_at ban đầu
+      original_updated_at: category.updated_at,
+    });
     setIsModalOpen(true);
   };
 

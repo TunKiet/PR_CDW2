@@ -24,6 +24,7 @@ export default function CategoryModal({
         ...category,
         // LẤY updated_at
         updatedAt: category.updated_at || null,
+        original_updated_at: category.original_updated_at || null,
       });
     } else {
       // Chế độ Thêm mới
