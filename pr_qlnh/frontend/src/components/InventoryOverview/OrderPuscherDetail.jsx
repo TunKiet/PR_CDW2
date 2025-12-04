@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     FaChartLine, FaFileAlt, FaBoxes, FaBuilding, FaReceipt, FaCoins,
     FaDollarSign, FaSignOutAlt, FaPrint, FaFilePdf, FaChevronDown, FaUser,
@@ -15,45 +15,130 @@ import StepContent from '@mui/material/StepContent';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import CircularProgress from '@mui/material/CircularProgress';
+
+
+const endPoint = 'http://localhost:8000/api';
 
 const OrderPuscherDetail = () => {
 
+    const { purchase_order_id } = useParams();
+
+    console.log(purchase_order_id);
+
+    const [orderDetail, setOrderDetail] = useState(null);
+    const [ingredients, setIngredients] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [activeStep, setActiveStep] = useState(0);
+
+    const formatDateTime = (datetime) => {
+        const dateObj = new Date(datetime);
+
+        const date = dateObj.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+
+        const time = dateObj.toLocaleTimeString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+
+        return { date, time };
+    };
+
+    const formatVND = (value) => {
+        return Number(value).toLocaleString('vi-VN') + ' đ';
+    };
+
+    useEffect(() => {
+        const fetchOrderDetail = async () => {
+            setLoading(true);
+            try {
+                const res = await axios.get(`${endPoint}/purchase-orders/${purchase_order_id}`);
+                setOrderDetail(res.data);
+
+                // Set activeStep dựa vào status trong DB
+                const stepIndex = orderSteps.findIndex(step => step.key === res.data.status);
+                setActiveStep(stepIndex !== -1 ? stepIndex : 0);
+                setIngredients(res.data.items);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchOrderDetail();
+    }, [purchase_order_id]);
+
     const orderSteps = [
         {
+            key: 'ordered',
             label: 'Đơn hàng đã được tạo',
             description: '24/10/2023 | 08:30 AM | bởi Nguyễn Văn A',
             icon: <FaCheckCircle className="text-green-500" />,
         },
         {
-            label: 'Chờ xác nhận từ nhà cung cấp',
+            key: 'pending',
+            label: 'Đơn hàng đang được xử lý',
             description: 'Đang chờ xử lý...',
             icon: <FaCircleNotch className="text-yellow-500" />,
         },
         {
+            key: 'shipping',
             label: 'Đang giao hàng',
             description: 'Nhân viên giao nhận đang di chuyển tới địa chỉ',
             icon: <FaTruck className="text-blue-500" />,
         },
         {
+            key: 'received',
             label: 'Hoàn tất đơn hàng',
             description: 'Đơn hàng đã giao thành công',
             icon: <FaCheckCircle className="text-green-500" />,
         },
+        {
+            key: 'cancelled',
+            label: 'Đơn hàng bị hủy',
+            description: 'Đơn hàng đã bị hủy',
+            icon: <FaTimes className="text-red-500" />,
+        },
     ];
 
-    const [activeStep, setActiveStep] = React.useState(1); // ví dụ đang ở bước 1
 
-    const handleNext = () => {
-        setActiveStep((prev) => Math.min(prev + 1, orderSteps.length - 1));
+    // const [activeStep, setActiveStep] = useState(
+    //     orderDetail ? orderSteps.findIndex(step => step.key === orderDetail.status) : 0
+    // );
+
+
+    const handleNext = async () => {
+        const nextStep = Math.min(activeStep + 1, orderSteps.length - 1);
+        setActiveStep(nextStep);
+
+        const newStatus = orderSteps[nextStep].key; // lấy key trực tiếp từ orderSteps
+
+        try {
+            await axios.patch(
+                `${endPoint}/purchase-orders/${purchase_order_id}/update-status`,
+                { status: newStatus }
+            );
+            console.log('Cập nhật trạng thái thành công:', newStatus);
+
+            // Cập nhật trạng thái trong state orderDetail để UI luôn đồng bộ
+            setOrderDetail(prev => ({ ...prev, status: newStatus }));
+        } catch (err) {
+            console.error('Cập nhật trạng thái lỗi:', err);
+        }
     };
+
 
     const handleBack = () => {
-        setActiveStep((prev) => Math.max(prev - 1, 0));
+        setActiveStep(prev => Math.max(prev - 1, 0));
     };
 
-    const handleReset = () => {
-        setActiveStep(0);
-    };
 
     return (
         <div className="section">
@@ -66,7 +151,7 @@ const OrderPuscherDetail = () => {
                         <div className="flex gap-2 items-center ms-auto">
                             <button className="px-3 py-1 border border-gray-300 rounded hover:border-blue-600 hover:text-blue-600 flex items-center"><FaPrint className="mr-1" /> In đơn</button>
                             <button className="px-3 py-1 border border-gray-300 rounded hover:border-blue-600 hover:text-blue-600 flex items-center"><FaFilePdf className="mr-1" /> Tải PDF</button>
-                            
+
                         </div>
                     </header>
                     <main className="flex-1 p-2 ml-56">
@@ -74,33 +159,42 @@ const OrderPuscherDetail = () => {
                             {/* Order Summary */}
                             <div className="bg-blue-900 text-white p-6!  rounded-lg mb-6 grid grid-cols-12 gap-6">
                                 <div className="col-span-8 flex flex-col gap-4">
-                                    <div className="flex items-center gap-4">
-                                        <span className="text-2xl font-bold">#NK-2023-001</span>
-                                        <span className="px-2 py-1 bg-green-500 rounded-full text-xs font-medium">Đã duyệt</span>
-                                    </div>
+                                    {orderDetail && (
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-2xl font-bold">#DH{orderDetail.purchase_order_id}</span>
+                                            <span className="px-2 py-1 bg-green-500 rounded-full text-xs font-medium">{orderDetail.status === 'ordered' ? 'Đã đặt' : orderDetail.status === 'pending' ? 'Chờ xử lý' : orderDetail.status === 'shipping' ? 'Đang giao' : orderDetail.status === 'received' ? 'Đã nhập kho' : 'Đã huỷ'}</span>
+                                        </div>
+                                    )}
+
                                     <div className="flex gap-8">
                                         <div className="flex items-start gap-2">
                                             <FaCalendarAlt className="mt-1" />
-                                            <div>
-                                                <div className="text-xs opacity-70">Ngày tạo đơn</div>
-                                                <div className="font-medium">08/10/2023</div>
-                                                <div className="text-xs opacity-70">08:30 AM</div>
-                                            </div>
+                                            {orderDetail && (
+                                                <div>
+                                                    <div className="text-xs opacity-70">Ngày tạo đơn</div>
+                                                    <div className="font-medium">{formatDateTime(orderDetail.created_at).date}</div>
+                                                    <div className="text-xs opacity-70">{formatDateTime(orderDetail.created_at).time}</div>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="flex items-start gap-2">
                                             <FaCalendarCheck className="mt-1" />
-                                            <div>
-                                                <div className="text-xs opacity-70">Ngày giao dự kiến</div>
-                                                <div className="font-medium">10/10/2023</div>
-                                                <div className="text-xs opacity-70">Trước 10:00 AM</div>
-                                            </div>
+                                            {orderDetail && (
+                                                <div>
+                                                    <div className="text-xs opacity-70">Ngày giao dự kiến</div>
+                                                    <div className="font-medium">{formatDateTime(orderDetail.order_date).date}</div>
+                                                    <div className="text-xs opacity-70">{formatDateTime(orderDetail.order_date).time}</div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-span-4 flex flex-col items-end justify-center">
-                                    <div className="text-sm opacity-70">Giá trị đơn hàng</div>
-                                    <div className="text-3xl font-bold text-yellow-300">5.250.000 ₫</div>
-                                </div>
+                                {orderDetail && (
+                                    <div className="col-span-4 flex flex-col items-end justify-center">
+                                        <div className="text-sm opacity-70">Giá trị đơn hàng</div>
+                                        <div className="text-3xl font-bold text-yellow-300">{formatVND(orderDetail.total_cost)}</div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Order Content Grid */}
@@ -110,11 +204,12 @@ const OrderPuscherDetail = () => {
                                     <div className="bg-white p-4 rounded shadow">
                                         <h4 className="text-lg font-semibold border-b border-gray-200 pb-2 mb-4 flex items-center gap-2"><FaBuilding size={20} color='green' /> Thông tin nhà cung cấp</h4>
                                         <div className="flex items-center gap-2 mb-4 pb-2 border-b border-dashed border-gray-200">
-                                            <div className="w-10 h-10 bg-red-600 text-white flex justify-center items-center font-medium rounded mr-2">NS</div>
-                                            <div>
-                                                <div className="font-semibold text-sm">Nông sản Sạch Việt</div>
-                                                <div className="text-xs text-gray-400">Mã NCC: NCC-001</div>
-                                            </div>
+                                            {orderDetail && (
+                                                <div>
+                                                    <div className="font-semibold text-sm">{orderDetail.supplier_name}</div>
+                                                    <div className="text-xs text-gray-400">Mã NCC: NCC-001</div>
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="text-sm space-y-1">
                                             <div className="flex items-center gap-2 p-2"><FaPhoneAlt className="w-4" /> 0911 224 564</div>
@@ -128,9 +223,9 @@ const OrderPuscherDetail = () => {
                                     <div className="bg-white p-4 rounded shadow">
                                         <h4 className="text-lg font-semibold border-b border-gray-200 pb-2 mb-4 flex items-center gap-2"><FaMapMarkerAlt size={20} color='green' /> Địa chỉ giao hàng</h4>
                                         <div className="text-sm">
-                                            <div className="font-medium text-sm mb-1">Nhà hàng KitchenFlow</div>
-                                            <div className="text-gray-600 mb-3">Đường Lê Lợi, Quận 1, TP.HCM</div>
-                                            <div className="text-gray-600 mb-1">Người nhận: Nguyễn Văn A</div>
+                                            <div className="font-medium text-sm mb-1">Nhà hàng D</div>
+                                            <div className="text-gray-600 mb-3">53 Võ Văn Ngân</div>
+                                            <div className="text-gray-600 mb-1">Người nhận: Quản lý</div>
                                             <div className="text-gray-600 mb-1">SĐT: 0912 345 678</div>
                                             <div className="mt-2 border-l-4 p-2 border-blue-600 bg-green-50 text-green-600 text-sm">Ghi chú giao hàng: Vui lòng giao hàng trước 08:30 phút.</div>
                                         </div>
@@ -153,27 +248,36 @@ const OrderPuscherDetail = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {[
-                                                    { name: 'Cà chua bi', code: 'NL-004', unit: 'Kg', qty: 25, price: '23.000 ₫', total: '1.250.000 ₫', img: 'path/to/image1.jpg' },
-                                                    { name: 'Cải xanh', code: 'NL-002', unit: 'Kg', qty: 30, price: '20.000 ₫', total: '1.050.000 ₫', img: 'path/to/image2.jpg' },
-                                                    { name: 'Cà rốt Đà Lạt', code: 'NL-003', unit: 'Kg', qty: 40, price: '21.000 ₫', total: '900.000 ₫', img: 'path/to/image3.jpg' },
-                                                    { name: 'Bí đỏ baby', code: 'NL-007', unit: 'Kg', qty: 20, price: '24.000 ₫', total: '950.000 ₫', img: 'path/to/image4.jpg' },
-                                                    { name: 'Nước giải khát', code: 'NL-008', unit: 'Lít', qty: 25, price: '28.000 ₫', total: '1.100.000 ₫', img: 'path/to/image5.jpg' },
-                                                ].map((item, idx) => (
-                                                    <tr key={idx} className="border-b border-gray-200 last:border-none">
-                                                        <td className="flex items-center gap-2 p-2">
-                                                            <img src={item.img} alt={item.name} className="w-10 h-10 object-cover rounded" />
-                                                            <div>
-                                                                <div className="font-medium">{item.name}</div>
-                                                                <div className="text-xs text-gray-400">{item.code}</div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="p-2">{item.unit}</td>
-                                                        <td className="p-2">{item.qty}</td>
-                                                        <td className="p-2">{item.price}</td>
-                                                        <td className="p-2">{item.total}</td>
-                                                    </tr>
-                                                ))}
+                                                {
+                                                    loading ? (
+                                                        <tr className='text-center'>
+                                                            <td>
+                                                                <CircularProgress />
+                                                            </td>
+                                                        </tr>
+                                                    ) : ingredients.length > 0 ? (
+                                                        ingredients.map((ingredient) => (
+
+                                                            <tr key={ingredient.ingredient_id} className="border-b border-gray-200 last:border-none">
+                                                                <td className="flex items-center gap-2 p-2">
+                                                                    {/* <img src={ingredient.img} alt={ingredient.name} className="w-10 h-10 object-cover rounded" /> */}
+                                                                    <div>
+                                                                        <div className="font-medium">{ingredient.ingredient_name}</div>
+                                                                        <div className="text-xs text-gray-400">#NL{ingredient.ingredient_id}</div>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="p-2">{ingredient.unit}</td>
+                                                                <td className="p-2">{ingredient.quantity}</td>
+                                                                <td className="p-2">{formatVND(ingredient.price)}</td>
+                                                                <td className="p-2">{formatVND(ingredient.total)}</td>
+                                                            </tr>
+                                                        ))
+                                                    ) : (
+                                                        <tr className='text-center'>
+                                                            <td>Không có dữ liệu</td>
+                                                        </tr>
+                                                    )
+                                                }
                                             </tbody>
                                         </table>
                                     </div>
@@ -185,14 +289,8 @@ const OrderPuscherDetail = () => {
                                         </h4>
                                         <Stepper activeStep={activeStep} orientation="vertical">
                                             {orderSteps.map((step, index) => (
-                                                <Step key={step.label}>
-                                                    <StepLabel
-                                                        optional={
-                                                            index === orderSteps.length - 1 ? (
-                                                                <Typography variant="caption">Hoàn tất</Typography>
-                                                            ) : null
-                                                        }
-                                                    >
+                                                <Step key={step.key}>
+                                                    <StepLabel optional={index === orderSteps.length - 1 ? <Typography variant="caption">Hoàn tất</Typography> : null}>
                                                         <div className="flex items-center gap-2">
                                                             {step.icon}
                                                             <span>{step.label}</span>
@@ -205,13 +303,14 @@ const OrderPuscherDetail = () => {
                                                                 variant="contained"
                                                                 onClick={handleNext}
                                                                 sx={{ mt: 1, mr: 1 }}
+                                                                disabled={activeStep === orderSteps.length - 1}
                                                             >
                                                                 {index === orderSteps.length - 1 ? 'Hoàn tất' : 'Tiếp theo'}
                                                             </Button>
                                                             <Button
-                                                                disabled={index === 0}
                                                                 onClick={handleBack}
                                                                 sx={{ mt: 1, mr: 1 }}
+                                                                disabled={activeStep === 0}
                                                             >
                                                                 Quay lại
                                                             </Button>
@@ -220,14 +319,6 @@ const OrderPuscherDetail = () => {
                                                 </Step>
                                             ))}
                                         </Stepper>
-                                        {activeStep === orderSteps.length && (
-                                            <Paper square elevation={0} sx={{ p: 3 }}>
-                                                <Typography>Tất cả các bước đã hoàn tất</Typography>
-                                                <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }}>
-                                                    Reset
-                                                </Button>
-                                            </Paper>
-                                        )}
                                     </Box>
                                 </div>
                             </div>

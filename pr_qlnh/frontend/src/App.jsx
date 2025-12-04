@@ -137,7 +137,7 @@ function App() {
         <Route path='/analytics' element={<UserDashboard />} />
         <Route path="/create-order" element={<CreateOrder/>}/>
         <Route path="/puscher-order" element={<OrderPuscher/>}/>
-        <Route path="/puscher-order-detail" element={<OrderPuscherDetail/>}/>
+        <Route path="/puscher-order-detail/:purchase_order_id" element={<OrderPuscherDetail/>}/>
         <Route path="/supplier" element={<SupplierOrder/>}/>
         <Route path="/supplier-detail" element={<SupplierOrderDetail/>}/>
 

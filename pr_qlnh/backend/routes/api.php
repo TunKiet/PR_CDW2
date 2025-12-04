@@ -72,6 +72,9 @@ Route::get('/export', [IngredientController::class, 'exportPDF']);
 
 Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
 Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
+Route::get('/purchase-orders-all', [PurchaseOrderController::class, 'index']); // danh sách + tổng quan
+Route::get('/purchase-orders/{id}', [PurchaseOrderController::class, 'show']); // chi tiết
+Route::patch('/purchase-orders/{id}/update-status', [PurchaseOrderController::class, 'updateStatus']);
 
 
 /*

@@ -152,40 +152,35 @@ const CreateOrder = () => {
             return;
         }
 
-        // Chỉ lấy nguyên liệu đã chọn
         const selectedItems = ingredientAlert
             .filter(i => i.checked)
             .map(i => ({
                 ingredient_id: i.ingredient_id,
-                quantity: i.order_quantity,   // đổi qty -> quantity
+                quantity: i.order_quantity,
                 price: i.price,
                 total: i.price * i.order_quantity
             }));
 
-        // Tính tổng tiền
         const total_cost = selectedItems.reduce((sum, item) => sum + item.total, 0);
 
         try {
-            const payload = {
+            const res = await axios.post(`${endPoint}/purchase-order`, {
                 supplier_name: supplierName,
                 order_date: deliveryDate,
                 total_cost: total_cost,
                 items: selectedItems,
-            };
-
-            const res = await axios.post(`${endPoint}/purchase-order`, payload);
+            });
 
             console.log("Order created:", res.data);
 
             await confirmSuccess(
-                "Đơn hàng đã được đặt thành công",
-                "Vui lòng theo dõi trạng thái đơn hàng"
+                'Đơn hàng đã được đặt thành công',
+                'Vui lòng theo dõi trạng thái đơn hàng trong thời gian tới'
             );
+
         } catch (error) {
-            console.log("API Error:", error?.response?.data || error.message);
+            console.log("API Error:", error.response?.data);
         }
-
-
 
         console.log("Dữ liệu gửi API:", selectedItems);
     };
@@ -361,7 +356,7 @@ const CreateOrder = () => {
                                     <div className="flex justify-between text-green-600 font-extrabold text-lg"><span>Tổng cộng</span><span>{formatVND(grandTotal)}</span></div>
 
                                     <div className="flex flex-col gap-2 mt-2">
-                                        <button onSubmit={handleSubmit()} className="bg-green-500 text-white font-bold py-2 rounded-lg!">Tạo đơn nhập kho</button>
+                                        <button onClick={handleSubmit} className="bg-green-500 text-white font-bold py-2 rounded-lg!">Tạo đơn nhập kho</button>
                                         <button className="bg-white text-red-500 border border-red-200 py-2 rounded-lg! cursor-pointer">Hủy bỏ</button>
                                     </div>
                                     <div className="text-gray-400 text-xs mt-2">

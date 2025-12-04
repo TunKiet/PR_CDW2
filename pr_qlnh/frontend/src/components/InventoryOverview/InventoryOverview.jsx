@@ -28,9 +28,9 @@ const endPoint = 'http://localhost:8000/api';
 const InventoryOverview = () => {
 
   const navigate = useNavigate();
-    const linkCreateOrder = () => {
-        navigate("/create-order"); // đường dẫn tới CreateOrder.jsx
-    };
+  const linkCreateOrder = () => {
+    navigate("/create-order"); // đường dẫn tới CreateOrder.jsx
+  };
 
   const [loading, setLoading] = useState(true);
   const [ingredients, setIngredients] = useState([]);
