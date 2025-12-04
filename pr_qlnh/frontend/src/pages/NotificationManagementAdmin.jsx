@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
+import axiosClient from "../api/axiosClient";
 import NotificationList from "../components/Notification/NotificationList";
 import NotificationModal from "../components/Notification/NotificationModal";
-import axiosClient from "../api/axiosClient";
 import { notify, confirmAction } from "../utils/notify";
 
 export default function NotificationManagementAdmin() {
   const [notifications, setNotifications] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
-  const [totalNotifications, setTotalNotifications] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -21,17 +20,15 @@ export default function NotificationManagementAdmin() {
 
       const res = await axiosClient.get(`/notifications?page=${page}`);
 
-      if (res.data?.success === false) {
-        notify.error(res.data?.error || "Lỗi khi tải thông báo!");
-        return;
-      }
+      if (!res.data.success) return;
 
-      setNotifications(res.data.data);
-      setCurrentPage(res.data.current_page);
-      setLastPage(res.data.last_page);
-      setTotalNotifications(res.data.total_notifications);
+      const pg = res.data.data;
+
+      setNotifications(pg.data);
+      setCurrentPage(pg.current_page);
+      setLastPage(pg.last_page);
     } catch (err) {
-      notify.error("Không thể kết nối tới server");
+      notify.error("Lỗi tải dữ liệu");
     } finally {
       setLoading(false);
     }
@@ -52,23 +49,16 @@ export default function NotificationManagementAdmin() {
   };
 
   const handleSaved = () => {
-    notify.success("Lưu thông báo thành công");
     fetchNotifications(currentPage);
   };
 
   const handleDelete = async (item) => {
-    const ok = await confirmAction("Xác nhận xóa", `Bạn có muốn xóa thông báo này?`);
+    const ok = await confirmAction("Xác nhận xóa", "Bạn có chắc muốn xóa?");
     if (!ok) return;
 
     try {
-      const res = await axiosClient.delete(`/notifications/${item.id}`);
-
-      if (res.data?.success === false) {
-        notify.error(res.data.error || "Không thể xóa thông báo");
-        return;
-      }
-
-      notify.success("Xóa thành công");
+      await axiosClient.delete(`/notifications/${item.notification_id}`);
+      notify.success("Đã xóa");
       fetchNotifications(currentPage);
     } catch (err) {
       notify.error("Lỗi khi xóa thông báo");
@@ -83,15 +73,11 @@ export default function NotificationManagementAdmin() {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-semibold">Quản lý Thông báo</h2>
 
-          <span className="text-sm text-gray-700">
-            Tổng số thông báo: <strong>{totalNotifications}</strong>
-          </span>
-
           <button
             onClick={openCreate}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700"
           >
-            Tạo thông báo
+            + Tạo thông báo
           </button>
         </div>
 
@@ -105,23 +91,24 @@ export default function NotificationManagementAdmin() {
           />
         )}
 
+        {/* PAGINATION */}
         <div className="flex justify-center items-center gap-3 mt-6">
           <button
             disabled={currentPage === 1}
             onClick={() => fetchNotifications(currentPage - 1)}
-            className="px-4 py-2 border rounded"
+            className="px-4 py-2 border rounded disabled:opacity-40"
           >
             Trang trước
           </button>
 
-          <span>
+          <span className="text-sm text-gray-600">
             Trang {currentPage} / {lastPage}
           </span>
 
           <button
             disabled={currentPage === lastPage}
             onClick={() => fetchNotifications(currentPage + 1)}
-            className="px-4 py-2 border rounded"
+            className="px-4 py-2 border rounded disabled:opacity-40"
           >
             Trang sau
           </button>

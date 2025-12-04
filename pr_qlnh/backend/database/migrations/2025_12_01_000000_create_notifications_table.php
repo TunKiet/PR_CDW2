@@ -14,28 +14,36 @@ return new class extends Migration
             $table->string('title');
             $table->text('message');
 
-            $table->enum('type', ['system','order','kitchen','promotion','warning','info'])
-                  ->default('system');
+            $table->enum('type', [
+                'system', 'order', 'kitchen', 'promotion', 'warning', 'info'
+            ])->default('system');
 
-            $table->enum('priority', ['low','normal','high'])
-                  ->default('normal');
+            $table->enum('priority', ['low', 'normal', 'high'])->default('normal');
 
-            $table->boolean('is_read')->default(false);
+            // Phạm vi thông báo: tất cả / user / role
+            $table->enum('scope', ['all', 'user', 'role'])->default('all');
 
-            // đúng với bảng users
+            // Nếu scope = user → user_id có giá trị
             $table->unsignedBigInteger('user_id')->nullable();
+
+            // Nếu scope = role → role có giá trị
+            $table->string('role')->nullable();
+
             $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
 
-            // Foreign keys CHUẨN ==> reference user_id chứ không phải id
+            // FK
             $table->foreign('user_id')
-                  ->references('user_id')->on('users')
-                  ->onDelete('set null');
+                ->references('user_id')->on('users')
+                ->onDelete('set null');
 
             $table->foreign('created_by')
-                  ->references('user_id')->on('users')
-                  ->onDelete('set null');
+                ->references('user_id')->on('users')
+                ->onDelete('set null');
         });
     }
 

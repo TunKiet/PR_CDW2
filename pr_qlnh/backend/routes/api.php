@@ -141,15 +141,19 @@ Route::prefix('reservation-management')->group(function () {
 Route::get('/floorplan', [TableController::class, 'floorplan']);
 Route::put('/tables/{id}/status', [TableController::class, 'updateStatus']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/notifications', [NotificationController::class, 'index']);
-    Route::post('/notifications', [NotificationController::class, 'store']);
-    Route::put('/notifications/{id}', [NotificationController::class, 'update']);
-    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+Route::prefix('notifications')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::post('/', [NotificationController::class, 'store']);
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::get('/{id}', [NotificationController::class, 'show']);
+    Route::put('/{id}', [NotificationController::class, 'update']);
+    Route::delete('/{id}', [NotificationController::class, 'destroy']);
 
-    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markRead']);
-    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+    Route::post('/{id}/mark-read', [NotificationController::class, 'markRead']);
+    Route::post('/mark-all-read', [NotificationController::class, 'markAllRead']);
 });
+
+
 
 
 //login mới được đặt bàn

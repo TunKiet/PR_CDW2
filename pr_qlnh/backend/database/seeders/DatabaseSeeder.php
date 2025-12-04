@@ -31,6 +31,7 @@ class DatabaseSeeder extends Seeder
             ReviewSeeder::class,
             ReviewReplySeeder::class,
             SessionSeeder::class,
+            NotificationSeeder::class,
         ]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
