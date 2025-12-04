@@ -35,7 +35,6 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ReviewReplyController;
 
 /*
@@ -50,7 +49,7 @@ Route::get('/test', fn () => response()->json(['message' => 'API loaded']));
 | 🍽️ Dishes & Reviews
 |--------------------------------------------------------------------------
 */
-Route::apiResource('dishes', DishController::class);
+
 
 Route::prefix('reviews')->group(function () {
     Route::post('/', [ReviewController::class, 'store']);
@@ -187,6 +186,19 @@ Route::prefix('customers')->group(function () {
     Route::get('/search', [CustomerController::class, 'search']);
 });
 
+
+Route::get('/menu-items', [MenuItemController::class, 'index']);
+Route::post('/orders', [OrderController::class, 'store']);
+use App\Models\Ingredient;
+use App\Models\Review;
+use App\Models\ReviewReply;
+
+// 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
+// use App\Http\Controllers\Api\TableController;
+// use App\Http\Controllers\Api\MenuItemController;
+
+
+
 /*
 |--------------------------------------------------------------------------
 | 🧾 Orders (Eat in restaurant)
@@ -201,6 +213,30 @@ Route::prefix('orders')->group(function () {
     Route::get('/{id}/export', [OrderController::class, 'exportData']);
 });
 
+//Menu
+Route::get('/menu', [OrderController::class, 'menu']); // lấy menu
+
+ //12/11/2025
+// Route::get('/customers', [OrderController::class, 'customers']); // lấy danh sách KH
+// Route::get('/customers/search', [CustomerController::class, 'search']);   
+
+// Payments
+// Route::get('/payments', [PaymentController::class, 'index']);
+// Route::get('/payments/{id}', [PaymentController::class, 'show']);
+// Route::post('/payments', [PaymentController::class, 'store']);
+Route::prefix('payments')->group(function () {
+    Route::get('/', [PaymentController::class, 'index']);
+    Route::get('/{id}', [PaymentController::class, 'show']);
+    Route::post('/', [PaymentController::class, 'store']);
+});
+// Promotions
+// use App\Http\Controllers\PromotionController;
+// Route::get('/promotions', [PromotionController::class, 'index']);
+// Route::get('/promotions/{id}', [PromotionController::class, 'show']);
+// Route::post('/promotions', [PromotionController::class, 'store']);
+// Route::put('/promotions/{id}', [PromotionController::class, 'update']);
+// Route::delete('/promotions/{id}', [PromotionController::class, 'destroy']);
+// Route::post('/promotions/validate', [PromotionController::class, 'validateCode']);
 Route::get('/menu', [OrderController::class, 'menu']);
 
 /*
@@ -213,6 +249,64 @@ Route::prefix('pre-orders')->group(function () {
     Route::get('/details/{id}', [PreOrderController::class, 'showDetails']);
     Route::put('/{id}/status', [PreOrderController::class, 'updateStatus']);
 });
+Route::get('/pre-orders', [PreOrderController::class, 'index']);
+Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
+Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
+
+Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
+
+// hao chuc nang
+
+use App\Http\Controllers\Api\PromotionController;
+// Protected routes (cần authentication - thêm middleware 'auth:sanctum' khi đã setup)
+Route::prefix('v1')->group(function () {
+    
+    // CRUD Promotion routes
+    Route::apiResource('promotions', PromotionController::class);
+    
+    // Additional promotion routes
+    Route::post('/promotions/{id}/apply', [PromotionController::class, 'apply']);
+    // Public routes for homepage
+    Route::get('/featured-dishes', [DishController::class, 'getFeatured']);
+    Route::get('/active-promotions', [PromotionController::class, 'getActive']);
+    
+});
+// routes/api.php
+
+use App\Http\Controllers\Api\StatisticController;
+
+// ⭐ STATISTICS ROUTES
+Route::prefix('statistics')->group(function () {
+    Route::get('/dashboard', [StatisticController::class, 'dashboard']);
+    Route::get('/revenue-chart', [StatisticController::class, 'revenueChart']);
+    Route::get('/top-dishes', [StatisticController::class, 'topDishes']);
+    Route::get('/comparison', [StatisticController::class, 'comparison']);
+    Route::get('/top-customers', [StatisticController::class, 'topCustomers']);
+    Route::get('/summary', [StatisticController::class, 'summary']); // Bonus
+});
+
+Route::apiResource('dishes', DishController::class);
+// ⭐ THÊM ROUTES MỚI CHO STATUS MANAGEMENT
+Route::prefix('dishes')->group(function () {
+    // Toggle status đơn lẻ
+    Route::patch('/{id}/status', [DishController::class, 'updateStatus']);
+    
+    // Cập nhật hàng loạt
+    Route::post('/bulk-update-status', [DishController::class, 'bulkUpdateStatus']);
+    
+    // Lịch sử thay đổi
+    Route::get('/{id}/status-history', [DishController::class, 'getStatusHistory']);
+    
+    // Thống kê
+    Route::get('/status-stats', [DishController::class, 'getStatusStats']);
+    
+    // Món sắp hết
+    Route::get('/low-stock', [DishController::class, 'getLowStock']);
+    
+    // Lọc nâng cao
+    Route::get('/filter', [DishController::class, 'filter']);
+});
+Route::apiResource('categories', CategoryController::class);
 
 /*
 |--------------------------------------------------------------------------

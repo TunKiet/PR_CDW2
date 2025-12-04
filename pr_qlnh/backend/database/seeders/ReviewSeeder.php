@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ReviewSeeder extends Seeder
 {
@@ -14,6 +15,8 @@ class ReviewSeeder extends Seeder
      */
     public function run(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         $sampleComments = [
             'Món ăn rất ngon, nhân viên phục vụ thân thiện.',
             'Chưa hài lòng về độ nóng của món.',
@@ -53,5 +56,6 @@ class ReviewSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+        Schema::enableForeignKeyConstraints();
     }
 }

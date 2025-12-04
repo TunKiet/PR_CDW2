@@ -11,7 +11,22 @@ class Promotion extends Model
 
     protected $table = 'promotions';
     protected $primaryKey = 'promotion_id';
-    protected $fillable = ['promotion_name', 'discount_percent', 'start_date', 'end_date', 'status'];
+    
+    // Cập nhật các trường fillable để khớp với migration và controller
+    protected $fillable = [
+        'code', 
+        'title', 
+        'description', 
+        'discount_type', 
+        'discount_value', 
+        'max_uses', 
+        'used_count', 
+        'expired_at', 
+        'status'
+    ]; 
+
+    // Các trường ngày tháng nên được tự động chuyển đổi thành đối tượng Carbon
+    protected $dates = ['expired_at'];
 
     public function orders()
     {

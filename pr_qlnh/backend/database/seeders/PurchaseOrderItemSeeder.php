@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class PurchaseOrderItemSeeder extends Seeder
 {
@@ -14,6 +15,7 @@ class PurchaseOrderItemSeeder extends Seeder
      */
     public function run(): void
     {
+        Schema::disableForeignKeyConstraints();
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             // Random purchase_order_id giả sử từ 1 đến 15 (tương ứng PurchaseOrderSeeder)
             $purchaseOrderId = rand(1, 15);
@@ -36,5 +38,6 @@ class PurchaseOrderItemSeeder extends Seeder
                 'updated_at' => now(),
             ]);
         }
+        Schema::enableForeignKeyConstraints();
     }
 }

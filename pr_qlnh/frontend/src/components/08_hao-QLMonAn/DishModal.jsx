@@ -1,178 +1,524 @@
 // src/components/DishModal.jsx
 
-import React, { useState, useEffect } from 'react';
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css"; // Import CSS cho Editor
+import React, { useState, useEffect } from "react";
+// === IMPORT THƯ VIỆN DRAFT.JS VÀ EDITOR ===
+import {
+  EditorState,
+  convertToRaw,
+  convertFromRaw,
+  ContentState,
+} from "draft-js";
+import { Editor } from "react-draft-wysiwyg";
+// ==========================================
 
-// === FIX LỖI: ĐỒNG BỘ MAPS VỚI DishCRUDTable.jsx ===
-const categoryMap = {
-    // Key API mong đợi (số dưới dạng chuỗi)
-    '1': "Món Chính",
-    '2': "Tráng Miệng",
-    '3': "Đồ Uống",
-    // Thêm các category khác nếu có
-};
-
+// Status map
 const statusMap = {
-    // Key API mong đợi (active, inactive, draft)
-    'active': "Còn hàng",
-    'inactive': "Hết hàng",
-    'draft': "Nháp/Ẩn",
+  active: "Còn hàng",
+  inactive: "Hết hàng",
+  draft: "Nháp/Ẩn",
 };
-// ===========================================
 
-export default function DishModal({ isVisible, onClose, onSave, dish }) {
-    const [formData, setFormData] = useState({
-        id: '',
-        name: '',
-        price: 0,
-        // FIX: Đặt giá trị mặc định mới
-        categoryKey: '1', 
-        statusKey: 'active',
-        description: '',
-        image: '', 
-    });
+export default function DishModal({
+  isVisible,
+  onClose,
+  onSave,
+  dish,
+  categories,
+}) {
+  // Khởi tạo state form cơ bản (Lưu ý: description giữ nguyên là string để lưu JSON)
+  const [formData, setFormData] = useState({
+    id: "",
+    name: "",
+    price: 0,
+    categoryKey: "",
+    statusKey: "active",
+    description: "", // Sẽ lưu chuỗi JSON từ Draft.js
+    image: "",
+  });
 
+  // === STATE DÙNG RIÊNG CHO EDITOR (Draft.js EditorState) ===
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  // ==========================================================
+
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const isEditMode = !!dish;
+  const title = isEditMode ? "Chỉnh Sửa Món Ăn" : "Thêm Món Ăn Mới";
+
+  useEffect(() => {
+    let isMounted = true;
+    if (dish) {
+      if (isMounted) {
+        setFormData(dish);
+        setImagePreview(dish.image);
+      }
+
+      // Xử lý nạp dữ liệu description (dạng JSON string) vào EditorState
+      if (dish.description) {
+        console.log(
+          "DEBUG [DishModal]: Đang tải description. Giá trị: ",
+          dish.description
+        );
+        try {
+          // Chuyển JSON string thành RawContentState object
+          const rawContentState = JSON.parse(dish.description);
+          console.log("DEBUG [DishModal]: JSON Parse thành công.");
+          // Kiểm tra xem có đúng định dạng Draft.js RawContentState không
+          if (rawContentState.blocks && Array.isArray(rawContentState.blocks)) {
+            const contentState = convertFromRaw(rawContentState);
+            if (isMounted) {
+              setEditorState(EditorState.createWithContent(contentState));
+            }
+          } else {
+            // JSON hợp lệ, nhưng không phải RawContentState (rất hiếm)
+            console.error(
+              "DEBUG [DishModal]: JSON hợp lệ nhưng không phải định dạng Draft.js RawContentState."
+            );
+            if (isMounted) {
+              setEditorState(EditorState.createEmpty());
+            }
+          }
+        } catch (e) {
+          // Lỗi: JSON.parse thất bại (dữ liệu là HTML thuần hoặc JSON bị hỏng)
+          console.error(
+            "DEBUG [DishModal]: LỖI KHI PARSE JSON. Khởi tạo Editor rỗng.",
+            e
+          );
+          const contentState = ContentState.createFromText(dish.description);
+
+          // 2. Tải ContentState đó vào Editor
+          if (isMounted) {
+            setEditorState(EditorState.createWithContent(contentState));
+          }
+        }
+      } else {
+        console.log(
+          "DEBUG [DishModal]: Không có description (null/empty). Khởi tạo Editor rỗng."
+        );
+        if (isMounted) {
+          setEditorState(EditorState.createEmpty());
+        }
+      }
+    } else {
+      // Thiết lập giá trị mặc định cho mode Thêm mới
+      const defaultCategory =
+        categories && categories.length > 0
+          ? String(categories[0].category_id)
+          : "";
+
+      const validCategoryIds = categories.map((cat) => String(cat.category_id));
+      const safeCategory = validCategoryIds.includes(defaultCategory)
+        ? defaultCategory
+        : validCategoryIds[0] || "";
+
+      if (isMounted) {
+        setFormData({
+          id: "",
+          name: "",
+          price: 0,
+          categoryKey: safeCategory,
+          statusKey: "active",
+          description: "",
+          image: "",
+        });
+        setImageFile(null);
+        setImagePreview(null);
+        setEditorState(EditorState.createEmpty()); // Reset Editor
+      }
+    }
+
+    // HÀM DỌN DẸP (CLEANUP): Chạy khi component bị unmount
+    return () => {
+      isMounted = false;
+    };
+  }, [dish, categories]);
+
+  const handleChange = (e) => {
+    const { id, value, type, files } = e.target;
+
+    if (type === "file" && files.length > 0) {
+      const file = files[0];
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      let finalValue = value;
+      if (id === "price") {
+        finalValue = parseInt(value) >= 0 ? parseInt(value) : 0;
+      }
+      if (id === "categoryKey") {
+        const validCategoryIds = categories.map((cat) =>
+          String(cat.category_id)
+        );
+        if (!validCategoryIds.includes(String(value))) {
+          console.warn("⚠️ Category không hợp lệ, bỏ qua!");
+          return; // Không cho phép set giá trị không hợp lệ
+        }
+      }
+
+      // ✅ THÊM: Validate statusKey
+      if (id === "statusKey") {
+        const validStatuses = Object.keys(statusMap);
+        if (!validStatuses.includes(value)) {
+          console.warn("⚠️ Status không hợp lệ, bỏ qua!");
+          return;
+        }
+      }
+      setFormData((prev) => ({
+        ...prev,
+        [id]: finalValue,
+      }));
+    }
+  };
+
+  // === HÀM XỬ LÝ RIÊNG CHO DRAFT-JS ===
+  const onEditorStateChange = (newEditorState) => {
+    setEditorState(newEditorState);
+
+    // Chuyển đổi nội dung EditorState sang RawContentState JSON
+    const rawContentState = convertToRaw(newEditorState.getCurrentContent());
+    // Chuyển RawContentState thành chuỗi JSON để lưu trữ an toàn trong DB
+    const jsonString = JSON.stringify(rawContentState);
+
+    // Cập nhật formData.description bằng chuỗi JSON
+    setFormData((prev) => ({
+      ...prev,
+      description: jsonString,
+    }));
+  };
+  // =======================================
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isSaving) return;
+
+    // 1. LẤY GIÁ TRỊ THỰC TẾ TỪ DOM (Đã đúng)
+    const actualCategoryValue = e.target.categoryKey.value;
+    const actualStatusValue = e.target.statusKey.value;
     const isEditMode = !!dish;
-    const title = isEditMode ? 'Chỉnh Sửa Món Ăn' : 'Thêm Món Ăn Mới';
 
-    useEffect(() => {
-        if (dish) {
-            // Chế độ Chỉnh sửa: Dữ liệu từ DishCRUDTable đã đúng format
-            setFormData(dish);
-        } else {
-            // Chế độ Thêm mới: Reset form
-            setFormData({
-                id: '',
-                name: '',
-                price: 0,
-                // FIX: Giá trị mặc định mới
-                categoryKey: '1', 
-                statusKey: 'active',
-                description: '',
-                image: 'https://placehold.co/40x40/e5e7eb/4b5563?text=N/A',
-            });
-        }
-    }, [dish]);
+    // DEBUG LOGS (Giữ nguyên)
+    console.log("🐛 DEBUG CATEGORY VALUE (DOM):", actualCategoryValue);
+    console.log("🐛 DEBUG STATUS VALUE (DOM):", actualStatusValue);
 
-    const handleChange = (e) => {
-        // Loại bỏ 'type' khỏi destructuring để tránh lỗi linter
-        const { id, value } = e.target;
-        
-        let finalValue = value;
-        if (id === 'price') {
-            const numValue = parseInt(value);
-            // Xử lý giá trị rỗng hoặc không hợp lệ
-            finalValue = (value === '' || isNaN(numValue) || numValue < 0) ? 0 : numValue;
-        }
+    // =============================================
+    // ⭐ BẢO VỆ 1: KIỂM TRA CATEGORY (SỬ DỤNG GIÁ TRỊ TỪ DOM) ⭐
+    // =============================================
+    const validCategoryIds = categories.map((cat) => String(cat.category_id));
+    if (isSaving) return;
+    setIsSaving(true);
+    // SỬA LỖI 1: Dùng actualCategoryValue thay vì formData.categoryKey
+    if (!validCategoryIds.includes(actualCategoryValue)) {
+      alert("❌ Danh mục không hợp lệ! Vui lòng chọn lại.");
+      return; // CHẶN SUBMIT
+    }
 
-        setFormData(prev => ({ 
-            ...prev, 
-            [id]: finalValue 
-        }));
-    };
+    // =============================================
+    // ⭐ BẢO VỆ 2: KIỂM TRA STATUS (SỬ DỤNG GIÁ TRỊ TỪ DOM) ⭐
+    // =============================================
+    const validStatuses = Object.keys(statusMap); // ['active', 'inactive', 'draft']
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        
-        // Validate cơ bản
-        if (!formData.name || !formData.price || formData.price <= 0) {
-            alert("Vui lòng nhập tên món và giá hợp lệ.");
-            return;
-        }
-        
-        // Đã FIX: Chỉ gọi onSave với formData (dữ liệu), để DishCRUDTable xác định POST/PUT
-        onSave(formData);
-    };
+    // SỬA LỖI 2 & 3: Dùng actualStatusValue thay vì formData.statusKey và bỏ setFormData
+    if (!validStatuses.includes(actualStatusValue)) {
+      alert("⚠️ Trạng thái không hợp lệ! Vui lòng chọn lại.");
+      return; // CHẶN SUBMIT
+    }
 
-    if (!isVisible) return null;
+    // 4. ĐỒNG BỘ STATE (Chỉ chạy khi Validation PASS)
+    // Cập nhật State với giá trị hợp lệ vừa đọc từ DOM
+    setFormData((prev) => ({
+      ...prev,
+      categoryKey: actualCategoryValue,
+      statusKey: actualStatusValue,
+    }));
 
-    // ... (Phần JSX giữ nguyên cấu trúc) ...
+    // Cảnh báo nếu mô tả quá dài (>45KB)
+    if (formData.description && formData.description.length > 45000) {
+      if (!window.confirm("⚠️ Mô tả rất dài (>45KB). Bạn có chắc muốn lưu?")) {
+        return;
+      }
+    }
 
-    return (
-        // Modal Overlay
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm">
-            {/* Modal Content */}
-            <div className="bg-white p-6 rounded-xl w-full max-w-xl shadow-2xl transform transition-all duration-300">
-                <h3 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3">{title}</h3>
+    // Validate cơ bản
+    if (!formData.name || formData.price <= 0) {
+      alert("Vui lòng nhập tên món và giá hợp lệ.");
+      return;
+    }
+    if (!isEditMode && !imageFile && !formData.image) {
+      alert("Vui lòng chọn hình ảnh cho món ăn.");
+      return;
+    }
+    // 3. BẮT ĐẦU TIẾN TRÌNH LƯU
+    setIsSaving(true); // ⭐ VÔ HIỆU HÓA NÚT NGAY
 
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                    
-                    {/* ID (Chỉ hiển thị khi chỉnh sửa) */}
-                    {isEditMode && (
-                        <div>
-                            <label htmlFor="id" className="block text-sm font-medium text-gray-600">ID Món ăn</label>
-                            <input type="text" id="id" className="dish-modal-input-readonly" value={formData.id} readOnly />
-                        </div>
-                    )}
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                        {/* Tên Món */}
-                        <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-600">Tên Món ăn (*)</label>
-                            <input type="text" id="name" required className="dish-modal-input" value={formData.name} onChange={handleChange} placeholder="Phở Bò, Lẩu Gà..." />
-                        </div>
+    // 4. ĐỒNG BỘ STATE (Chỉ chạy khi Validation PASS)
+    setFormData((prev) => ({
+      ...prev,
+      categoryKey: actualCategoryValue,
+      statusKey: actualStatusValue,
+    }));
 
-                        {/* Giá Bán */}
-                        <div>
-                            <label htmlFor="price" className="block text-sm font-medium text-gray-600">Giá Bán (VNĐ) (*)</label>
-                            <input type="number" id="price" required min="0" className="dish-modal-input" value={formData.price} onChange={handleChange} placeholder="50000" />
-                        </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                        {/* Danh Mục */}
-                        <div>
-                            <label htmlFor="categoryKey" className="block text-sm font-medium text-gray-600">Danh Mục (*)</label>
-                            {/* Đã FIX: render từ map mới */}
-                            <select id="categoryKey" required className="dish-modal-input" value={formData.categoryKey} onChange={handleChange}>
-                                {Object.entries(categoryMap).map(([key, value]) => (
-                                    <option key={key} value={key}>{value}</option>
-                                ))}
-                            </select>
-                        </div>
-                        
-                        {/* Trạng Thái */}
-                        <div>
-                            <label htmlFor="statusKey" className="block text-sm font-medium text-gray-600">Trạng Thái (*)</label>
-                             {/* Đã FIX: render từ map mới */}
-                            <select id="statusKey" required className="dish-modal-input" value={formData.statusKey} onChange={handleChange}>
-                                {Object.entries(statusMap).map(([key, value]) => (
-                                    <option key={key} value={key}>{value}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
+    // TẠO FORM DATA để gửi multipart/form-data
+    const data = new FormData();
 
-                    {/* URL Hình ảnh */}
-                    <div>
-                        <label htmlFor="image" className="block text-sm font-medium text-gray-600">URL Hình ảnh (hoặc placeholder)</label>
-                        <input type="text" id="image" className="dish-modal-input" value={formData.image} onChange={handleChange} placeholder="https://..." />
-                        {/* Preview ảnh */}
-                        <div className="mt-2 text-xs text-gray-500 flex items-center">
-                            Preview: 
-                            <img 
-                                src={formData.image} 
-                                alt="Preview" 
-                                className="h-8 w-8 object-cover rounded ml-2 border" 
-                                onError={(e) => e.target.src = 'https://placehold.co/40x40/e5e7eb/4b5563?text=N/A'}
-                            />
-                        </div>
-                    </div>
-                    
-                    {/* Mô tả */}
-                    <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-600">Mô Tả Chi Tiết</label>
-                        <textarea id="description" rows="3" className="dish-modal-input" value={formData.description} onChange={handleChange} placeholder="Món ăn này có hương vị..." />
-                    </div>
+    // Thêm trường cơ bản
+    data.append("menu_item_name", formData.name);
+    // ⭐ SỬA LỖI 4: Dùng actualCategoryValue đã được validate
+    data.append("category_id", actualCategoryValue);
+    // === GỬI NỘI DUNG DƯỚI DẠNG CHUỖI JSON ===
+    data.append("description", formData.description || "{}");
+    // ===========================================
+    data.append("price", formData.price);
+    // ⭐ SỬA LỖI 5: Dùng actualStatusValue đã được validate
+    data.append("status", actualStatusValue);
 
-                    {/* Nút Thao tác */}
-                    <div className="mt-8 flex justify-end space-x-3 pt-4 border-t border-gray-200">
-                        <button type="button" onClick={onClose} className="dish-button-secondary">Hủy</button>
-                        <button type="submit" className="dish-button-primary">
-                            {isEditMode ? 'Cập Nhật Món Ăn' : 'Thêm Món Ăn'}
-                        </button>
-                    </div>
-                </form>
+    if (isEditMode) {
+      data.append("_method", "PUT");
+      if (dish && dish.updated_at) {
+        data.append("original_updated_at", dish.updated_at);
+      }
+    }
+
+    if (imageFile) {
+      data.append("image_file", imageFile);
+    }
+
+    try {
+      await onSave(data, isEditMode ? formData.id : null); // ⭐ THÊM 'await'
+    } catch (error) {
+      console.error("Lỗi khi gọi onSave từ DishModal:", error);
+    } finally {
+      // ⭐ ĐẢM BẢO NÚT ĐƯỢC BẬT LẠI TRONG MỌI TRƯỜNG HỢP
+      setIsSaving(false);
+    }
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm dish-modal-backdrop-blur">
+      <div className="bg-white p-6 rounded-xl w-full max-w-xl shadow-2xl transform transition-all duration-300 max-h-[90vh] flex flex-col">
+        <h3 className="text-2xl font-bold mb-4 text-gray-800 border-b pb-3 flex-shrink-0">
+          {title}
+        </h3>
+
+        <form
+          className="space-y-4 overflow-y-auto pr-2 flex-grow"
+          onSubmit={handleSubmit}
+        >
+          {/* ID */}
+          {isEditMode && (
+            <div>
+              <label
+                htmlFor="id"
+                className="block text-sm font-medium text-gray-600"
+              >
+                ID Món ăn
+              </label>
+              <input
+                type="text"
+                id="id"
+                className="dish-modal-input-readonly"
+                value={dish.id}
+                readOnly
+              />
             </div>
-        </div>
-    );
+          )}
+
+          {/* Tên & Giá */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-600"
+              >
+                Tên Món ăn (*)
+              </label>
+              <input
+                type="text"
+                id="name"
+                required
+                className="dish-modal-input"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Phở Bò, Lẩu Gà..."
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="price"
+                className="block text-sm font-medium text-gray-600"
+              >
+                Giá Bán (VNĐ) (*)
+              </label>
+              <input
+                type="number"
+                id="price"
+                required
+                min="1000"
+                className="dish-modal-input"
+                value={formData.price}
+                onChange={handleChange}
+                placeholder="50000"
+              />
+            </div>
+          </div>
+
+          {/* Danh mục & Trạng thái */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="categoryKey"
+                className="block text-sm font-medium text-gray-600"
+              >
+                Danh Mục (*)
+              </label>
+              <select
+                id="categoryKey"
+                required
+                className="dish-modal-input"
+                value={formData.categoryKey}
+                onChange={handleChange}
+                onContextMenu={(e) => e.preventDefault()}
+                onCopy={(e) => e.preventDefault()}
+                onCut={(e) => e.preventDefault()}
+                title="Vui lòng chọn từ danh sách có sẵn"
+              >
+                {categories.map((cat) => (
+                  <option key={cat.category_id} value={String(cat.category_id)}>
+                    {cat.category_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="statusKey"
+                className="block text-sm font-medium text-gray-600"
+              >
+                Trạng Thái (*)
+              </label>
+              <select
+                id="statusKey"
+                required
+                className="dish-modal-input"
+                value={formData.statusKey}
+                onChange={handleChange}
+              >
+                {Object.entries(statusMap).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* TRƯỜNG INPUT FILE */}
+          <div>
+            <label
+              htmlFor="imageFile"
+              className="block text-sm font-medium text-gray-600"
+            >
+              Hình ảnh Món ăn {isEditMode ? "(Thay đổi ảnh mới)" : "(*)"}
+            </label>
+            <input
+              type="file"
+              id="imageFile"
+              name="imageFile"
+              accept="image/*"
+              {...(!isEditMode && { required: !dish?.image })}
+              className="dish-modal-input file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+              onChange={handleChange}
+            />
+            {(imagePreview || dish?.image) && (
+              <div className="mt-2 text-xs text-gray-500 flex items-center">
+                Preview:
+                <img
+                  src={imagePreview || dish?.image}
+                  alt="Preview"
+                  className="h-16 w-16 object-cover rounded ml-2 border"
+                  onError={(e) =>
+                    (e.target.src =
+                      "https://placehold.co/64x64/e5e7eb/4b5563?text=N/A")
+                  }
+                />
+              </div>
+            )}
+          </div>
+
+          {/* === EDITOR MỚI: REACT-DRAFT-WYSIWYG === */}
+          <div className="border border-gray-300 rounded-lg p-2 min-h-[250px] focus-within:border-emerald-500">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-600 mb-1"
+            >
+              Mô Tả Chi Tiết (Rich Text Editor)
+            </label>
+            <Editor
+              editorState={editorState}
+              onEditorStateChange={onEditorStateChange}
+              wrapperClassName="wrapper-class"
+              editorClassName="editor-class h-48 px-2"
+              toolbarClassName="toolbar-class border-b border-gray-200 mb-2"
+              placeholder="Món ăn này có hương vị..."
+              toolbar={{
+                options: [
+                  "inline",
+                  "blockType",
+                  "list",
+                  "textAlign",
+                  "link",
+                  "image",
+                  "history",
+                ],
+                inline: {
+                  inDropdown: false,
+                  options: ["bold", "italic", "underline", "strikethrough"],
+                },
+              }}
+            />
+          </div>
+          {/* ============================================= */}
+
+          {/* Nút Thao tác */}
+          <div className="sticky bottom-0 bg-white mt-8 flex justify-end space-x-3 pt-4 border-t border-gray-200 flex-shrink-0">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition duration-150 shadow-md disabled:opacity-50"
+              disabled={isSaving} // ⭐ THÊM DISABLED
+            >
+              {isSaving ? (
+                <>
+                  Đang Lưu...
+                  {/* Tùy chọn: Thêm hiệu ứng loading spinner */}
+                  <span
+                    className="ml-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                    role="status"
+                  >
+                    <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                      Loading...
+                    </span>
+                  </span>
+                </>
+              ) : isEditMode ? (
+                "Cập Nhật Món Ăn"
+              ) : (
+                "Thêm Món Ăn"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }

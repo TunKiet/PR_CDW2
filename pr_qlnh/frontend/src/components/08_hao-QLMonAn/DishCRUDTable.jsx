@@ -1,21 +1,15 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import Sidebar from "../../components/Sidebar";
-import DetailModal from "./DetailModal";
 import "./DishTable.css";
-import DishModal from "./DishModal";
 import axios from "axios";
+import DishModal from "./DishModal";
+import DetailModal from "./DetailModal"; // KHAI BÁO MỚI: Cần file này
 
 // === CẤU HÌNH API ===
 const API_URL = "http://127.0.0.1:8000/api/dishes";
+const CATEGORY_API_URL = "http://127.0.0.1:8000/api/categories";
 
 // === HÀM HỖ TRỢ VÀ MAPS ===
-
-const categoryMap = {
-  1: "Món Chính",
-  2: "Tráng Miệng",
-  3: "Đồ Uống",
-};
-
 const statusMap = {
   active: "Còn hàng",
   inactive: "Hết hàng",
@@ -30,6 +24,7 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
+// Hàm ánh xạ dữ liệu API sang React
 const mapApiDataToReact = (item) => ({
   id: item.menu_item_id,
   categoryKey: String(item.category_id),
@@ -38,494 +33,650 @@ const mapApiDataToReact = (item) => ({
   image: item.image_url,
   description: item.description,
   statusKey: item.status,
+  updated_at: item.updated_at,
 });
-
-const mapReactDataToApi = (dish) => ({
-  category_id: dish.categoryKey,
-  menu_item_name: dish.name,
-  description: dish.description,
-  price: dish.price,
-  image_url: dish.image,
-  status: dish.statusKey,
-});
-
-// ===================================================================
-
 export default function DishCRUDTable() {
+  // === STATES DỮ LIỆU ===
   const [dishes, setDishes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dishTimestamps, setDishTimestamps] = useState({});
   const [error, setError] = useState(null);
 
-  // Thêm minPrice và maxPrice vào state filters
-  const [filters, setFilters] = useState({
-    keyword: "",
-    category: "",
-    status: "",
-    minPrice: "",
-    maxPrice: "",
-  });
+  // === STATES LỌC & PHÂN TRANG ===
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchText, setSearchText] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const itemsPerPage = 10;
 
+  // === STATES MODAL ===
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingDish, setEditingDish] = useState(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false); // STATE CÓ VẤN ĐỀ
   const [selectedDish, setSelectedDish] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4;
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      // Chỉ giữ lại số cho giá, loại bỏ ký tự không phải số
-      [name]:
-        name === "minPrice" || name === "maxPrice"
-          ? value.replace(/[^0-9]/g, "")
-          : value,
-    }));
-    setCurrentPage(1);
-  };
+  
+  const [showConflictModal, setShowConflictModal] = useState(false);
+  const [conflictData, setConflictData] = useState(null);
 
-  // HÀM: Xóa tất cả các điều kiện lọc
-  const handleClearFilters = () => {
-    setFilters({
-      keyword: "",
-      category: "",
-      status: "",
-      minPrice: "",
-      maxPrice: "",
+  // =========================================================
+  // 1. FETCH DỮ LIỆU
+  // =========================================================
+
+  const handleEditConflict = (result, dishId) => {
+    setConflictData({
+      message: result.message,
+      currentData: result.current_data,
+      dishId: dishId,
     });
-    setCurrentPage(1);
+    setShowConflictModal(true);
+    handleCloseEditModal(); // Đóng modal edit
   };
+
+  const handleReloadAfterConflict = async () => {
+    await fetchDishes();
+    setShowConflictModal(false);
+    setConflictData(null);
+    alert("✅ Đã tải lại dữ liệu mới nhất!");
+  };
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await axios.get(CATEGORY_API_URL);
+      setCategories(response.data.data);
+    } catch (err) {
+      console.error("Lỗi khi fetch danh mục:", err);
+    }
+  }, []);
 
   const fetchDishes = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    setIsLoading(true);
     try {
       const response = await axios.get(API_URL);
-
-      if (
-        response.data.status === "success" &&
-        Array.isArray(response.data.data)
-      ) {
-        const mappedDishes = response.data.data.map(mapApiDataToReact);
-        setDishes(mappedDishes);
-      } else {
-        setError("Dữ liệu API không hợp lệ hoặc thiếu trường 'data'.");
-      }
+      const mappedData = response.data.data.map(mapApiDataToReact);
+      setDishes(mappedData);
+      // ⭐ LƯU TIMESTAMPS
+      const timestamps = {};
+      response.data.data.forEach((item) => {
+        timestamps[item.menu_item_id] = item.updated_at;
+      });
+      setDishTimestamps(timestamps);
+      setError(null);
     } catch (err) {
-      console.error("Lỗi khi fetch data:", err.response || err);
+      console.error("Lỗi khi fetch data:", err);
       setError(
-        err.response
-          ? `Lỗi Server (${err.response.status}): ${err.message}`
-          : "Lỗi kết nối API."
+        "Không thể tải dữ liệu món ăn. Vui lòng kiểm tra Server Backend."
       );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    fetchCategories();
     fetchDishes();
-  }, [fetchDishes]);
+  }, [fetchCategories, fetchDishes]);
 
-  // Logic lọc
-  const filteredDishes = useMemo(() => {
-    let result = dishes;
-    const lowercasedKeyword = filters.keyword.toLowerCase();
-    const minPrice = parseFloat(filters.minPrice);
-    const maxPrice = parseFloat(filters.maxPrice);
+  // =========================================================
+  // 2. LOGIC CRUD & HỖ TRỢ
+  // =========================================================
 
-    if (lowercasedKeyword) {
-      result = result.filter(
-        (dish) =>
-          dish.name.toLowerCase().includes(lowercasedKeyword) ||
-          String(dish.id).includes(lowercasedKeyword)
-      );
-    }
-    if (filters.category) {
-      result = result.filter(
-        (dish) => String(dish.categoryKey) === String(filters.category)
-      );
-    }
-    if (filters.status) {
-      result = result.filter((dish) => dish.statusKey === filters.status);
-    }
-
-    // Logic lọc Giá
-    if (!isNaN(minPrice) && filters.minPrice !== "") {
-      result = result.filter((dish) => dish.price >= minPrice);
-    }
-    if (!isNaN(maxPrice) && filters.maxPrice !== "") {
-      result = result.filter((dish) => dish.price <= maxPrice);
-    }
-
-    return result;
-  }, [dishes, filters]);
-
-  const totalPages = Math.ceil(filteredDishes.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = filteredDishes.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
-
-  const pageNumbers = useMemo(() => {
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(i);
-    }
-    return pages;
-  }, [totalPages]);
-
-  const handleOpenEditModal = (dish = null) => {
-    setEditingDish(dish);
-    setIsEditModalOpen(true);
-  };
-  const handleCloseEditModal = () => {
-    setIsEditModalOpen(false);
-    setEditingDish(null);
-  };
-
-  const handleOpenDetailModal = (dish) => {
-    setSelectedDish(dish);
-    setIsDetailModalOpen(true);
-  };
-  const handleCloseDetailModal = () => {
-    setSelectedDish(null);
-    setIsDetailModalOpen(false);
-  };
-  //xóa
-  const handleDeleteDish = async (dishId, dishName) => {
-    if (
-      !window.confirm(
-        `Bạn có chắc chắn muốn xóa món ăn "${dishName}" (ID: ${dishId})?`
-      )
-    ) {
-      return;
-    }
+  const handleSaveDish = async (formData, dishId) => {
+    // formData bây giờ là đối tượng FormData
     try {
-      await axios.delete(`${API_URL}/${dishId}`);
-      alert(`✅ Đã xóa món ăn ${dishName} thành công!`);
-      fetchDishes();
-    } catch (err) {
-      console.error("Lỗi xóa món ăn:", err.response || err);
-      alert(
-        `❌ Lỗi: Không thể xóa món ăn. ${
-          err.response?.data?.message || err.message
-        }`
-      );
-    }
-  };
-  //sửa món ăn
-  const handleSaveDish = async (dishToSave) => {
-    const apiData = mapReactDataToApi(dishToSave);
-    const isEditMode = !!dishToSave.id;
-    try {
-      if (isEditMode) {
-        if (!dishToSave.id) {
-          throw new Error("ID món ăn không hợp lệ cho thao tác cập nhật.");
+      if (dishId && dishTimestamps[dishId]) {
+        formData.append("updated_at", dishTimestamps[dishId]);
+      }
+      if (dishId) {
+        // Chỉnh sửa
+        const response = await axios.post(`${API_URL}/${dishId}`, formData);
+
+        // ⭐ XỬ LÝ CONFLICT
+        if (response.status === 409) {
+          handleEditConflict(response.data, dishId);
+          return;
         }
-        await axios.put(`${API_URL}/${dishToSave.id}`, apiData);
-        alert(`✅ Đã cập nhật món ăn ${dishToSave.id} thành công!`);
+
+        alert(`✅ Cập nhật món ăn thành công!`);
       } else {
-        const response = await axios.post(API_URL, apiData);
-        alert(
-          `✅ Đã thêm món ăn mới (ID: ${response.data.data.menu_item_id}) thành công!`
-        );
+        // CHẾ ĐỘ THÊM MỚI: SỬ DỤNG formData
+        await axios.post(API_URL, formData);
+        alert(`✅ Thêm món ăn thành công!`);
       }
 
       handleCloseEditModal();
       fetchDishes();
     } catch (err) {
-      console.error("Lỗi lưu món ăn:", err.response || err);
-      const validationErrors = err.response?.data?.errors;
-      let errorMessage =
-        err.response?.data?.message || "Lỗi không xác định khi lưu món ăn.";
-
-      if (validationErrors) {
-        errorMessage += "\nChi tiết:\n";
-        Object.values(validationErrors).forEach((messages) => {
-          messages.forEach((msg) => (errorMessage += `- ${msg}\n`));
-        });
+      console.error("Lỗi khi lưu món ăn:", err.response ? err.response.data : err.message);
+      // ⭐ HANDLE 404 (Món đã bị xóa)
+      if (err.response?.status === 404) {
+        alert("❌ Món ăn không tồn tại (có thể đã bị xóa). Tải lại danh sách!");
+        handleCloseEditModal();
+        fetchDishes();
+        return;
       }
-      alert(`❌ Lỗi: ${errorMessage}`);
+      // ⭐ CATCH HTTP 409
+      if (err.response?.status === 409) {
+        handleEditConflict(err.response.data, dishId);
+        return;
+      }
+
+      let detailedError =
+        "Không thể lưu món ăn. Vui lòng kiểm tra console để biết chi tiết.";
+
+      if (err.response && err.response.status === 422) {
+        const errors = err.response.data.errors;
+        if (errors) {
+          detailedError = "Lỗi Validation: ";
+          for (const key in errors) {
+            detailedError += `[${key}]: ${errors[key].join(", ")} | `;
+          }
+          detailedError = detailedError.trim().slice(0, -1);
+        }
+      } else if (err.response?.data?.message) {
+        detailedError = err.response.data.message;
+      }
+
+      alert(`Lỗi: ${detailedError}`);
     }
   };
 
-  // Khối render cho trạng thái Loading
-  if (loading) {
-    return (
-      <div className="dish-layout">
-        <Sidebar />
-        <main className="dish-main">
-          <div className="dish-container text-center py-10 text-xl font-semibold text-indigo-600">
-            Đang tải dữ liệu món ăn từ Server...
-          </div>
-        </main>
-      </div>
-    );
-  }
+  const handleDeleteDish = async (id, name) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa món ăn "${name}" không?`)) {
+      return;
+    }
 
-  // Khối render cho trạng thái Error
-  if (error) {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      alert(`✅ Xóa món ăn "${name}" thành công!`);
+      fetchDishes();
+    } catch (err) {
+      console.error(
+        "Lỗi khi xóa món ăn:",
+        err.response ? err.response.data : err.message
+      );
+      alert(`Lỗi: ${err.response?.data?.message || "Không thể xóa món ăn."}`);
+    }
+  };
+
+  const getCategoryName = useCallback(
+    (categoryId) => {
+      const category = categories.find(
+        (cat) => String(cat.category_id) === String(categoryId)
+      );
+      return category ? category.category_name : "N/A";
+    },
+    [categories]
+  );
+
+  // =========================================================
+  // 3. LOGIC LỌC VÀ PHÂN TRANG
+  // =========================================================
+
+  // HÀM MỚI: XÓA TẤT CẢ BỘ LỌC
+  const handleClearFilters = () => {
+    setSearchText("");
+    setFilterCategory("");
+    setFilterStatus("");
+    setMinPrice("");
+    setMaxPrice("");
+    setCurrentPage(1);
+  };
+
+  // Lọc và Tìm kiếm (Memoized)
+  const filteredDishes = useMemo(() => {
+    let currentDishes = dishes;
+    const minP = minPrice ? parseFloat(minPrice) : null;
+    const maxP = maxPrice ? parseFloat(maxPrice) : null;
+
+    // 1. Lọc theo Danh mục
+    if (filterCategory) {
+      currentDishes = currentDishes.filter(
+        (dish) => dish.categoryKey === filterCategory
+      );
+    }
+
+    // 2. Lọc theo Trạng thái
+    if (filterStatus) {
+      currentDishes = currentDishes.filter(
+        (dish) => dish.statusKey === filterStatus
+      );
+    }
+
+    // 3. Lọc theo Khoảng Giá
+    if (minP !== null && !isNaN(minP)) {
+      currentDishes = currentDishes.filter((dish) => dish.price >= minP);
+    }
+    if (maxP !== null && !isNaN(maxP)) {
+      currentDishes = currentDishes.filter((dish) => dish.price <= maxP);
+    }
+
+    // 4. Tìm kiếm theo Tên/Mô tả (Keyword)
+    if (searchText) {
+      const lowerSearchText = searchText.toLowerCase();
+      currentDishes = currentDishes.filter(
+        (dish) =>
+          dish.name.toLowerCase().includes(lowerSearchText) ||
+          (dish.description &&
+            dish.description.toLowerCase().includes(lowerSearchText))
+      );
+    }
+
+    return currentDishes;
+  }, [dishes, searchText, filterCategory, filterStatus, minPrice, maxPrice]);
+
+  // Phân trang
+  const totalPages = Math.ceil(filteredDishes.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = filteredDishes.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  // Tạo danh sách số trang (Giữ nguyên)
+  const pageNumbers = useMemo(() => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+    if (endPage - startPage + 1 < maxPagesToShow) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }, [totalPages, currentPage]);
+
+  // =========================================================
+  // 4. LOGIC MODAL
+  // =========================================================
+
+  const handleAddDish = async () => {
+    await fetchCategories();
+    setEditingDish(null);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditDish = async (dish) => {
+    await fetchCategories();
+    setEditingDish(dish);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingDish(null);
+  };
+
+  // HÀM MỚI: Mở Modal Xem Chi Tiết
+  const handleViewDetail = (dish) => {
+    setSelectedDish(dish);
+    setIsDetailModalOpen(true);
+  };
+
+  // HÀM MỚI: Đóng Modal Xem Chi Tiết
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedDish(null);
+  };
+
+  // Component modal conflict (copy từ DishStatusManagement)
+  const ConflictModal = () => {
+    if (!showConflictModal || !conflictData) return null;
+
     return (
-      <div className="dish-layout">
-        <Sidebar />
-        <main className="dish-main">
-          <div className="dish-container text-center py-10 text-xl font-semibold text-red-600">
-            {error} <br />
+      <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[2000] flex items-center justify-center p-4">
+        <div className="bg-white p-6 rounded-xl max-w-md shadow-2xl">
+          <div className="flex items-center mb-4">
+            <span className="text-4xl mr-3">⚠️</span>
+            <h3 className="text-xl font-bold text-red-600">
+              Xung đột dữ liệu!
+            </h3>
+          </div>
+
+          <p className="text-gray-700 mb-4">{conflictData.message}</p>
+
+          {conflictData.currentData && (
+            <div className="bg-gray-50 p-4 rounded-lg mb-4 border-l-4 border-yellow-500">
+              <h4 className="font-semibold mb-2">📊 Dữ liệu hiện tại:</h4>
+              <ul className="text-sm text-gray-600 space-y-1">
+                <li>• Tên: {conflictData.currentData.menu_item_name}</li>
+                <li>• Giá: {formatCurrency(conflictData.currentData.price)}</li>
+                <li>
+                  • Cập nhật:{" "}
+                  {new Date(conflictData.currentData.updated_at).toLocaleString(
+                    "vi-VN"
+                  )}
+                </li>
+              </ul>
+            </div>
+          )}
+
+          <div className="bg-blue-50 p-3 rounded-lg mb-4 text-sm text-blue-800">
+            <strong>💡 Lý do:</strong> Có người khác đã chỉnh sửa món này khi
+            bạn đang mở form.
+          </div>
+
+          <div className="flex space-x-3">
             <button
-              onClick={fetchDishes}
-              className="mt-4 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition"
+              onClick={handleReloadAfterConflict}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              Thử tải lại
+              🔄 Tải lại
+            </button>
+            <button
+              onClick={() => {
+                setShowConflictModal(false);
+                setConflictData(null);
+              }}
+              className="flex-1 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+            >
+              Đóng
             </button>
           </div>
-        </main>
+        </div>
       </div>
     );
-  }
-
-  // === RENDER NỘI DUNG CHÍNH (PHẦN JSX) ===
+  };
+  // =========================================================
+  // 5. HIỂN THỊ (JSX)
+  // =========================================================
   return (
     <div className="dish-layout">
       <Sidebar />
       <main className="dish-main">
-        <div className="dish-container">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">
-            📝 Quản Lý Thực Đơn (Đã kết nối Backend)
-          </h1>
+        <div className="dish-container p-6">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+            Quản Lý Món Ăn (Dish CRUD)
+          </h2>
 
-          {/* KHU VỰC LỌC, TÌM KIẾM, VÀ NÚT THÊM MỚI (SỬ DỤNG GRID CHO LAYOUT 2 HÀNG) */}
-          <div className="mb-6 p-6 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-700">
-                Tìm kiếm Nâng cao
-              </h2>
+          {/* Thanh công cụ tìm kiếm và lọc */}
+          <div className="flex flex-col gap-4 mb-6">
+            {/* Hàng 1: Tìm kiếm (Keyword) & Nút Thêm */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {/* 1. Thanh tìm kiếm (Keyword) */}
+              <input
+                type="text"
+                placeholder="Tìm kiếm tên/mô tả (Keyword)..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="w-full sm:flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150"
+              />
+
+              {/* Nút Thêm Món */}
               <button
-                onClick={() => handleOpenEditModal(null)}
-                className="px-4 py-2 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition duration-150 whitespace-nowrap"
+                onClick={handleAddDish}
+                className="dish-button-primary dish-button-base flex items-center gap-1 min-w-[150px]"
               >
-                + Thêm Món Ăn Mới
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Thêm Món Ăn
               </button>
             </div>
 
-            {/* HÀNG 1: Tên/ID, Danh Mục, Trạng Thái, Áp dụng Lọc */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4 items-end">
-              {/* 1. TÌM KIẾM THEO TÊN/ID */}
-              <div>
-                <label
-                  htmlFor="keyword"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Tên món/ID
-                </label>
-                <input
-                  type="text"
-                  id="keyword"
-                  name="keyword"
-                  placeholder="Nhập từ khóa tìm kiếm..."
-                  value={filters.keyword}
-                  onChange={handleFilterChange}
-                  className="dish-modal-input"
-                />
-              </div>
+            {/* Hàng 2: Bộ lọc Category, Status, Price & Nút Xóa Lọc */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* 2. Lọc Danh mục */}
+              <select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[150px]"
+              >
+                <option value="">Tất cả Danh mục</option>
+                {categories.map((cat) => (
+                  <option key={cat.category_id} value={String(cat.category_id)}>
+                    {cat.category_name}
+                  </option>
+                ))}
+              </select>
 
-              {/* 2. LỌC THEO DANH MỤC */}
-              <div>
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Danh mục
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  value={filters.category}
-                  onChange={handleFilterChange}
-                  className="dish-modal-input"
-                >
-                  <option value="">Tất cả Danh mục</option>
-                  {Object.entries(categoryMap).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* 3. Lọc Trạng thái */}
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[150px]"
+              >
+                <option value="">Tất cả Trạng thái</option>
+                {Object.entries(statusMap).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
+                  </option>
+                ))}
+              </select>
 
-              {/* 3. LỌC THEO TRẠNG THÁI */}
-              <div>
-                <label
-                  htmlFor="status"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Trạng thái
-                </label>
-                <select
-                  id="status"
-                  name="status"
-                  value={filters.status}
-                  onChange={handleFilterChange}
-                  className="dish-modal-input"
-                >
-                  <option value="">Tất cả Trạng thái</option>
-                  {Object.entries(statusMap).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* 4. Giá tối thiểu */}
+              <input
+                type="number"
+                placeholder="Giá Min"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[120px]"
+                min="0"
+              />
 
-              {/* 4. NÚT ÁP DỤNG LỌC */}
-              <div className="flex justify-end">
-                {/* Nút này hiện tại không cần thiết vì lọc chạy theo onChange, nhưng giữ lại cho giao diện */}
-                <button className="px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition duration-150 w-full md:w-auto">
-                  Áp dụng Lọc
-                </button>
-              </div>
-            </div>
+              {/* 5. Giá tối đa */}
+              <input
+                type="number"
+                placeholder="Giá Max"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 transition duration-150 flex-1 min-w-[120px]"
+                min="0"
+              />
 
-            {/* HÀNG 2: Lọc Giá và Xóa Lọc */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-              {/* 5. Giá Tối Thiểu */}
-              <div>
-                <label
-                  htmlFor="minPrice"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Giá Tối Thiểu (VNĐ)
-                </label>
-                <input
-                  type="number"
-                  id="minPrice"
-                  name="minPrice"
-                  placeholder="0"
-                  value={filters.minPrice}
-                  onChange={handleFilterChange}
-                  className="dish-modal-input"
-                />
-              </div>
-
-              {/* 6. Giá Tối Đa */}
-              <div>
-                <label
-                  htmlFor="maxPrice"
-                  className="block text-sm font-medium text-gray-600"
-                >
-                  Giá Tối Đa (VNĐ)
-                </label>
-                <input
-                  type="number"
-                  id="maxPrice"
-                  name="maxPrice"
-                  placeholder="Không giới hạn"
-                  value={filters.maxPrice}
-                  onChange={handleFilterChange}
-                  className="dish-modal-input"
-                />
-              </div>
-
-              {/* 7. Nút Xóa Lọc */}
-              <div className="col-span-1">
+              {/* 6. Nút Xóa Lọc */}
+              {(searchText ||
+                filterCategory ||
+                filterStatus ||
+                minPrice ||
+                maxPrice) && (
                 <button
                   onClick={handleClearFilters}
-                  className="px-6 py-2 bg-gray-400 text-white font-semibold rounded-lg hover:bg-gray-500 transition duration-150 w-full"
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-red-50 text-red-600 transition duration-150 min-w-[100px]"
+                  title="Xóa tất cả các điều kiện lọc"
                 >
                   Xóa Lọc
                 </button>
-              </div>
-              {/* Cột còn lại trống */}
-              <div className="col-span-1"></div>
+              )}
             </div>
           </div>
+          {/* HẾT Thanh công cụ tìm kiếm và lọc */}
 
-          {/* BẢNG MÓN ĂN */}
-          <div className="dish-table-wrapper">
-            <table className="dish-table">
-              <thead>
-                <tr>
-                  <th className="w-16">ID</th>
-                  <th className="w-12">Ảnh</th>
-                  <th className="w-64">Tên Món Ăn</th>
-                  <th className="w-32">Danh Mục</th>
-                  <th className="w-24">Giá Bán</th>
-                  <th className="w-24">Trạng Thái</th>
-                  <th className="w-32 text-center">Thao Tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentItems.length > 0 ? (
-                  currentItems.map((dish) => (
-                    <tr key={dish.id}>
-                      <td>{dish.id}</td>
-                      <td>
-                        <img
-                          src={dish.image}
-                          alt={dish.name}
-                          className="dish-img w-10 h-10 object-cover rounded-full"
-                          onError={(e) =>
-                            (e.target.src =
-                              "https://placehold.co/40x40/e5e7eb/4b5563?text=N/A")
-                          }
-                        />
-                      </td>
-                      <td>{dish.name}</td>
-                      <td>
-                        {categoryMap[dish.categoryKey] || dish.categoryKey}
-                      </td>
-                      <td>{formatCurrency(dish.price)}</td>
-                      <td>
-                        <span
-                          className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                            dish.statusKey === "active"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {statusMap[dish.statusKey] || dish.statusKey}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
-                        <button
-                          // === KHẮC PHỤC LỖI handleOpenDetailModal ===
-                          onClick={() => handleOpenDetailModal(dish)}
-                          // ===========================================
-                          className="text-indigo-600 hover:text-indigo-900 transition"
-                        >
-                          Xem
-                        </button>
-                        <button
-                          onClick={() => handleOpenEditModal(dish)}
-                          className="text-yellow-600 hover:text-yellow-900 transition"
-                        >
-                          Sửa
-                        </button>
-                        <button
-                          onClick={() => handleDeleteDish(dish.id, dish.name)}
-                          className="text-red-600 hover:text-red-900 transition"
-                        >
-                          Xóa
-                        </button>
+          {/* Hiển thị lỗi hoặc Loading */}
+          {isLoading && (
+            <div className="text-center py-4 text-emerald-600">
+              Đang tải dữ liệu món ăn...
+            </div>
+          )}
+          {error && (
+            <div className="text-center py-4 text-red-600 border border-red-300 bg-red-50 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* Bảng Món Ăn */}
+          {!isLoading && !error && (
+            <div className="dish-table-wrapper overflow-x-auto shadow-lg rounded-xl">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                      ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48">
+                      Ảnh & Tên
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                      Danh Mục
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                      Giá
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
+                      Trạng thái
+                    </th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
+                      Thao Tác
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {currentData.length > 0 ? (
+                    currentData.map((dish, index) => (
+                      <tr
+                        key={dish.id}
+                        className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {dish.id}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-10 w-10">
+                              <img
+                                className="h-10 w-10 rounded-full object-cover"
+                                src={dish.image}
+                                alt={dish.name}
+                                onError={(e) =>
+                                  (e.target.src =
+                                    "https://placehold.co/40x40/e5e7eb/4b5563?text=N/A")
+                                }
+                              />
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">
+                                {dish.name}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                          {getCategoryName(dish.categoryKey)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600">
+                          {formatCurrency(dish.price)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            ${
+                                              dish.statusKey === "active"
+                                                ? "bg-green-100 text-green-800"
+                                                : dish.statusKey === "inactive"
+                                                ? "bg-red-100 text-red-800"
+                                                : "bg-yellow-100 text-yellow-800"
+                                            }`}
+                          >
+                            {statusMap[dish.statusKey] || "Không xác định"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center space-x-2">
+                          {/* Nút Xem Chi Tiết */}
+                          <button
+                            onClick={() => handleViewDetail(dish)}
+                            className="text-gray-500 hover:text-gray-700"
+                            title="Xem chi tiết"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 inline-block"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                              />
+                            </svg>
+                          </button>
+
+                          {/* Nút Chỉnh sửa */}
+                          <button
+                            onClick={() => handleEditDish(dish)}
+                            className="text-indigo-600 hover:text-indigo-900"
+                            title="Chỉnh sửa"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 inline-block"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                              <path
+                                fillRule="evenodd"
+                                d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+
+                          {/* Nút Xóa */}
+                          <button
+                            onClick={() => handleDeleteDish(dish.id, dish.name)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Xóa"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 inline-block"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        className="text-center py-4 text-gray-500"
+                      >
+                        Không tìm thấy món ăn nào.
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={7} className="text-center py-4 text-gray-500">
-                      Không có món ăn nào phù hợp với điều kiện lọc.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
 
-          {/* PHÂN TRANG */}
-          <div className="pagination-controls mt-4 flex justify-between items-center">
-            <div className="flex space-x-1">
+          {/* Phân Trang */}
+          <div className="flex justify-between items-center mt-6">
+            <div className="text-sm text-gray-600">
+              Hiển thị {currentData.length} trên {filteredDishes.length} món ăn.
+            </div>
+            <div className="flex space-x-2">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 transition duration-150"
@@ -562,17 +713,22 @@ export default function DishCRUDTable() {
 
           {/* Modal Xem Chi Tiết */}
           <DetailModal
-            isVisible={isDetailModalOpen} // Sử dụng State 1
+            isVisible={isDetailModalOpen}
             onClose={handleCloseDetailModal}
-            dish={selectedDish} // Sử dụng State 2
+            dish={selectedDish}
+            categories={categories}
           />
+
           {/* Modal Thêm/Sửa */}
           <DishModal
             isVisible={isEditModalOpen}
             onClose={handleCloseEditModal}
             onSave={handleSaveDish}
             dish={editingDish}
+            categories={categories}
           />
+          {/* ⭐ THÊM MODAL CONFLICT */}
+          <ConflictModal />
         </div>
       </main>
     </div>
