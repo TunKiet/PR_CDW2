@@ -80,6 +80,8 @@ function App() {
         <Route path="/inventory-overview" element={<InventoryOverview />} />
         <Route path="/category-manager" element={<CategoryManager />} />
         <Route path="/tables" element={<TableManagementAdmin />} />
+        <Route path="/attendance" element={<AttendancePage />} />
+        <Route path="/attendance-management" element={<AttendanceManagementPage />} />
 
         {/* Định tuyến cho các trang khác nhau */}
         <Route
@@ -170,7 +172,7 @@ function App() {
         {/* <Route path="/invoices" element={<InvoicePage />} /> */}
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
-        {/* <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} /> */}
+        <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} />
       </Routes>
     </BrowserRouter>
   );
