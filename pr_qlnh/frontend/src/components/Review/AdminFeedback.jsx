@@ -9,6 +9,20 @@ const AdminFeedback = ({ reply }) => {
     // Hiển thị chữ cái đầu tiên là AD hoặc tên viết tắt admin
     const avatarText = 'AD';
 
+    const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // tháng bắt đầu từ 0
+        const year = date.getFullYear();
+
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+    };
+
+
     return (
         <>
             <div className="item-rep-comment my-4">
@@ -27,7 +41,7 @@ const AdminFeedback = ({ reply }) => {
                     </div>
                     <div className="box-time flex items-center text-gray-400 mx-2">
                         <MdAccessTime />
-                        <span>{created_at}</span>
+                        <span>{formatDate(created_at)}</span>
                     </div>
                 </div>
                 <div className="box-rep-question">

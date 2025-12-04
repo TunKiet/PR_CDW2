@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-
 // import React from 'react'
 import "./App.css";
 // import MenuList from "./components/MenuList";
@@ -44,14 +43,21 @@ import UserChat from "./components/Chat/UserChat";
 import AdminChat from "./components/Chat/AdminChat";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
 import OrderOnlineAdmin from "./pages/OrderOnlineAdmin";
+
 import AttendancePage from "./pages/AttendancePage";
 import AttendanceManagementPage from "./pages/AttendanceManagementPage";
+
+import CreateOrder from "./components/InventoryOverview/CreateOrder";
+import OrderPuscher from "./components/InventoryOverview/OrderPuscher";
+import OrderPuscherDetail from "./components/InventoryOverview/OrderPuscherDetail";
+import SupplierOrder from "./components/InventoryOverview/SupplierOrder";
+import SupplierOrderDetail from "./components/InventoryOverview/SupplierOrderDetail";
+
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/" element={<LoginPage />} />
         <Route path="/dish-status-management" element={<DishStatusManagement />} />
         <Route path="/category-manager" element={<CategoryManager />} />
@@ -136,6 +142,11 @@ function App() {
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path='/analytics' element={<UserDashboard />} />
+        <Route path="/create-order" element={<CreateOrder/>}/>
+        <Route path="/puscher-order" element={<OrderPuscher/>}/>
+        <Route path="/puscher-order-detail/:purchase_order_id" element={<OrderPuscherDetail/>}/>
+        <Route path="/supplier" element={<SupplierOrder/>}/>
+        <Route path="/supplier-detail" element={<SupplierOrderDetail/>}/>
 
 
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}

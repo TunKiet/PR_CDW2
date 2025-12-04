@@ -34,8 +34,13 @@ use App\Http\Controllers\Api\OrderOnlineAdminController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Models\Ingredient;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ConversationController;
+// use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ReviewReplyController;
+use App\Models\Review;
+use App\Models\ReviewReply;
 
 /*
 |--------------------------------------------------------------------------
@@ -81,19 +86,19 @@ Route::post('/send-message', [MessageController::class, 'sendMessage']);
 | 🧂 Ingredients
 |--------------------------------------------------------------------------
 */
-Route::prefix('ingredients')->group(function () {
-    Route::get('/', [IngredientController::class, 'getAllIngredient']);
-    Route::post('/', [IngredientController::class, 'store']);
-    Route::put('/{id}', [IngredientController::class, 'update']);
-    Route::delete('/{id}', [IngredientController::class, 'destroy']);
-    Route::get('/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
-    Route::get('/used', [IngredientController::class, 'getUsedIngredients']);
-});
-
+Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
+Route::post('/ingredients', [IngredientController::class, 'store']);
+Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
+Route::delete('/ingredients/delete/{id}', [IngredientController::class, 'destroy']);
+Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
 Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::get('/export', [IngredientController::class, 'exportPDF']);
 Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
 Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
+Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
+Route::get('/purchase-orders-all', [PurchaseOrderController::class, 'index']); // danh sách + tổng quan
+Route::get('/purchase-orders/{id}', [PurchaseOrderController::class, 'show']); // chi tiết
+Route::patch('/purchase-orders/{id}/update-status', [PurchaseOrderController::class, 'updateStatus']);
 
 /*
 |--------------------------------------------------------------------------
@@ -189,9 +194,6 @@ Route::prefix('customers')->group(function () {
 
 Route::get('/menu-items', [MenuItemController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
-use App\Models\Ingredient;
-use App\Models\Review;
-use App\Models\ReviewReply;
 
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
@@ -204,6 +206,95 @@ use App\Models\ReviewReply;
 | 🧾 Orders (Eat in restaurant)
 |--------------------------------------------------------------------------
 */
+// ✅ Test route kiểm tra API hoạt động
+Route::get('/test', function () {
+    return response()->json(['message' => 'API file is loaded']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 🍽️ Dish & Review Routes
+|--------------------------------------------------------------------------
+*/
+Route::apiResource('dishes', DishController::class);
+Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
+Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
+Route::post('/add', [IngredientController::class, 'store']);
+Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
+Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
+Route::get('/export', [IngredientController::class, 'exportPDF']);
+Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
+Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
+Route::get('/ingredients/used', [IngredientController::class, 'getUsedIngredients']);
+Route::post('/send-message', [MessageController::class, 'sendMessage']);
+Route::get('/conversations', [MessageController::class, 'getConversations']);
+Route::get('/messages/{conversationId}', [MessageController::class, 'getMessages']);
+Route::post('/mark-read', [MessageController::class, 'markAsRead']);
+Route::post('/chat', [ChatController::class, 'message']);
+
+//Review
+Route::prefix('reviews')->group(function () {
+    Route::get('/all-review', action: [ReviewController::class, 'getAllReviews']);
+    Route::post('/add-review', [ReviewController::class, 'store']);
+    Route::get('/chart/data', [ReviewController::class, 'getDataChartReview']);
+    Route::get('/item/{menuItemId}', [ReviewController::class, 'getDataReview']);
+    Route::get('/reply/{reviewId}', [ReviewReplyController::class, 'getDataReply']);
+    Route::post('/{reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
+    Route::delete('/{reviewId}/delete', [ReviewController::class, 'delete']);
+    Route::patch('/{reviewId}/hide', [ReviewController::class, 'hide']);
+    Route::patch('/{reviewId}/approve', [ReviewController::class, 'approved']);
+});
+
+Route::prefix('reply')->group(function () {
+    Route::post('/add-reply/{reviewId}', [ReviewReplyController::class, 'store']);
+    Route::get('/chart', [ReviewReplyController::class, 'getAllReplies']);
+    Route::delete('/{replyId}/delete', [ReviewReplyController::class, 'delete']);
+    Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);
+    Route::patch('/{replyId}/approve', [ReviewReplyController::class, 'approved']);
+});
+Route::post('/create-conversation', [ConversationController::class, 'createConversation']);
+Route::delete('/delete-message/{messageId}', [MessageController::class, 'delete']);
+
+
+
+/*
+|--------------------------------------------------------------------------
+| 👤 Auth Routes (JWT)
+|--------------------------------------------------------------------------
+*/
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 🛡️ Role & Permission Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::apiResource('/roles', RoleController::class);
+    Route::apiResource('/permissions', PermissionController::class);
+});
+
+Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
+Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);
+
+Route::get('/categories', [CategoryController::class, 'index']);
+
+
+Route::get('/pre-orders', [PreOrderController::class, 'index']);
+Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
+Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
+
+
+Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
+Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
+
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']);
     Route::get('/{id}', [OrderController::class, 'show']);

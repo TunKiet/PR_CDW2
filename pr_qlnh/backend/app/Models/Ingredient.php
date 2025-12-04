@@ -22,10 +22,25 @@ class Ingredient extends Model
         'min_stock_level'
     ];
 
+     protected $appends = ['status'];
+
     protected $casts = [
         'created_at' => 'datetime:Y/m/d H:i:s',
         'updated_at' => 'datetime:Y/m/d H:i:s',
     ];
+
+    public function getStatusAttribute()
+    {
+        if ($this->stock_quantity <= 0) {
+            return 'out';
+        } elseif ($this->stock_quantity <= $this->min_stock_level) {
+            return 'low';
+        } elseif ($this->stock_quantity <= $this->min_stock_level * 1.5) {
+            return 'warning';
+        } else {
+            return 'good';
+        }
+    }
 
     public function category_ingredient()
     {
@@ -65,13 +80,13 @@ class Ingredient extends Model
         }
 
         $ingredient->update([
-            'ingredient_name'        => $data['ingredient_name'],
+            'ingredient_name' => $data['ingredient_name'],
             'category_ingredient_id' => $data['category_ingredient_id'],
-            'price'                  => $data['price'],
-            'unit'                   => $data['unit'],
-            'stock_quantity'         => $data['stock_quantity'],
-            'min_stock_level'        => $data['min_stock_level'],
-            'total_price'            => $data['price'] * $data['stock_quantity']
+            'price' => $data['price'],
+            'unit' => $data['unit'],
+            'stock_quantity' => $data['stock_quantity'],
+            'min_stock_level' => $data['min_stock_level'],
+            'total_price' => $data['price'] * $data['stock_quantity']
         ]);
         return [
             'success' => true,
@@ -115,7 +130,7 @@ class Ingredient extends Model
      * @param mixed $perPage
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public static function getIngredients($categoryId = null, $perPage = 10)
+    public static function queryIngredients($categoryId = null)
     {
         $query = self::with('category_ingredient');
 
@@ -123,7 +138,7 @@ class Ingredient extends Model
             $query->where('category_ingredient_id', $categoryId);
         }
 
-        return $query->orderBy('ingredient_id', 'desc')->paginate($perPage);
+        return $query;
     }
 
     public static function getIngredientExports()
@@ -134,7 +149,7 @@ class Ingredient extends Model
             ->join('ingredients', 'cooking_recipes.ingredient_id', '=', 'ingredients.ingredient_id')
             ->where('orders.payment_status', 'paid')
             ->select(
-        'ingredients.ingredient_id',
+                'ingredients.ingredient_id',
                 'ingredients.ingredient_name',
                 'ingredients.unit',
                 'ingredients.stock_quantity',
@@ -146,6 +161,14 @@ class Ingredient extends Model
             ->orderBy('year', 'asc')
             ->orderBy('month', 'asc')
             ->orderBy('ingredients.ingredient_name', 'asc')
+            ->get();
+    }
+
+    public static function getIngredientAlert()
+    {
+        return self::with('category_ingredient:category_ingredient_id,category_ingredient_name')
+            ->whereColumn('stock_quantity', '<=', 'min_stock_level')
+            ->orderBy('stock_quantity', 'asc')
             ->get();
     }
 }

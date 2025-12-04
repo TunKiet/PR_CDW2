@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('supplier_name', 100);
             $table->decimal('total_cost', 12, 2);
             $table->string('status', 50)->default('ordered');
-            $table->timestamp('order_date')->useCurrent();
+            $table->timestamp('order_date');
             $table->timestamps();
         });
     }

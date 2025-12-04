@@ -11,35 +11,34 @@ import axios from 'axios';
 import Pusher from 'pusher-js';
 import EmojiPicker from 'emoji-picker-react';
 import { Popover } from '@headlessui/react';
+import { notify, confirmAction } from '../../utils/notify'
+
 
 const endPoint = 'http://localhost:8000/api';
 
 const UserChat = () => {
 
+    const userId = JSON.parse(localStorage.getItem("user"))?.user_id;
+
+    console.log("user id: " + userId);
+
     const [openChat, setOpenChat] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
+    const [conversationId, setConversationId] = useState(null);
 
-    const userId = 2;
-    const conversationId = 1;
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
+   
 
     // Load conversation
     useEffect(() => {
-        if (!openChat) return;
+        if (!openChat || !conversationId) return;
 
-        // 1) Load messages first
         axios.get(`${endPoint}/messages/${conversationId}`)
-            .then(res => {
-                setMessages(res.data);
-            });
+            .then(res => setMessages(res.data));
 
-        // 2) Setup Pusher
-        const pusher = new Pusher("f923893c65fd2311c63c", {
-            cluster: "ap1",
-        });
-
+        const pusher = new Pusher("f923893c65fd2311c63c", { cluster: "ap1" });
         const channelName = `conversation.${conversationId}`;
         const channel = pusher.subscribe(channelName);
 
@@ -50,33 +49,42 @@ const UserChat = () => {
             });
         });
 
-        // 3) Cleanup
         return () => {
             pusher.unsubscribe(channelName);
             pusher.disconnect();
         };
+    }, [openChat, conversationId]);
 
-    }, [openChat]);
+
 
     // Scroll
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    //Create new conversation when user create chat
+    useEffect(() => {
+        if (!openChat || !userId) return;
+
+        axios.post(`${endPoint}/create-conversation`, { customer_id: userId })
+            .then(res => {
+                console.log("📌 Conversation:", res.data);
+                setConversationId(res.data.conversation_id.conversation_id);
+            })
+            .catch(err => {
+                console.error("❌ Conversation error:", err)
+            });
+
+    }, [openChat, userId]);
+
+
     // Send message
     const sendMessage = () => {
-
-        if (!input.trim()) {
-            console.log("⚠️ Cannot send: input empty");
+        if (!input.trim()) return;
+        if (!conversationId) {
+            console.log("⚠️ Conversation chưa sẵn");
             return;
         }
-
-        console.log("📤 Sending message:", {
-            conversation_id: conversationId,
-            user_id: userId,
-            sender_type: 'user',
-            message: input
-        });
 
         axios.post(`${endPoint}/send-message`, {
             conversation_id: conversationId,
@@ -84,14 +92,10 @@ const UserChat = () => {
             sender_type: 'user',
             message: input
         })
-            .then(res => {
-                console.log("✅ Send message response:", res.data);
-
-                // ❗ Không thêm vào state nữa — đã có Pusher xử lý
-                setInput('');
-            })
-            .catch(err => console.error("❌ Send message error:", err));
+            .then(() => setInput(''))
+            .catch(err => console.error(err));
     };
+
 
     const handleEmojiClick = (emojiData) => {
         setInput(prev => prev + emojiData.emoji);
@@ -132,6 +136,23 @@ const UserChat = () => {
         }
     }
 
+    const handleDelete = async (messageId) => {
+        const isConfirmed = await confirmAction('Bạn chắc chắn muốn xóa tin nhắn này?');
+        if (!isConfirmed) return;
+
+        try {
+            notify.info('Đang xóa...');
+            notify.dismiss();
+
+            await axios.delete(`${endPoint}/delete-message/${messageId}`);
+            setMessages(prev => prev.filter(msg => msg.message_id !== messageId));
+            notify.success('Xóa tin nhắn thành công');
+        } catch (error) {
+            notify.error('Xóa tin nhắn không hợp lệ. Vui lòng tải lại trang');
+            console.log(error);
+        }
+    }
+
     return (
         <>
             {/* Nút mở chat */}
@@ -168,18 +189,23 @@ const UserChat = () => {
                                     key={`${msg.conversation_id}-${msg.message_id}`}
                                     content={msg.message}
                                     time={msg.created_at}
+                                    messageId={msg.message_id}
+                                    handleDelete={handleDelete}
                                 />
                             ) : (
                                 <Receiver
                                     key={`${msg.conversation_id}-${msg.message_id}`}
                                     content={msg.message}
                                     time={msg.created_at}
+                                    messageId={msg.message_id}
                                 />
                             )
                         )}
 
                         <div ref={messagesEndRef} />
                     </div>
+
+                    
 
                     {/* Input */}
                     <div className="chat-option flex items-center gap-2 p-2 border-t border-gray-300">

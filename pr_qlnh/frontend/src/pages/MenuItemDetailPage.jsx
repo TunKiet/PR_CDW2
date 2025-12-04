@@ -37,6 +37,7 @@ const DescriptionRenderer = ({ description }) => {
     />
   );
 };
+import Review from "../components/Review/Review";
 
 export default function MenuItemDetailPage() {
   const { id } = useParams();
@@ -52,7 +53,7 @@ export default function MenuItemDetailPage() {
   if (!item) return <p className="text-center mt-20">Đang tải...</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto p-6">
       <img
         src={item.image_url}
         alt={item.menu_item_name}
@@ -70,34 +71,8 @@ export default function MenuItemDetailPage() {
         {/* SỬ DỤNG COMPONENT MỚI ĐỂ XỬ LÝ DỮ LIỆU AN TOÀN */}
         <DescriptionRenderer description={item.description} />
       </div>
-
-      <h2 className="text-xl font-bold mt-6">Đánh giá khách hàng</h2>
-
-      <div className="mt-3 space-y-4">
-        {(
-          item.reviews || [
-            {
-              user: "Nguyễn Thành",
-              content: "Món ăn ngon, nêm nếm vừa miệng!",
-              rating: 5,
-            },
-            {
-              user: "Minh Phúc",
-              content: "Trang trí đẹp mắt, sẽ quay lại!",
-              rating: 4,
-            },
-          ]
-        ).map((review, index) => (
-          <div key={index} className="p-4 bg-gray-100 rounded-xl">
-            <p className="font-semibold">{review.user}</p>
-            <p className="text-yellow-500">
-              {"★".repeat(review.rating)}
-              {"☆".repeat(5 - review.rating)}
-            </p>
-            <p>{review.content}</p>
-          </div>
-        ))}
-      </div>
+      <Review menuItemId={item.menu_item_id} />
+    
     </div>
   );
 }
