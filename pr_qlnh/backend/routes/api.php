@@ -227,7 +227,7 @@ Route::prefix('reviews')->group(function () {
 });
 
 Route::prefix('reply')->group(function () {
-    Route::post('/add-reply', [ReviewReplyController::class, 'store']);
+    Route::post('/add-reply/{reviewId}', [ReviewReplyController::class, 'store']);
     Route::get('/chart', [ReviewReplyController::class, 'getAllReplies']);
     Route::delete('/{replyId}/delete', [ReviewReplyController::class, 'delete']);
     Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);

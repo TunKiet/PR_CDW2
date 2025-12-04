@@ -16,20 +16,22 @@ class ReviewReplyController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $reviewId)
     {
         $request->validate([
-            'review_id' => 'required|integer',
             'user_id' => 'required|integer',
             'reply_text' => 'required|string',
         ]);
 
-        $reply = ReviewReply::create($request->all());
-
-        return response()->json([
-            'data' => $reply,
+        $reply = ReviewReply::create([
+            'review_id' => $reviewId,
+            'user_id' => $request->user_id,
+            'reply_text' => $request->reply_text,
         ]);
+
+        return response()->json(['data' => $reply]);
     }
+
 
     //Count reply, all reply
     public function getAllReplies(Request $request)

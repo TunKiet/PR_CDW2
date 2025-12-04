@@ -8,12 +8,18 @@ import Pagination from '@mui/material/Pagination';
 import CircularProgress from '@mui/material/CircularProgress';
 import { notify, confirmAction } from '../../utils/notify'
 import { CiImageOff } from "react-icons/ci";
+import Dialog from '@mui/material/Dialog';
+import Rating from '@mui/material/Rating';
+import Button from '@mui/material/Button';
 import axios from 'axios';
 
 const endPoint = 'http://localhost:8000/api';
 
 
 const ManagerReview = () => {
+
+    const userId = JSON.parse(localStorage.getItem("user"))?.user_id;
+
     const [loadingTable, setLoadingTable] = useState(false);
     const [allReview, setAllReview] = useState([]);
     const [page, setPage] = useState(1);
@@ -21,6 +27,7 @@ const ManagerReview = () => {
     const [hoveredReviewId, setHoveredReviewId] = useState(null);
     const [openReply, setOpenReply] = useState(false);
     const [currentReview, setCurrentReview] = useState(null);
+    const [replyText, setReplyText] = useState('');
 
 
     // const truncateText = (text, limit = 30) => {
@@ -111,8 +118,13 @@ const ManagerReview = () => {
 
     const handleReply = async (reviewId) => {
         try {
-            const res = await axios.post(`${endPoint}/reply/add-reply${reviewId}`);
+            const res = await axios.post(`${endPoint}/reply/add-reply/${reviewId}`, {
+                review_id: reviewId,
+                user_id: userId, // lấy từ context/auth
+                reply_text: replyText,
+            });
             setCurrentReview(res.data);
+            setOpenReply(false);
             notify.success('Gửi phản hồi thành công');
             console.log(res.data);
         } catch (error) {
@@ -150,9 +162,12 @@ const ManagerReview = () => {
                                 </tr>
                             ) : allReview.length > 0 ? (
                                 allReview.map((review) => (
-                                    <tr key={review.review_id} className='hover:bg-gray-300 transition cursor-pointer'
+                                    <tr
+                                        key={review.review_id}
+                                        className="hover:bg-gray-300 transition cursor-pointer relative"
                                         onMouseEnter={() => setHoveredReviewId(review.review_id)}
-                                        onMouseLeave={() => setHoveredReviewId(null)}>
+                                        onMouseLeave={() => setHoveredReviewId(null)}
+                                    >
                                         <td className='text-[13px] text-center border-b'>{review.review_id}</td>
                                         <td className='text-[13px] text-center border-b'>{review.user?.full_name}</td>
                                         <td className='text-[13px] text-center border-b'>{review.menu_item?.menu_item_name}</td>
@@ -168,25 +183,44 @@ const ManagerReview = () => {
                                         <td className='text-[13px] text-center border-b'>{review.like || 0}</td>
                                         <td className='text-[13px] text-center border-b'>{review.dislike || 0}</td>
                                         <td className='text-[13px] text-center border-b'>{review.status}</td>
+
                                         <td className='text-[13px] text-center border-b'>
                                             <Tooltip title="Approve">
-                                                <IconButton onClick={() => hanldApproved(review.review_id)}><CheckCircleOutlineIcon size={20} /></IconButton>
+                                                <IconButton onClick={() => hanldApproved(review.review_id)}>
+                                                    <CheckCircleOutlineIcon size={20} />
+                                                </IconButton>
                                             </Tooltip>
                                             <Tooltip title="Hide">
-                                                <IconButton onClick={() => handleHide(review.review_id)}><VisibilityOffOutlinedIcon /></IconButton>
+                                                <IconButton onClick={() => handleHide(review.review_id)}>
+                                                    <VisibilityOffOutlinedIcon />
+                                                </IconButton>
                                             </Tooltip>
                                             <Tooltip title="Delete">
-                                                <IconButton onClick={() => handleDelete(review.review_id)}><DeleteIcon /></IconButton>
+                                                <IconButton onClick={() => handleDelete(review.review_id)}>
+                                                    <DeleteIcon />
+                                                </IconButton>
                                             </Tooltip>
-                                            {hoveredReviewId === review.review_id && (
-                                                <Tooltip title="Reply">
-                                                    <IconButton onClick={() => handleReply(review)}>
-                                                        🗨️
-                                                    </IconButton>
-                                                </Tooltip>
-                                            )}
                                         </td>
+
+                                        {hoveredReviewId === review.review_id && (
+                                            <td>
+                                                <div
+                                                    className="absolute right-60 top-1/5 -translate-y-1/2 
+                       bg-gray-200 p-2 rounded-full shadow text-[10px] cursor-pointer z-50"
+                                                    onClick={() => {
+                                                        setCurrentReview(review);
+                                                        setOpenReply(true);
+                                                    }}
+                                                >
+                                                    Phản hồi
+                                                    <div className="absolute w-2.5 h-2.5 bg-gray-200 -bottom-0.5 left-4 rotate-45">
+
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
+
                                 ))
                             ) : (
                                 <tr>
@@ -207,10 +241,16 @@ const ManagerReview = () => {
                                 </div>
                             </div>
                             <div className="reply-body">
-                                <div className="border border-black rounded-lg p-3">
+                                <div className="border shadow rounded-lg p-3">
                                     <div className="reply-title flex gap-1 text-[13px]">
-                                        <div className="dish-name"><span>Bun bo</span></div>|
-                                        <div className="time-rieview"><span>20/10/2025 09:00</span></div>
+                                        <div className="dish-name"><span>{currentReview.menu_item?.menu_item_name}</span></div>|
+                                        <div className="time-rieview">
+                                            <span>
+                                                {currentReview.created_at
+                                                    ? new Date(currentReview.created_at).toLocaleDateString('vi-VN')
+                                                    : ''}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="reply-info">
                                         <div className="name-user-review text-2xl font-bold my-1">{currentReview.user?.full_name}</div>
@@ -219,7 +259,7 @@ const ManagerReview = () => {
                                         </div>
                                         <div className="reply-image w-[200px] h-[125px]">
                                             <div className="w-full h-full">
-                                                <img src="https://fit.tdc.edu.vn/assets/images/news/chupchung.jpg" alt="" />
+                                                <img src={currentReview.image_url} alt="" />
                                             </div>
                                         </div>
                                         <div className="reply-comment">
@@ -235,7 +275,10 @@ const ManagerReview = () => {
                                     </div>
                                     <div className="reply-textarea">
                                         <div className="write-reply">
-                                            <textarea value={currentReview.adminReply} name="" id="" className="w-full h-24 p-2 border border-black rounded-lg resize-none! focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200" placeholder="Nhập phản hồi..." >
+                                            <textarea value={replyText}
+                                                onChange={(e) => setReplyText(e.target.value)} 
+                                                name="" id="" 
+                                                className="w-full h-24 p-2 border shadow rounded-lg resize-none! focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-200" placeholder="Nhập phản hồi..." >
 
                                             </textarea>
                                         </div>
@@ -245,7 +288,7 @@ const ManagerReview = () => {
                                             <Button variant="outlined" color="outline" onClick={() => setOpenReply(false)}>Hủy</Button>
                                         </div>
                                         <div className="button-right">
-                                            <Button variant="contained" color="primary" onClick={() => handleReply()}>Gửi phản hồi</Button>
+                                            <Button variant="contained" color="primary" onClick={() => handleReply(currentReview.review_id)}>Gửi phản hồi</Button>
                                         </div>
                                     </div>
                                 </div>

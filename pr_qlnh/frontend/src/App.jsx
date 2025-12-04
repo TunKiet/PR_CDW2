@@ -43,6 +43,11 @@ import UserChat from "./components/Chat/UserChat";
 import AdminChat from "./components/Chat/AdminChat";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
 import OrderOnlineAdmin from "./pages/OrderOnlineAdmin";
+import CreateOrder from "./components/InventoryOverview/CreateOrder";
+import OrderPuscher from "./components/InventoryOverview/OrderPuscher";
+import OrderPuscherDetail from "./components/InventoryOverview/OrderPuscherDetail";
+import SupplierOrder from "./components/InventoryOverview/SupplierOrder";
+import SupplierOrderDetail from "./components/InventoryOverview/SupplierOrderDetail";
 
 function App() {
   return (
@@ -130,6 +135,11 @@ function App() {
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path='/analytics' element={<UserDashboard />} />
+        <Route path="/create-order" element={<CreateOrder/>}/>
+        <Route path="/puscher-order" element={<OrderPuscher/>}/>
+        <Route path="/puscher-order-detail" element={<OrderPuscherDetail/>}/>
+        <Route path="/supplier" element={<SupplierOrder/>}/>
+        <Route path="/supplier-detail" element={<SupplierOrderDetail/>}/>
 
 
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}
