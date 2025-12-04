@@ -6,11 +6,11 @@ import {
   Navigate,
 } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
+
 // import React from 'react'
 import "./App.css";
-import MenuList from "./components/MenuList";
+// import MenuList from "./components/MenuList";
 
 import Sidebar from "./components/Sidebar/Sidebar";
 import Header from "./components/Header/Header";
@@ -164,25 +164,10 @@ function App() {
           }
         />
 
-<<<<<<< HEAD
-        <Route path="/customers" element={<CustomerManagementPage />} />
+        {/* <Route path="/customers" element={<CustomerManagementPage />} /> */}
 
         {/* Thêm các route khác nếu có: /invoices, /menu, ... */}
         {/* <Route path="/invoices" element={<InvoicePage />} /> */}
-=======
-        {/* ROUTE: Trang Chấm Công */}
-        <Route path="/attendance" element={<AttendancePage />} />
-        
-        {/* ROUTE: Trang Quản Lý Chấm Công */}
-        <Route
-          path="/attendance-management"
-          element={
-            <ProtectedRoute>
-              <AttendanceManagementPage />
-            </ProtectedRoute>
-          }
-        />
->>>>>>> 18-kiet/RE-Role
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
         {/* <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} /> */}
