@@ -57,3 +57,8 @@ export const getRankColor = (rank) => {
       return "bg-orange-300 text-white";
   }
 };
+// 🔧 Thêm hàm getRankByPoints để tránh lỗi import
+export const getRankByPoints = (points) => {
+  return getRankName(points);
+};
+

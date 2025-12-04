@@ -177,7 +177,7 @@ const PaymentModal = ({
 
       {/* Modal */}
       <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex justify-center items-center z-[9999]">
-        <div className="bg-white rounded-2xl shadow-xl w-[850px] max-h-[90vh] overflow-auto p-8">
+        <div className="bg-white rounded-2xl shadow-xl w-[850px] max-h-[90vh] overflow-auto py-4 px-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Xác nhận thanh toán</h2>
             <button className="p-2 hover:bg-gray-100 rounded-full" onClick={onClose}>
