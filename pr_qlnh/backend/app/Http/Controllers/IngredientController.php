@@ -14,13 +14,26 @@ class IngredientController extends Controller
      */
     public function getAllIngredient(Request $request)
     {
-        $perPage = $request->get('per_page', 10);
+        $perPage = $request->get('per_page', 4);
         $categoryId = $request->query('category_ingredient_id', null);
 
-        $ingredients = Ingredient::getIngredients($categoryId, $perPage);
+        $query = Ingredient::queryIngredients($categoryId);
 
-        return response()->json($ingredients);
+        // Tổng giá trị nguyên liệu
+        $totalValue = $query->sum('total_price');
+
+        // Lấy danh sách paginate
+        $ingredients = $query->orderBy('ingredient_id', 'desc')->paginate($perPage);
+
+        $alerts = Ingredient::getIngredientAlert()->count();
+
+        return response()->json([
+            'ingredients' => $ingredients,
+            'total_value' => $totalValue,
+            'wanning_ingredient' => $alerts
+        ]);
     }
+
 
     public function store(Request $request)
     {
@@ -106,5 +119,14 @@ class IngredientController extends Controller
                 'message' => 'Server error: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function alertIngredient()
+    {
+        $alerts = Ingredient::getIngredientAlert();
+        return response()->json([
+            'data' => $alerts,
+            'count' => $alerts->count()
+        ]);
     }
 }

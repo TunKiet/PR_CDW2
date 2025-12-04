@@ -144,7 +144,7 @@ const ManagerReply = () => {
                                             {reply.reply_text.split(" ").slice(0, 13).join(" ")}
                                             {reply.reply_text.split(" ").length > 13 ? "..." : ""}
                                         </td>
-                                        <td className='text-[13px] text-center border-b'>{new Date(reply.create_at).toLocaleDateString()}</td>
+                                        <td className='text-[13px] text-center border-b'>{new Date(reply.created_at).toLocaleDateString()}</td>
                                         <td className='text-[13px] text-center border-b'>{reply.status}</td>
                                         <td className='text-center border-b'>
                                             {/* <Tooltip title="Reply">

@@ -95,6 +95,10 @@ Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::get('/export', [IngredientController::class, 'exportPDF']);
 Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
 Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
+Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
+Route::get('/purchase-orders-all', [PurchaseOrderController::class, 'index']); // danh sách + tổng quan
+Route::get('/purchase-orders/{id}', [PurchaseOrderController::class, 'show']); // chi tiết
+Route::patch('/purchase-orders/{id}/update-status', [PurchaseOrderController::class, 'updateStatus']);
 
 /*
 |--------------------------------------------------------------------------
@@ -216,7 +220,6 @@ Route::post('/send-message', [MessageController::class, 'sendMessage']);
 Route::get('/conversations', [MessageController::class, 'getConversations']);
 Route::get('/messages/{conversationId}', [MessageController::class, 'getMessages']);
 Route::post('/mark-read', [MessageController::class, 'markAsRead']);
-Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::post('/chat', [ChatController::class, 'message']);
 
 //Review
@@ -233,7 +236,7 @@ Route::prefix('reviews')->group(function () {
 });
 
 Route::prefix('reply')->group(function () {
-    Route::post('/add-reply', [ReviewReplyController::class, 'store']);
+    Route::post('/add-reply/{reviewId}', [ReviewReplyController::class, 'store']);
     Route::get('/chart', [ReviewReplyController::class, 'getAllReplies']);
     Route::delete('/{replyId}/delete', [ReviewReplyController::class, 'delete']);
     Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);

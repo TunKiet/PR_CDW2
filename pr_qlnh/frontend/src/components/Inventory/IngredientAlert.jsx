@@ -46,17 +46,23 @@ const IngredientAlert = ({ loading, ingredientAlert }) => {
     // const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    const isValid = ingredientAlert.some((item, index) => {
+        return checked[index] && quantities[index] > 0;
+    });
+
     const handleCreateOrder = () => {
         //filter ingredient checked
         const selectedItems = ingredientAlert
-        .map((item, index) => checked[index] ? {
-            ingredient_id: item.ingredient_id,
-            ingredient_name: item.ingredient_name,
-            quantity: quantities[index] || 0
-        }: null)
-        .filter(Boolean);
+            .map((item, index) => checked[index] ? {
+                ingredient_id: item.ingredient_id,
+                ingredient_name: item.ingredient_name,
+                quantity: quantities[index] || 0
+            } : null)
+            .filter(Boolean);
 
         console.log('Nguyen lieu duoc chon: ', selectedItems);
+
+        setOpen(true);
     }
 
 
@@ -68,12 +74,13 @@ const IngredientAlert = ({ loading, ingredientAlert }) => {
                         <h5>Nguyên liệu sắp hết hàng</h5>
                     </div>
                     <div className="boxIngredient-button ms-auto">
-                        <Button variant="contained" color="primary" onClick={handleCreateOrder}>
+                        <Button variant="contained" color="primary" disabled={!isValid} onClick={handleCreateOrder}>
                             <RiFileList2Line size={20} /> Tạo đơn nhập hàng
                         </Button>
 
-                        <Dialog open={open} onClose={handleClose}>
-                            Đơn hàng nhập nguyên liệu
+                        <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth="lg">
+                            <div className="order-title"><h3>Don hang nhap nguyen lieu</h3></div>
+                            .
                         </Dialog>
                     </div>
                 </div>
