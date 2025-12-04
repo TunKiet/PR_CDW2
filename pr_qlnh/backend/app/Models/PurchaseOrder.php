@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class PurchaseOrder extends Model
 {
@@ -17,10 +18,12 @@ class PurchaseOrder extends Model
         'order_date'
     ];
 
+
     public function order_item()
     {
         return $this->hasMany(PurchaseOrderItem::class, 'purchase_order_id', 'purchase_order_id');
     }
+
 
     public static function getIngredientImport()
     {
@@ -36,5 +39,10 @@ class PurchaseOrder extends Model
             ->orderBy('year', 'asc')
             ->orderBy('month', 'asc')
             ->get();
+    }
+
+    public static function getDataPurchaseOrder()
+    {
+        
     }
 }

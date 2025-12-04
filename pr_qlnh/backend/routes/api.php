@@ -71,6 +71,7 @@ Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::get('/export', [IngredientController::class, 'exportPDF']);
 
 Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
+Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
 
 
 /*

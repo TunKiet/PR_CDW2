@@ -26,16 +26,34 @@ export const confirmAction = async (title = 'Bạn có chắc chắn?', text = '
 
 //Hộp thoại xác nhận
 export const confirmDialog = async (title, message = "") => {
-    return await Swal.fire({
-        title: title,
+    const result = await Swal.fire({
+        title,
         text: message,
         icon: "warning",
         confirmButtonColor: "#3085d6",
         confirmButtonText: "OK",
-        showCancelButton: false,
+        showCancelButton: true,
+        cancelButtonText: "Hủy",
         allowOutsideClick: false,
         allowEscapeKey: false,
         allowEnterKey: false,
-        timer: undefined
     });
+
+    return result.isConfirmed;
 };
+
+export const confirmSuccess = async (title, message = "") => {
+    const result = await Swal.fire({
+        title,
+        text: message,
+        icon: "success",
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "OK",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        allowEnterKey: false,
+    });
+
+    return result.isConfirmed;
+};
+

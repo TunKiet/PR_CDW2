@@ -15,7 +15,6 @@ import StepContent from '@mui/material/StepContent';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useNavigate } from "react-router-dom";
 
 const OrderPuscherDetail = () => {
 
@@ -56,10 +55,6 @@ const OrderPuscherDetail = () => {
         setActiveStep(0);
     };
 
-    const navigate = useNavigate();
-    const handleSupplier = () => {
-        navigate("/supplier"); // đường dẫn tới CreateOrder.jsx
-    };
     return (
         <div className="section">
             <div className="flex min-h-screen">
@@ -68,18 +63,10 @@ const OrderPuscherDetail = () => {
                 <div className="w-[85%] h-screen bg-gray-100 mx-auto overflow-y-auto">
                     {/* Top Header */}
                     <header className="bg-white p-4 flex justify-between items-center border-b border-gray-200 sticky top-0 z-10">
-                        <div className="text-gray-600">
-                            <a href="#" className="hover:underline">Quay lại</a>
-                            <span className="ml-1">/ Chi Tiết Đơn Hàng</span>
-                        </div>
-                        <div className="flex gap-2 items-center">
+                        <div className="flex gap-2 items-center ms-auto">
                             <button className="px-3 py-1 border border-gray-300 rounded hover:border-blue-600 hover:text-blue-600 flex items-center"><FaPrint className="mr-1" /> In đơn</button>
                             <button className="px-3 py-1 border border-gray-300 rounded hover:border-blue-600 hover:text-blue-600 flex items-center"><FaFilePdf className="mr-1" /> Tải PDF</button>
-                            <div className="flex items-center gap-1 text-gray-800 cursor-pointer border border-blue-100 bg-blue-50 rounded px-2 py-1 font-medium">
-                                <div className="w-6 h-6 rounded-full bg-red-600 text-white flex justify-center items-center text-xs">NV</div>
-                                <span>Chỉnh sửa</span>
-                                <FaChevronDown className="text-sm" />
-                            </div>
+                            
                         </div>
                     </header>
                     <main className="flex-1 p-2 ml-56">
@@ -92,14 +79,6 @@ const OrderPuscherDetail = () => {
                                         <span className="px-2 py-1 bg-green-500 rounded-full text-xs font-medium">Đã duyệt</span>
                                     </div>
                                     <div className="flex gap-8">
-                                        <div className="flex items-start gap-2">
-                                            <FaUser className="mt-1" />
-                                            <div>
-                                                <div className="text-xs opacity-70">Người lập đơn</div>
-                                                <div className="font-medium">Nguyễn Văn A</div>
-                                                <div className="text-xs opacity-70">Quản lý</div>
-                                            </div>
-                                        </div>
                                         <div className="flex items-start gap-2">
                                             <FaCalendarAlt className="mt-1" />
                                             <div>
@@ -198,24 +177,7 @@ const OrderPuscherDetail = () => {
                                             </tbody>
                                         </table>
                                     </div>
-
-                                    {/* Payment Summary */}
-                                    <div className="bg-white p-4 rounded shadow">
-                                        <h4 className="text-lg font-semibold border-b border-gray-200 pb-2 mb-4 flex items-center gap-2"><FaMoneyBillWave size={20} color='green' /> Thanh toán</h4>
-                                        <div className="flex flex-col gap-2">
-                                            <div className="flex justify-between text-sm"><span className="text-gray-500">Tạm tính</span><span>4.250.000 ₫</span></div>
-                                            <div className="flex justify-between text-sm"><span className="text-gray-500">Chiết khấu (0%)</span><span className="text-red-500">0 ₫</span></div>
-                                            <div className="flex justify-between text-sm"><span className="text-gray-500">Phí vận chuyển</span><span className="text-green-500 font-medium">Miễn phí</span></div>
-                                            <div className="flex justify-between text-sm"><span className="text-gray-500">VAT (10%)</span><span>527.000 ₫</span></div>
-                                            <div className="flex justify-between border-t border-gray-200 pt-2 mt-2 font-bold text-red-600 text-lg"><span>Tổng cộng</span><span>5.797.000 ₫</span></div>
-                                        </div>
-                                        <div className="border-t border-dashed border-gray-200 mt-3 pt-2 text-sm flex flex-col gap-1">
-                                            <div className="flex justify-between"><span className="text-gray-500">Phương thức thanh toán</span><span>Chuyển khoản</span></div>
-                                            <div className="flex justify-between"><span className="text-gray-500">Trạng thái thanh toán</span><span className="text-yellow-400 font-medium"><FaCircleNotch className="inline mr-1 text-xs" /> Chờ xác nhận</span></div>
-                                        </div>
-                                    </div>
-
-                                    {/* Order History */}
+                                    {/* Order Status */}
 
                                     <Box className="bg-white p-4 mb-5 rounded shadow">
                                         <h4 className="text-lg font-semibold border-b border-gray-200 pb-2 mb-4 flex items-center gap-2">
@@ -273,7 +235,6 @@ const OrderPuscherDetail = () => {
                     </main>
 
                     <footer className="fixed bottom-0 left-56 right-0 bg-white border-t border-gray-200 p-3 flex justify-end gap-3 shadow">
-                        <button onClick={handleSupplier} className="bg-blue-600 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-blue-700"><FaShareSquare /> Gửi cho nhà cung cấp</button>
                         <button className="bg-red-500 text-white px-4 py-2 rounded flex items-center gap-1 hover:bg-red-600"><FaTimes /> Hủy đơn</button>
                     </footer>
                 </div>

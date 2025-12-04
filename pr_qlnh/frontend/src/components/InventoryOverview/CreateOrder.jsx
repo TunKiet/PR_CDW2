@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from '../Sidebar';
 import { IoIosWarning } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
+import { confirmDialog, confirmSuccess } from '../../utils/notify'
 
 import axios from "axios";
+
+const endPoint = 'http://localhost:8000/api';
 
 const statusBadge = {
     good: "bg-green-500",
@@ -13,106 +16,76 @@ const statusBadge = {
     out: "bg-red-500",
 };
 
-const MOCK_INGREDIENTS = [
-    {
-        id: 1,
-        name: "Ức gà phi lê",
-        code: "ING-010",
-        category: "Thịt",
-        unit: "Kg",
-        price: 85000,
-        stock: 2,
-        minStock: 10,
-        orderQty: 20,
-        badge: "low",
-        img: "https://images.unsplash.com/photo-1604908177760-0e6b0b2b8c31?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=bdc6d2b3b3b6a4d2c4e6f1f1e1a3d0f3",
-        note: "Ngày cập nhật: 2 ngày trước · Tồn tối thiểu: 10 Kg",
-    },
-    {
-        id: 2,
-        name: "Cá hồi Na Uy",
-        code: "ING-022",
-        category: "Hải sản",
-        unit: "Kg",
-        price: 320000,
-        stock: 1.5,
-        minStock: 5,
-        orderQty: 15,
-        badge: "low",
-        img: "https://images.unsplash.com/photo-1546491764-2b5d6d6f2b6b?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=abcdef1234567890",
-        note: "HSD: 7 ngày · Tồn tối thiểu: 5 Kg",
-    },
-    {
-        id: 3,
-        name: "Xả (lá xả tươi)",
-        code: "ING-033",
-        category: "Rau thơm",
-        unit: "Kg",
-        price: 25000,
-        stock: 3.5,
-        minStock: 5,
-        orderQty: 20,
-        badge: "warn",
-        img: "https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=123456abcdef7890",
-        note: "Thời gian lưu kho: 3 ngày · Tồn tối thiểu: 5 Kg",
-    },
-    {
-        id: 4,
-        name: "Hành tây",
-        code: "ING-041",
-        category: "Rau củ",
-        unit: "Kg",
-        price: 18000,
-        stock: 4,
-        minStock: 3,
-        orderQty: 25,
-        badge: "warn",
-        img: "https://images.unsplash.com/photo-1584205078759-3c8b24b1f8f7?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=abcdabcdabcdabcd",
-        note: "Tồn tối thiểu: 3 Kg",
-    },
-    {
-        id: 5,
-        name: "Tỏi tươi",
-        code: "ING-055",
-        category: "Gia vị",
-        unit: "Kg",
-        price: 45000,
-        stock: 5.5,
-        minStock: 4,
-        orderQty: 15,
-        badge: "warn",
-        img: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=abcdefabcdefabcd",
-        note: "Tồn tối thiểu: 4 Kg",
-    },
-];
-
 const CreateOrder = () => {
     //Fomat money
     const formatVND = (value) => {
         return Number(value).toLocaleString('vi-VN') + ' đ';
     };
 
-    const navigate = useNavigate();
-    const handleCreateOrderPuscher = () => {
-        navigate("/puscher-order"); // đường dẫn tới CreateOrder.jsx
-    };
+    // const navigate = useNavigate();
+    // const handleCreateOrderPuscher = () => {
+    //     navigate("/puscher-order"); // đường dẫn tới CreateOrder.jsx
+    // };
 
     const [showAll, setShowAll] = useState(false);
     const [ingredientAlert, setIngredientAlert] = useState([]);
     const [loading, setLoading] = useState(true);
     const [count, setCount] = useState(0);
+    const [supplierName, setSupplierName] = useState("");
+    const [deliveryDate, setDeliveryDate] = useState("");
 
-    const [ingredients, setIngredients] = useState(
-        MOCK_INGREDIENTS.map(item => ({ ...item, checked: false }))
-    );
+
+    //validate checked ingredient
+    const validateIngredients = () => {
+        let hasChecked = false;
+        let hasQty = false;
+
+        for (const item of ingredientAlert) {
+            const checked = item.checked;
+            const qty = Number(item.order_quantity);
+
+            if (checked) hasChecked = true;
+            if (qty > 0) hasQty = true;
+
+            // CASE 1: Check nhưng không nhập
+            if (checked && (!qty || qty <= 0)) {
+                return { valid: false, message: "Bạn đã chọn nguyên liệu nhưng chưa nhập số lượng" };
+            }
+
+            // CASE 2: Nhập nhưng không check
+            if (!checked && qty > 0) {
+                return { valid: false, message: "Bạn đã nhập số lượng nhưng chưa chọn nguyên liệu" };
+            }
+        }
+
+        if (!hasChecked && hasQty) {
+            return { valid: false, message: "Bạn đã nhập số lượng nhưng không chọn nguyên liệu nào" };
+        }
+
+        if (hasChecked && !hasQty) {
+            return { valid: false, message: "Bạn đã chọn nguyên liệu nhưng chưa nhập số lượng" };
+        }
+
+        if (!hasChecked && !hasQty) {
+            return { valid: false, message: "Bạn chưa chọn nguyên liệu nào" };
+        }
+
+        return { valid: true };
+    };
 
     //Fetch api wanning ingredient
     useEffect(() => {
         const fetchAlert = async () => {
             setLoading(true);
             try {
-                const res = await axios.get("http://localhost:8000/api/alert");
-                setIngredientAlert(res.data.data);
+                const res = await axios.get(`${endPoint}/alert`);
+
+                const dataAlert = res.data.data.map(alert => ({
+                    ...alert,
+                    checked: false,
+                    order_quantity: ""
+                }));
+                setIngredientAlert(dataAlert);
                 setCount(res.data.count);
             } catch (error) {
                 console.log(error);
@@ -126,6 +99,20 @@ const CreateOrder = () => {
 
     const displayedIngredients = showAll ? ingredientAlert : ingredientAlert.slice(0, 5);
 
+    //Count checked ingredient
+    const selectedCount = ingredientAlert.filter(i => i.checked).length;
+
+    //Total quantity input
+    const totalQuantity = ingredientAlert
+        .filter(i => i.checked)
+        .reduce((sum, item) => sum + Number(item.order_quantity || 0), 0);
+
+    //Total money
+    const subTotal = ingredientAlert
+        .filter(i => i.checked)
+        .reduce((sum, item) => sum + (item.price * item.order_quantity), 0);
+
+    const grandTotal = subTotal;
 
     // Chọn tất cả
     const handleSelectAll = () => {
@@ -141,13 +128,67 @@ const CreateOrder = () => {
 
     // Chọn từng nguyên liệu
     const handleToggleItem = (id) => {
-        const updated = ingredients.map(i =>
-            i.id === id ? { ...i, checked: !i.checked } : i
+        const updated = ingredientAlert.map(i =>
+            i.ingredient_id === id
+                ? { ...i, checked: !i.checked }
+                : i
         );
-        setIngredients(updated);
+        setIngredientAlert(updated);
     };
 
-    //
+    const handleChangeQuantity = (id, qty) => {
+        const updated = ingredientAlert.map(i =>
+            i.ingredient_id === id
+                ? { ...i, order_quantity: qty }
+                : i
+        );
+        setIngredientAlert(updated);
+    };
+    const handleSubmit = async () => {
+        const validate = validateIngredients();
+
+        if (!validate.valid) {
+            await confirmDialog('Không thể tạo đơn hàng', 'Vui lòng kiểm tra lại các thông tin');
+            return;
+        }
+
+        // Chỉ lấy nguyên liệu đã chọn
+        const selectedItems = ingredientAlert
+            .filter(i => i.checked)
+            .map(i => ({
+                ingredient_id: i.ingredient_id,
+                quantity: i.order_quantity,   // đổi qty -> quantity
+                price: i.price,
+                total: i.price * i.order_quantity
+            }));
+
+        // Tính tổng tiền
+        const total_cost = selectedItems.reduce((sum, item) => sum + item.total, 0);
+
+        try {
+            const payload = {
+                supplier_name: supplierName,
+                order_date: deliveryDate,
+                total_cost: total_cost,
+                items: selectedItems,
+            };
+
+            const res = await axios.post(`${endPoint}/purchase-order`, payload);
+
+            console.log("Order created:", res.data);
+
+            await confirmSuccess(
+                "Đơn hàng đã được đặt thành công",
+                "Vui lòng theo dõi trạng thái đơn hàng"
+            );
+        } catch (error) {
+            console.log("API Error:", error?.response?.data || error.message);
+        }
+
+
+
+        console.log("Dữ liệu gửi API:", selectedItems);
+    };
 
     return (
         <div className="section">
@@ -244,7 +285,8 @@ const CreateOrder = () => {
                                                                     <input
                                                                         type="number"
                                                                         min="0"
-                                                                        value={ingredient.orderQty}
+                                                                        value={ingredient.order_quantity}
+                                                                        onChange={(e) => handleChangeQuantity(ingredient.ingredient_id, e.target.value)}
                                                                         className="w-20 p-2 border rounded-lg text-right font-bold border-gray-200"
                                                                     />
                                                                 </div>
@@ -283,55 +325,43 @@ const CreateOrder = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                                         <div className="flex flex-col gap-1">
                                             <label className="font-semibold text-sm text-gray-900">Nhà cung cấp</label>
-                                            <select className="p-2 border rounded-lg">
-                                                <option>Chọn nhà cung cấp</option>
-                                                <option>Công ty ABC</option>
-                                                <option>Nhà cung cấp XYZ</option>
+                                            <select
+                                                className="p-2 border rounded-lg"
+                                                value={supplierName}
+                                                onChange={(e) => setSupplierName(e.target.value)}
+                                            >
+                                                <option value="">Chọn nhà cung cấp</option>
+                                                <option value="Công ty ABC">Công ty ABC</option>
+                                                <option value="Nhà cung cấp XYZ">Nhà cung cấp XYZ</option>
                                             </select>
                                         </div>
                                         <div className="flex flex-col gap-1">
                                             <label className="font-semibold text-sm text-gray-900">Ngày giao dự kiến</label>
-                                            <input type="date" className="p-2 border rounded-lg" />
-                                        </div>
-                                        <div className="flex flex-col gap-1">
-                                            <label className="font-semibold text-sm text-gray-900">Phương thức thanh toán</label>
-                                            <select className="p-2 border rounded-lg">
-                                                <option>Chuyển khoản</option>
-                                                <option>Tiền mặt</option>
-                                            </select>
-                                        </div>
-
-                                        <div className="flex flex-col gap-1">
-                                            <label className="font-semibold text-sm text-gray-900">Kho nhận hàng</label>
-                                            <select className="p-2 border rounded-lg">
-                                                <option>Kho trung tâm - Quận 1</option>
-                                                <option>Kho chi nhánh - Quận 3</option>
-                                            </select>
-                                        </div>
-
-                                        <div className="flex flex-col gap-1 md:col-span-2">
-                                            <label className="font-semibold text-sm text-gray-900">Ghi chú đơn hàng</label>
-                                            <textarea placeholder="Nhập ghi chú cho đơn hàng (nếu có)..." className="p-2 border rounded-lg min-h-20" />
+                                            <input
+                                                type="date"
+                                                className="p-2 border rounded-lg"
+                                                value={deliveryDate}
+                                                onChange={(e) => setDeliveryDate(e.target.value)}
+                                            />
                                         </div>
                                     </div>
                                     <div className="text-gray-400 text-sm mt-2">Bạn có thể lưu đơn dưới dạng nháp hoặc tạo đơn ngay.</div>
                                 </div>
-
                             </div>
 
                             {/* Right column: summary */}
                             <aside className="w-full md:w-80 shrink-0">
                                 <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-md flex flex-col gap-2">
                                     <h3 className="text-sm font-bold">Tóm tắt đơn hàng</h3>
-                                    <div className="flex justify-between text-gray-400 font-semibold"><span>Số nguyên liệu đã chọn</span><span>5</span></div>
-                                    <div className="flex justify-between text-gray-400 font-semibold"><span>Tổng số lượng</span><span>100</span></div>
-                                    <div className="flex justify-between text-gray-400 font-semibold"><span>Tạm tính</span><span>0 đ</span></div>
-                                    <div className="flex justify-between text-gray-400 font-semibold"><span>Phí vận chuyển</span><span>50.000 đ</span></div>
+                                    <div className="flex justify-between text-gray-400 font-semibold"><span>Số nguyên liệu đã chọn</span><span>{selectedCount}</span></div>
+                                    <div className="flex justify-between text-gray-400 font-semibold"><span>Tổng số lượng</span><span>{totalQuantity}</span></div>
+                                    <div className="flex justify-between text-gray-400 font-semibold"><span>Tạm tính</span><span>{formatVND(subTotal)}</span></div>
+                                    <div className="flex justify-between text-gray-400 font-semibold"><span>Phí vận chuyển</span><span>0 đ</span></div>
                                     <hr className="border-t border-gray-200 my-1" />
-                                    <div className="flex justify-between text-green-600 font-extrabold text-lg"><span>Tổng cộng</span><span>50.000 đ</span></div>
+                                    <div className="flex justify-between text-green-600 font-extrabold text-lg"><span>Tổng cộng</span><span>{formatVND(grandTotal)}</span></div>
 
                                     <div className="flex flex-col gap-2 mt-2">
-                                        <button onClick={handleCreateOrderPuscher} className="bg-green-500 text-white font-bold py-2 rounded-lg!">Tạo đơn nhập kho</button>
+                                        <button onSubmit={handleSubmit()} className="bg-green-500 text-white font-bold py-2 rounded-lg!">Tạo đơn nhập kho</button>
                                         <button className="bg-white text-red-500 border border-red-200 py-2 rounded-lg! cursor-pointer">Hủy bỏ</button>
                                     </div>
                                     <div className="text-gray-400 text-xs mt-2">
