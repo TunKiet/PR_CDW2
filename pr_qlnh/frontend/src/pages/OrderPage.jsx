@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar/Sidebar";
+import Sidebar from "../components/Sidebar";
 import MenuList from "../components/MenuList";
 import OrderSummary from "../components/OrderSummary";
 import axiosClient from "../api/axiosClient";
@@ -72,25 +72,39 @@ useEffect(() => {
   };
 
   // thêm món
-  const addOrIncrementItem = (tableId, item) => {
-    setTableCarts((prev) => {
-      const cart = prev[tableId] || [];
-      const exist = cart.find(i => i.menu_item_id === item.menu_item_id);
+  // thêm món
+const addOrIncrementItem = (tableId, item) => {
+  setTableCarts(prev => {
+    const cart = prev[tableId] || [];
 
-      const updated = exist
-        ? cart.map(i =>
-            i.menu_item_id === item.menu_item_id
-              ? { ...i, qty: i.qty + 1 }
-              : i
-          )
-        : [...cart, { ...item, qty: 1 }];
+    // Kiểm tra món đã tồn tại chưa
+    const existIndex = cart.findIndex(i => i.menu_item_id === item.menu_item_id);
 
-      // 🚀 Khi thêm món => tự switch bàn thành đang sử dụng
-      setTableStatus(s => ({ ...s, [tableId]: "in_use" }));
+    let updatedCart;
 
-      return { ...prev, [tableId]: updated };
-    });
-  };
+    if (existIndex !== -1) {
+      // ✔ Nếu món đã tồn tại → tăng qty và đưa lên đầu
+      const existItem = { 
+        ...cart[existIndex], 
+        qty: cart[existIndex].qty + 1 
+      };
+
+      const newCart = [...cart];
+      newCart.splice(existIndex, 1); // xóa vị trí cũ
+
+      updatedCart = [existItem, ...newCart]; // đưa món đó lên đầu
+    } else {
+      // ✔ Món mới → thêm lên đầu
+      updatedCart = [{ ...item, qty: 1 }, ...cart];
+    }
+
+    // ✔ Khi thêm món => chuyển bàn sang đang sử dụng
+    setTableStatus(s => ({ ...s, [tableId]: "in_use" }));
+
+    return { ...prev, [tableId]: updatedCart };
+  });
+};
+
 
   const onUpdateQty = (tableId, menuId, qty) => {
   setTableCarts(prev => ({

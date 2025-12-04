@@ -7,7 +7,7 @@ const menuItems = [
   { title: "Đơn hàng mới", icon: <ClipboardList size={20} />, path: '/order-page' },
   { title: "Thống kê", icon: <BarChart2 size={20} />, path: '/analytics' },
   { title: "Hóa đơn", icon: <FileText size={20} />, path: '/order-management' },
-  { title: "Đặt bàn", icon: <Calendar size={20} />, path: '/tables' },
+  { title: "Đặt bàn", icon: <Calendar size={20} />, path: '/tables',   },
   { 
       title: "Chấm công", 
       icon: <Clock size={20} />, 
@@ -38,7 +38,7 @@ const menuItems = [
     ]
   },
    {
-    title: "Bảo mật & quyền hạn",
+    title: "Bảo mật",
     icon: <Users size={20} />,
     isParent: true,
     subItems: [
@@ -122,10 +122,10 @@ const Sidebar = () => {
   return (
     <div className="w-64 h-screen bg-white border-r flex flex-col">
       <div className="flex items-center p-4 border-b">
-        <div className="bg-indigo-600 text-white w-10 h-10 flex items-center justify-center rounded-full font-semibold text-sm">
+        <div className="bg-indigo-600 text-white w-10 h-10 flex items-center justify-center rounded-full font-semibold text-sm mx-2">
           {initials}
         </div>
-        <h1 className="ml-3 text-xs font-medium text-gray-800 truncate">{displayName}</h1>
+        <span className="text-xl font-semibold text-gray-800 leading-none">{displayName}</span>
       </div>
 
       <div className="flex-1 p-4 space-y-2 overflow-y-auto">

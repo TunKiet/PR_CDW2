@@ -73,7 +73,7 @@ class OrderController extends Controller
         }
     }
 
->>>>>>> Loc/f3/OrderManageentPage
+
 
     public function index()
 {
