@@ -84,30 +84,29 @@ class CategoryController extends Controller
             'original_updated_at' => 'required|date',
         ]);
 
-        // ⭐ TC-001: 3. Kiểm tra xung đột (Optimistic Locking)
-        // Lưu ý: $category->updated_at là đối tượng Carbon, cần chuyển về chuỗi để so sánh
-        $currentUpdatedAt = $category->updated_at->toDateTimeString();
-        $originalUpdatedAt = $validated['original_updated_at'];
+        // ⭐ 3. Kiểm tra xung đột với format nhất quán
+    try {
+        // Chuyển về timestamp để so sánh chính xác
+        $currentTimestamp = $category->updated_at->timestamp;
+        $originalTimestamp = \Carbon\Carbon::parse($validated['original_updated_at'])->timestamp;
 
-        try {
-            $originalUpdatedAt = \Carbon\Carbon::parse($validated['original_updated_at'])->toDateTimeString();
-        } catch (\Exception $e) {
-            // Phòng hờ nếu format quá lạ, gửi lỗi 400 Bad Request
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Định dạng thời gian không hợp lệ.'
-            ], 400);
-        }
-
-        // So sánh hai chuỗi đã được đồng bộ hóa
-        if ($currentUpdatedAt !== $originalUpdatedAt) {
-            // Trả về 409 Conflict khi phát hiện xung đột
+        if ($currentTimestamp !== $originalTimestamp) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Cập nhật thất bại. Danh mục đã được người dùng khác chỉnh sửa.',
-                'latest_data' => $category // Tùy chọn: trả về dữ liệu mới nhất
+                'latest_data' => $category,
+                'debug' => [
+                    'current' => $category->updated_at->toIso8601String(),
+                    'original' => $validated['original_updated_at']
+                ]
             ], 409);
         }
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Định dạng thời gian không hợp lệ: ' . $e->getMessage()
+        ], 400);
+    }
 
         // Tự động tạo slug nếu category_name được cập nhật và slug không có
         if (isset($validated['category_name']) && (empty($validated['slug']) && !isset($request->slug))) {

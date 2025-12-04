@@ -111,10 +111,12 @@ export default function CategoryManager() {
           errorMessage =
             message || "Xung đột: Danh mục đã được người dùng khác cập nhật.";
           fetchCategories();
+          handleCloseModal();
         } else if (status === 410) {
           errorMessage =
             message || "Danh mục này không tồn tại hoặc đã bị xóa.";
           fetchCategories();
+          handleCloseModal();
         }
       }
 
@@ -195,7 +197,6 @@ export default function CategoryManager() {
   const handleEdit = (category) => {
     setEditingCategory({
       ...category,
-      // Thêm trường mới chứa giá trị updated_at ban đầu
       original_updated_at: category.updated_at,
     });
     setIsModalOpen(true);
