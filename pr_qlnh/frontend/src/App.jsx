@@ -166,12 +166,7 @@ function App() {
           }
         />
 
-        {/* <Route path="/customers" element={<CustomerManagementPage />} /> */}
-
-        {/* Thêm các route khác nếu có: /invoices, /menu, ... */}
-        {/* <Route path="/invoices" element={<InvoicePage />} /> */}
-
-        {/* Route xử lý trường hợp không tìm thấy trang (404) */}
+        
         <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} />
       </Routes>
     </BrowserRouter>
