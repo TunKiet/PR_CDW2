@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\PreOrderController;
 use App\Http\Controllers\API\TableController;
 use App\Http\Controllers\API\ReservationController;
 use App\Http\Controllers\API\ReservationManagementController;
+use App\Http\Controllers\Api\NotificationController;
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
 // use App\Http\Controllers\Api\MenuItemController;
@@ -139,6 +140,16 @@ Route::prefix('reservation-management')->group(function () {
 });
 Route::get('/floorplan', [TableController::class, 'floorplan']);
 Route::put('/tables/{id}/status', [TableController::class, 'updateStatus']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications', [NotificationController::class, 'store']);
+    Route::put('/notifications/{id}', [NotificationController::class, 'update']);
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markRead']);
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+});
 
 
 //login mới được đặt bàn

@@ -13,6 +13,8 @@ import IngredientInOut from './components/Inventory/IngredientInOut'
 import TableManagementAdmin from './pages/TableManagementAdmin'
 import Reservation from './pages/Reservations/ReservationCenter'
 import ReservationCreate from './pages/ReservationCreate'
+import NotificationManagementAdmin from "./pages/NotificationManagementAdmin";
+
 import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 
 // Import các component trang của bạn
@@ -58,6 +60,8 @@ function App() {
 		    <Route path="/tables" element={<TableManagementAdmin/>} />
         <Route path="/reservation" element={<Reservation/>} />
         <Route path="/reservationcreate" element={<ReservationCreate/>} />
+        <Route path="/notifications" element={<NotificationManagementAdmin />} />
+
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path='/analytics' element={<UserDashboard />} />  
