@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-
 // import React from 'react'
 import "./App.css";
 // import MenuList from "./components/MenuList";
@@ -51,7 +50,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route path="/" element={<LoginPage />} />
         <Route path="/dish-status-management" element={<DishStatusManagement />} />
         <Route path="/category-manager" element={<CategoryManager />} />

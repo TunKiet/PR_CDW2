@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import Sidebar from '../Sidebar/Sidebar'
+import Sidebar from '../Sidebar'
 import ManagerReview from './ManagerReview';
 import ManagerReply from './ManagerReply';
 import { CiSearch } from "react-icons/ci";

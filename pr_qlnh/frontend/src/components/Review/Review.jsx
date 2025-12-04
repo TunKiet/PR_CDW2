@@ -14,10 +14,13 @@ import axios from "axios";
 
 const endPoint = 'http://localhost:8000/api';
 
-const Review = () => {
+const Review = ({ menuItemId }) => {
 
-    const menuItemId = 1;
-    const userId = 1;
+    const userId = JSON.parse(localStorage.getItem("user"))?.user_id;
+    const userName = JSON.parse(localStorage.getItem("user"))?.full_name;
+
+    console.log("user id: " + userId);
+
 
     const [activeFilter, setActiveFilter] = useState(1);
     const [openFormReview, setOpenFormReview] = useState(false);
@@ -142,7 +145,7 @@ const Review = () => {
 
     return (
         <>
-            <div className="container-review w-[80%] h-auto m-auto border border-[#333] p-2 bg-gray-100 rounded-[10px]">
+            <div className="container-review w-full h-auto m-auto border border-[#333] p-2 bg-gray-100 rounded-[10px]">
                 <div className="headReview">
                     <h2>Đánh giá món ăn</h2>
                 </div>
@@ -165,7 +168,7 @@ const Review = () => {
                                             <Avatar />
                                         </div>
                                         <div className="formReview-info-name">
-                                            <p className='mx-3 m-0'>User 1</p>
+                                            <p className='mx-3 m-0'>{userName}</p>
                                         </div>
                                     </div>
                                     <div className="formReview-select-rating py-2">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from '../Sidebar/Sidebar'
+import Sidebar from '../Sidebar'
 import { ImAttachment } from "react-icons/im";
 import { FaImage } from "react-icons/fa";
 import { CiPaperplane } from "react-icons/ci";
@@ -17,12 +17,15 @@ import { Popover } from '@headlessui/react';
 const endPoint = 'http://localhost:8000/api';
 
 const AdminChat = () => {
+
+    const adminId = JSON.parse(localStorage.getItem("user"))?.user_id;
+
     const [conversations, setConversations] = useState([]);
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const messagesEndRef = useRef(null);
-    const adminId = 1;
+    const [isSending, setIsSending] = useState(false);
 
     // Load danh sách conversations
     useEffect(() => {
@@ -36,6 +39,12 @@ const AdminChat = () => {
                 console.error("❌ Error loading conversations:", err);
             });
     }, []);
+
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages]);
 
     // Load messages khi chọn conversation
 
@@ -82,6 +91,13 @@ const AdminChat = () => {
             return;
         }
 
+        if (isSending) {
+            console.log("⚠️ Message is being sent, please wait...");
+            return;
+        }
+
+        setIsSending(true);
+
         console.log("📤 Sending message:", {
             conversation_id: selectedConversation.conversation_id,
             user_id: adminId,
@@ -110,7 +126,8 @@ const AdminChat = () => {
 
                 setInput('');
             })
-            .catch(err => console.error("❌ Error sending message:", err));
+            .catch(err => console.error("❌ Error sending message:", err))
+            .finally(() => setIsSending(false));
     };
 
     const handleEmojiClick = (emojiData) => {
@@ -180,6 +197,11 @@ const AdminChat = () => {
 
                         {/* Khung chat chính */}
                         <div className="w-[80%] h-full flex flex-col flex-1">
+                            {!selectedConversation && (
+                                <div className="flex-1 flex justify-center items-center text-gray-600 text-lg">
+                                    Chọn cuộc hội thoại
+                                </div>
+                            )}
                             {selectedConversation && (
                                 <>
                                     {/* Header hội thoại */}
@@ -199,6 +221,8 @@ const AdminChat = () => {
                                         </div>
                                     </div>
 
+
+                                    
                                     {/* Danh sách tin nhắn */}
                                     <div className="flex flex-col flex-1 bg-gray-200 p-2 overflow-y-auto 
                   [&::-webkit-scrollbar]:w-1 
@@ -248,7 +272,7 @@ const AdminChat = () => {
                                                 <CiPaperplane
                                                     onClick={sendMessage}
                                                     size={23}
-                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600"
+                                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600`}
                                                 />
                                             </div>
                                         </div>

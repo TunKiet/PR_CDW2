@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ClipboardList, BarChart2, Clock, FileText, Calendar, ShoppingCart, Menu, Zap, Users, Settings, Building, ChevronDown, ChevronUp, LogOut } from "lucide-react";
 import axios from 'axios';
+import { AiOutlineMessage } from "react-icons/ai";
+import { BsBoxSeam } from "react-icons/bs";
+import { FaRegCommentAlt } from "react-icons/fa";
 
 const menuItems = [
   { title: "Đơn hàng mới", icon: <ClipboardList size={20} />, path: '/order-page' },
@@ -47,7 +50,10 @@ const menuItems = [
     ]
   },
   { title: "Quản lý đơn online", icon: <ShoppingCart size={20} />, path: '/order-online' },
+  { title: "Đánh giá", icon: <FaRegCommentAlt size={20} />, path: '/moderator' },
   { title: "Mặt hàng", icon: <Zap size={20} />, path: '/inventory' },
+  { title: "Thống kê kho", icon: <BsBoxSeam size={20} />, path: '/inventory-overview' },
+  { title: "Tin nhắn", icon: <AiOutlineMessage size={20} />, path: '/admin-chat' },
   { title: "Hệ thống", icon: <Settings size={20} />, path: '/system-settings' },
   { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/restaurant-info' },
   { title: "Đăng xuất", icon: <LogOut size={20} />, action: "logout" }, // thêm action
@@ -115,8 +121,8 @@ const Sidebar = () => {
 
   // Lấy tên hiển thị và chữ cái đầu
   const displayName = currentUser?.full_name || currentUser?.username || 'Chưa có tên';
-  const initials = displayName === 'Chưa có tên' 
-    ? '?' 
+  const initials = displayName === 'Chưa có tên'
+    ? '?'
     : displayName.split(' ').map(word => word[0]).join('').slice(0, 2).toUpperCase();
 
   return (

@@ -39,4 +39,15 @@ class Message extends Model
     {
         return $this->hasMany(MessageAttachment::class, 'message_id', 'message_id');
     }
+
+    public static function deleteMessage($messageId)
+    {
+        $message = Message::find($messageId);
+
+        if (!$message) {
+            return false;
+        }
+
+        return $message->delete();
+    }
 }
