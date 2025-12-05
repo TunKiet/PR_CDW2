@@ -14,6 +14,7 @@ import TableManagementAdmin from './pages/TableManagementAdmin'
 import Reservation from './pages/Reservations/ReservationCenter'
 import ReservationCreate from './pages/ReservationCreate'
 import NotificationManagementAdmin from "./pages/NotificationManagementAdmin";
+import NotificationBellFloating from "./components/Notification/NotificationBell";
 
 import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 
@@ -35,8 +36,12 @@ import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
 
 function App() {
+  // Lấy user từ localStorage sau khi đăng nhập
+  // const user = JSON.parse(localStorage.getItem("users"));
   return (
     <BrowserRouter> 
+    {/* {user && <NotificationBell userId={users.user_id} />} */}
+        <NotificationBellFloating userId={1} />
       <Routes>
         <Route path="/dish-status-management" element={<DishStatusManagement />} />
         <Route path="/category-manager" element={<CategoryManager />} />

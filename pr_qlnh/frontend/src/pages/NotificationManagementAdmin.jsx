@@ -49,7 +49,14 @@ export default function NotificationManagementAdmin() {
   };
 
   const handleSaved = () => {
+
+    // REFRESH LIST
     fetchNotifications(currentPage);
+
+    // ⭐ TRIGGER CHO CHUÔNG BIẾT CÓ THÔNG BÁO MỚI
+    window.dispatchEvent(new Event("notification-updated"));
+
+    notify.success("Lưu thông báo thành công");
   };
 
   const handleDelete = async (item) => {
@@ -59,7 +66,12 @@ export default function NotificationManagementAdmin() {
     try {
       await axiosClient.delete(`/notifications/${item.notification_id}`);
       notify.success("Đã xóa");
+
       fetchNotifications(currentPage);
+
+      // ⭐ CHUÔNG NHẬN UPDATE NGAY LẬP TỨC
+      window.dispatchEvent(new Event("notification-updated"));
+
     } catch (err) {
       notify.error("Lỗi khi xóa thông báo");
     }
