@@ -3,7 +3,7 @@ import "./restaurant_infor_manage.css";
 import Sidebar from "../../components/Sidebar";
 
 // === API Configuration ===
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1"; // Thay đổi theo môi trường của bạn
+const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
 const API_URL = "http://127.0.0.1:8000/api/dishes";
 
 // === HÀM HỖ TRỢ ===
@@ -835,7 +835,7 @@ export default function QuanLyTrangThongTin() {
       // ✅ CHỈ RELOAD KHI CÓ LỖI
       await fetchDishes();
     } finally {
-      setIsSavingFeatured(false); // ← THÊM dòng này
+      setIsSavingFeatured(false);
     }
   };
   const featuredDishes = React.useMemo(() => {
