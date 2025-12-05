@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ingredient;
+use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -97,9 +98,9 @@ class IngredientController extends Controller
         ]);
     }
 
-    public function exportPDF()
+    public function exportPDF($id)
     {
-        $dataExport = Ingredient::exportIngredient();
+        $dataExport = PurchaseOrder::getOrderDetail($id);
         return response()->json($dataExport);
     }
 

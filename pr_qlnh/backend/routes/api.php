@@ -92,12 +92,12 @@ Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
 Route::delete('/ingredients/delete/{id}', [IngredientController::class, 'destroy']);
 Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
 Route::get('/alert', [IngredientController::class, 'alertIngredient']);
-Route::get('/export', [IngredientController::class, 'exportPDF']);
+Route::get('/export/{id}', [IngredientController::class, 'exportPDF']);
 Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
 Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
 Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
-Route::get('/purchase-orders-all', [PurchaseOrderController::class, 'index']); // danh sách + tổng quan
-Route::get('/purchase-orders/{id}', [PurchaseOrderController::class, 'show']); // chi tiết
+Route::get('/purchase-orders-all', [PurchaseOrderController::class, 'index']);
+Route::get('/purchase-orders/{id}', [PurchaseOrderController::class, 'show']);
 Route::patch('/purchase-orders/{id}/update-status', [PurchaseOrderController::class, 'updateStatus']);
 
 /*
