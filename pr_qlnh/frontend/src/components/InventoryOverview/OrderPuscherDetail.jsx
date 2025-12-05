@@ -33,6 +33,7 @@ const OrderPuscherDetail = () => {
     const [ingredients, setIngredients] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
+    const [notFound, setNotFound] = useState(false);
 
     const formatDateTime = (datetime) => {
         const dateObj = new Date(datetime);
@@ -56,25 +57,48 @@ const OrderPuscherDetail = () => {
         return Number(value).toLocaleString('vi-VN') + ' đ';
     };
 
-    useEffect(() => {
-        const fetchOrderDetail = async () => {
-            setLoading(true);
-            try {
-                const res = await axios.get(`${endPoint}/purchase-orders/${purchase_order_id}`);
-                setOrderDetail(res.data);
 
-                // Set activeStep dựa vào status trong DB
-                const stepIndex = orderSteps.findIndex(step => step.key === res.data.status);
-                setActiveStep(stepIndex !== -1 ? stepIndex : 0);
-                setIngredients(res.data.items);
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+
+    useEffect(() => {
+        if (!/^\d+$/.test(purchase_order_id)) {
+            setNotFound(true);  // purchase_order_id không phải số
+            setLoading(false);
+            return;
+        }
+
+        if (Number(purchase_order_id) <= 0) {
+            setNotFound(true);
+            setLoading(false);
+            return;
+        }
+
         fetchOrderDetail();
     }, [purchase_order_id]);
+
+
+    useEffect(() => {
+        fetchOrderDetail();
+    }, [purchase_order_id]);
+
+    const fetchOrderDetail = async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${endPoint}/purchase-orders/${purchase_order_id}`);
+            setOrderDetail(res.data);
+
+            // Set activeStep dựa vào status trong DB
+            const stepIndex = orderSteps.findIndex(step => step.key === res.data.status);
+            setActiveStep(stepIndex !== -1 ? stepIndex : 0);
+            setIngredients(res.data.items);
+        } catch (error) {
+            if (error.response?.status === 404) {
+                setNotFound(true);
+            }
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const orderSteps = [
         {
@@ -160,6 +184,8 @@ const OrderPuscherDetail = () => {
             notify.error("Đã xảy ra lỗi khi xuất file PDF");
         }
     }
+
+    if (notFound) return <h3 className='text-center'>404 Không tìm thấy trang</h3>;
 
 
     return (

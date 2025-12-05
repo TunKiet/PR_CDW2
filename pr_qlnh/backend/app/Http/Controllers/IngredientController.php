@@ -80,6 +80,7 @@ class IngredientController extends Controller
             'unit' => 'required|string|max:50',
             'stock_quantity' => 'required|integer|min:0',
             'min_stock_level' => 'required|integer|min:0',
+            'updated_at' => 'required|date',
         ]);
 
         $result = Ingredient::updateIngredient($id, $validated);
@@ -88,7 +89,7 @@ class IngredientController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $result['message']
-            ], 404);
+            ], $result['code']); // trả 404 hoặc 409
         }
 
         return response()->json([
@@ -97,6 +98,7 @@ class IngredientController extends Controller
             'data' => $result['data']
         ]);
     }
+
 
     public function exportPDF($id)
     {

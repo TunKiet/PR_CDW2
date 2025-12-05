@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Ingredient extends Model
 {
@@ -22,12 +23,7 @@ class Ingredient extends Model
         'min_stock_level'
     ];
 
-     protected $appends = ['status'];
-
-    protected $casts = [
-        'created_at' => 'datetime:Y/m/d H:i:s',
-        'updated_at' => 'datetime:Y/m/d H:i:s',
-    ];
+    protected $appends = ['status'];
 
     public function getStatusAttribute()
     {
@@ -75,10 +71,34 @@ class Ingredient extends Model
         if (!$ingredient) {
             return [
                 'success' => false,
+                'code' => 404,
                 'message' => 'Nguyên liệu không tồn tại.'
             ];
         }
 
+        //Kiểm tra cập nhật nguyên liệu
+        if (!isset($data['updated_at'])) {
+            return [
+                'success' => false,
+                'code' => 422,
+                'message' => 'Thiếu thời gian cập nhật (updated_at).'
+            ];
+        }
+
+        if ($data['updated_at'] !== $ingredient->updated_at->toISOString()) {
+            Log::warning("OPTIMISTIC LOCK FAIL", [
+                'client_updated_at' => $data['updated_at'],
+                'server_updated_at' => $ingredient->updated_at->toISOString()
+            ]);
+
+            return [
+                'success' => false,
+                'code' => 409,
+                'message' => 'Dữ liệu đã thay đổi bởi người khác, vui lòng tải lại trang.'
+            ];
+        }
+
+        // Update
         $ingredient->update([
             'ingredient_name' => $data['ingredient_name'],
             'category_ingredient_id' => $data['category_ingredient_id'],
@@ -88,12 +108,16 @@ class Ingredient extends Model
             'min_stock_level' => $data['min_stock_level'],
             'total_price' => $data['price'] * $data['stock_quantity']
         ]);
+
         return [
             'success' => true,
+            'code' => 200,
             'message' => 'Cập nhật nguyên liệu thành công.',
             'data' => $ingredient->fresh()->load('category_ingredient')
         ];
     }
+
+
     /**
      * Summary of remove
      * @param mixed $id

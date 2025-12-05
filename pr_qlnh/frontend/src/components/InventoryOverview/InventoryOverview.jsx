@@ -266,8 +266,9 @@ const InventoryOverview = () => {
       return;
     }
 
+    notify.info("Đang cập nhật...");
+
     try {
-      notify.info('Đang cập nhật...');
       const payload = {
         ingredient_name: editIngredient.ingredient_name?.trim(),
         category_ingredient_id: editIngredient.category_ingredient_id,
@@ -275,32 +276,34 @@ const InventoryOverview = () => {
         unit: editIngredient.unit,
         stock_quantity: editIngredient.stock_quantity,
         min_stock_level: editIngredient.min_stock_level,
+        updated_at: editIngredient.updated_at
       };
+
 
       const { data } = await axios.put(
         `http://localhost:8000/api/ingredients/${editIngredient.ingredient_id}`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-        }
+        payload
       );
-      notify.dismiss();
 
+      notify.dismiss();
       if (data.success) {
         notify.success("Cập nhật nguyên liệu thành công!");
         setOpenUpdate(false);
-        fetchIngredients(); // reload danh sách
+        fetchIngredients();
       } else {
-        notify.error(`${data.message || "Cập nhật thất bại!"}`);
+        notify.error(data.message || "Cập nhật thất bại!");
       }
     } catch (error) {
-      console.error("Lỗi khi cập nhật nguyên liệu:", error);
-      notify.error("Đã xảy ra lỗi trong quá trình cập nhật nguyên liệu!");
+      notify.dismiss();
+      if (error.response?.status === 409) {
+        notify.error("Dữ liệu đã thay đổi. Vui lòng tải lại trang trước khi cập nhật.");
+        return;
+      }
+      notify.error("Lỗi khi cập nhật nguyên liệu!");
     }
   };
+
+
 
   //Fomat money
   const formatVND = (value) => {
