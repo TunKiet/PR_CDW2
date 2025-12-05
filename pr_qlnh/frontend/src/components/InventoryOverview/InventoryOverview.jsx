@@ -12,6 +12,8 @@ import Dialog from '@mui/material/Dialog';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { notify, confirmAction } from '../../utils/notify'
+import * as Yup from "yup";
+import { useFormik } from "formik";
 
 import { FaGauge, FaPlus, FaBoxesStacked, FaListCheck, FaTruck, FaMagnifyingGlass, FaBell, FaCircleUser, FaCubesStacked, FaTriangleExclamation, FaWallet } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
@@ -43,50 +45,142 @@ const InventoryOverview = () => {
   const [openUpdate, setOpenUpdate] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState([]);
   const [openAdd, setOpenAdd] = useState(false);
-  const [formErrors, setFormErrors] = useState({});
+
+  const onClose = () => setOpenUpdate(false);   // Đóng dialog
+  const onSuccess = () => fetchIngredients();
 
 
-  const validateForm = () => {
-    const errors = {};
+  const DANGEROUS_SPACES = /[\s\u3000\u00A0\u2000-\u200B]/g;
+  const REGEX_TEXT = /^[A-Za-zÀ-ỹ0-9 .,()'"-]+$/;
+  const REGEX_NUMBER = /^[0-9]+$/;
+  const REGEX_EMAIL = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    //Validate ingredient name
-    if (!formData.ingredient_name.trim()) {
-      errors.ingredient_name = "Tên nguyên liệu không được để trống";
-    } else if (!/^[\p{L}\p{N}\s]+$/u.test(formData.ingredient_name)) {
-      errors.ingredient_name = "Tên nguyên liệu không chứa ký tự đặc biệt)";
-    }
+  Yup.addMethod(Yup.string, 'noOnlySpaces', function (message) {
+    return this.test('no-only-spaces', message, function (value) {
+      if (!value) return true; // Để required() xử lý
 
-    //Validate unit
-    if (!formData.unit.trim()) {
-      errors.unit = "Đơn vị không được để trống";
-    } else if (!/^[a-zA-Z0-9]+$/.test(formData.unit)) {
-      errors.unit = "Đơn vị không được chứa ký tự đặc biệt";
-    }
+      const cleaned = value.replace(DANGEROUS_SPACES, '');
+      return cleaned.length > 0;
+    });
+  });
 
-    // Giá
-    if (formData.price === "" || formData.price < 0) {
-      errors.price = "Giá phải lớn hơn hoặc bằng 0";
-    }
 
-    // Tồn kho
-    if (formData.stock_quantity === "" || formData.stock_quantity < 0) {
-      errors.stock_quantity = "Tồn kho phải lớn hơn hoặc bằng 0";
-    }
+  Yup.addMethod(Yup.string, 'noFullWidthSpace', function (message) {
+    return this.test('no-fullwidth-space', message, function (value) {
+      if (!value) return true;
+      return !value.includes('\u3000');
+    });
+  });
 
-    // Ngưỡng cảnh báo
-    if (formData.min_stock_level === "" || formData.min_stock_level < 0) {
-      errors.min_stock_level = "Ngưỡng cảnh báo phải lớn hơn hoặc bằng 0";
-    }
 
-    // Danh mục
-    if (!formData.category_ingredient_id) {
-      errors.category_ingredient_id = "Vui lòng chọn danh mục";
-    }
+  Yup.addMethod(Yup.string, 'sanitize', function () {
+    return this.transform((value) => {
+      if (!value) return value;
 
-    setFormErrors(errors);
+      let cleaned = value.replace(/\u3000/g, ' ');
 
-    return Object.keys(errors).length === 0; // true nếu không lỗi
-  }
+      cleaned = cleaned.trim();
+
+      cleaned = cleaned.replace(/\s+/g, ' ');
+
+      return cleaned;
+    });
+  });
+
+
+  const ingredientSchema = Yup.object({
+    ingredient_name: Yup.string()
+      .sanitize()
+      .required("Vui lòng nhập tên nguyên liệu")
+      .noOnlySpaces("Tên nguyên liệu không được chỉ chứa khoảng trắng")
+      .noFullWidthSpace("Tên nguyên liệu không được chứa khoảng trắng full-width (　)")
+      .matches(
+        REGEX_TEXT,
+        "Tên chỉ được chứa chữ cái, số, dấu cách và các ký tự: . , ( ) ' \" -"
+      )
+      .min(2, "Tên nguyên liệu phải có ít nhất 2 ký tự")
+      .max(255, "Tên nguyên liệu không được vượt quá 255 ký tự"),
+
+    category_ingredient_id: Yup.number()
+      .required("Vui lòng chọn danh mục")
+      .positive("Danh mục không hợp lệ")
+      .integer("Danh mục không hợp lệ")
+      .typeError("Vui lòng chọn danh mục"),
+
+    unit: Yup.string()
+      .sanitize()
+      .required("Vui lòng nhập đơn vị")
+      .noOnlySpaces("Đơn vị không được chỉ chứa khoảng trắng")
+      .noFullWidthSpace("Đơn vị không được chứa khoảng trắng full-width (　)")
+      .matches(
+        REGEX_TEXT,
+        "Đơn vị chỉ được chứa chữ cái, số và các ký tự: . , ( ) ' \" -"
+      )
+      .min(1, "Đơn vị phải có ít nhất 1 ký tự")
+      .max(50, "Đơn vị không được vượt quá 50 ký tự"),
+
+    price: Yup.number()
+      .required("Vui lòng nhập giá")
+      .typeError("Giá phải là số")
+      .positive("Giá phải lớn hơn 0")
+      .integer("Giá phải là số nguyên")
+      .min(1, "Giá phải lớn hơn 0")
+      .max(999999999, "Giá không được vượt quá 999,999,999"),
+
+    stock_quantity: Yup.number()
+      .required("Vui lòng nhập tồn kho")
+      .typeError("Tồn kho phải là số")
+      .integer("Tồn kho phải là số nguyên")
+      .min(0, "Tồn kho phải lớn hơn hoặc bằng 0")
+      .max(999999999, "Tồn kho không được vượt quá 999,999,999"),
+
+    min_stock_level: Yup.number()
+      .required("Vui lòng nhập ngưỡng cảnh báo")
+      .typeError("Ngưỡng cảnh báo phải là số")
+      .integer("Ngưỡng cảnh báo phải là số nguyên")
+      .min(0, "Ngưỡng cảnh báo phải lớn hơn hoặc bằng 0")
+      .max(999999999, "Ngưỡng cảnh báo không được vượt quá 999,999,999")
+      .test(
+        'is-less-than-stock',
+        'Ngưỡng cảnh báo nên nhỏ hơn tồn kho hiện tại',
+        function (value) {
+          const { stock_quantity } = this.parent;
+          if (stock_quantity && value) {
+            return value <= stock_quantity;
+          }
+          return true;
+        }
+      ),
+  });
+
+  //add new ingredient
+  const formikAdd = useFormik({
+    initialValues: {
+      ingredient_name: "",
+      category_ingredient_id: "",
+      price: "",
+      unit: "",
+      stock_quantity: "",
+      min_stock_level: "",
+    },
+    validationSchema: ingredientSchema,
+    onSubmit: async (values, { setSubmitting }) => {
+      notify.info('Đang thêm...');
+      try {
+        await axios.post("http://localhost:8000/api/add", values);
+        notify.dismiss();
+        notify.success('Thêm thành công!');
+        fetchIngredients();
+      } catch (err) {
+        notify.dismiss();
+        notify.error('Thêm thất bại');
+        console.log(err);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+
 
   //Fetch all ingredients
   const fetchIngredients = async () => {
@@ -112,124 +206,6 @@ const InventoryOverview = () => {
 
   const handlePageChange = (event, value) => {
     setPage(value);
-  };
-
-  //Form add ingredient
-  const [formData, setFormData] = useState({
-    ingredient_name: "",
-    category_ingredient_id: "",
-    price: "",
-    unit: "",
-    total_price: "",
-    stock_quantity: "",
-    min_stock_level: "",
-  });
-
-  //Process button when click
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (validateForm()) {
-      try {
-        notify.info('Đang thêm...');
-
-        await axios.post("http://localhost:8000/api/add", formData);
-
-        notify.dismiss();
-        notify.success('Thêm thành công!');
-
-        //reset form data
-        setFormData({
-          ingredient_name: "",
-          category_ingredient_id: "",
-          price: "",
-          unit: "",
-          total_price: "",
-          stock_quantity: "",
-          min_stock_level: "",
-        })
-        //Load api
-        fetchIngredients();
-      } catch (error) {
-        notify.dismiss();
-        console.log(error);
-        notify.error('Thêm thất bại');
-      }
-    } else {
-      console.log("Có lỗi trong form:", formErrors);
-    }
-
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    // Cập nhật dữ liệu form
-    setFormData(prev => ({ ...prev, [name]: value }));
-
-    // Xử lý validation "ngay lập tức"
-    setFormErrors(prev => {
-      const newErrors = { ...prev };
-
-      switch (name) {
-        case "ingredient_name":
-          if (!value.trim()) {
-            newErrors.ingredient_name = "Tên nguyên liệu không được để trống";
-          } else if (!/^[a-zA-Z0-9\s]+$/.test(value)) {
-            newErrors.ingredient_name = "Tên nguyên liệu không được chứa ký tự đặc biệt";
-          } else {
-            delete newErrors.ingredient_name;
-          }
-          break;
-
-        case "category_ingredient_id":
-          if (!value) {
-            newErrors.category_ingredient_id = "Vui lòng chọn danh mục";
-          } else {
-            delete newErrors.category_ingredient_id;
-          }
-          break;
-
-        case "unit":
-          if (!value.trim()) {
-            newErrors.unit = "Đơn vị không được để trống";
-          } else if (!/^[a-zA-Z0-9]+$/.test(value)) {
-            newErrors.unit = "Đơn vị không được chứa ký tự đặc biệt";
-          } else {
-            delete newErrors.unit;
-          }
-          break;
-
-        case "price":
-          if (value === "" || parseFloat(value) < 0) {
-            newErrors.price = "Giá phải lớn hơn hoặc bằng 0";
-          } else {
-            delete newErrors.price;
-          }
-          break;
-
-        case "stock_quantity":
-          if (value === "" || parseFloat(value) < 0) {
-            newErrors.stock_quantity = "Tồn kho phải lớn hơn hoặc bằng 0";
-          } else {
-            delete newErrors.stock_quantity;
-          }
-          break;
-
-        case "min_stock_level":
-          if (value === "" || parseFloat(value) < 0) {
-            newErrors.min_stock_level = "Ngưỡng cảnh báo phải lớn hơn hoặc bằng 0";
-          } else {
-            delete newErrors.min_stock_level;
-          }
-          break;
-
-        default:
-          break;
-      }
-
-      return newErrors;
-    });
   };
 
   //Delete ingredient
@@ -259,51 +235,155 @@ const InventoryOverview = () => {
       .catch(err => console.log(err));
   }, []);
 
-  //Update ingredient
-  const handleUpdateIngredient = async () => {
-    if (!editIngredient) {
-      notify.warning("⚠️ Không có dữ liệu nguyên liệu để cập nhật!");
-      return;
-    }
+  const updateIngredientSchema = Yup.object({
+    ingredient_name: Yup.string()
+      .sanitize()
+      .required("Vui lòng nhập tên nguyên liệu")
+      .noOnlySpaces("Tên nguyên liệu không được chỉ chứa khoảng trắng")
+      .noFullWidthSpace("Tên nguyên liệu không được chứa khoảng trắng full-width (　)")
+      .matches(
+        REGEX_TEXT,
+        "Tên chỉ được chứa chữ cái, số, dấu cách và các ký tự: . , ( ) ' \" -"
+      )
+      .min(2, "Tên nguyên liệu phải có ít nhất 2 ký tự")
+      .max(255, "Tên nguyên liệu không được vượt quá 255 ký tự"),
 
-    notify.info("Đang cập nhật...");
+    category_ingredient_id: Yup.number()
+      .required("Vui lòng chọn danh mục")
+      .positive("Danh mục không hợp lệ")
+      .integer("Danh mục không hợp lệ")
+      .typeError("Vui lòng chọn danh mục"),
 
-    try {
-      const payload = {
-        ingredient_name: editIngredient.ingredient_name?.trim(),
-        category_ingredient_id: editIngredient.category_ingredient_id,
-        price: editIngredient.price,
-        unit: editIngredient.unit,
-        stock_quantity: editIngredient.stock_quantity,
-        min_stock_level: editIngredient.min_stock_level,
-        updated_at: editIngredient.updated_at
-      };
+    unit: Yup.string()
+      .sanitize()
+      .required("Vui lòng nhập đơn vị")
+      .noOnlySpaces("Đơn vị không được chỉ chứa khoảng trắng")
+      .noFullWidthSpace("Đơn vị không được chứa khoảng trắng full-width (　)")
+      .matches(
+        REGEX_TEXT,
+        "Đơn vị chỉ được chứa chữ cái, số và các ký tự: . , ( ) ' \" -"
+      )
+      .min(1, "Đơn vị phải có ít nhất 1 ký tự")
+      .max(50, "Đơn vị không được vượt quá 50 ký tự"),
 
+    price: Yup.number()
+      .required("Vui lòng nhập giá")
+      .typeError("Giá phải là số")
+      .positive("Giá phải lớn hơn 0")
+      .integer("Giá phải là số nguyên")
+      .min(1, "Giá phải lớn hơn 0")
+      .max(999999999, "Giá không được vượt quá 999,999,999"),
 
-      const { data } = await axios.put(
-        `http://localhost:8000/api/ingredients/${editIngredient.ingredient_id}`,
-        payload
-      );
+    stock_quantity: Yup.number()
+      .required("Vui lòng nhập tồn kho")
+      .typeError("Tồn kho phải là số")
+      .integer("Tồn kho phải là số nguyên")
+      .min(0, "Tồn kho phải lớn hơn hoặc bằng 0")
+      .max(999999999, "Tồn kho không được vượt quá 999,999,999"),
 
-      notify.dismiss();
-      if (data.success) {
-        notify.success("Cập nhật nguyên liệu thành công!");
-        setOpenUpdate(false);
-        fetchIngredients();
-      } else {
-        notify.error(data.message || "Cập nhật thất bại!");
+    min_stock_level: Yup.number()
+      .required("Vui lòng nhập ngưỡng cảnh báo")
+      .typeError("Ngưỡng cảnh báo phải là số")
+      .integer("Ngưỡng cảnh báo phải là số nguyên")
+      .min(0, "Ngưỡng cảnh báo phải lớn hơn hoặc bằng 0")
+      .max(999999999, "Ngưỡng cảnh báo không được vượt quá 999,999,999")
+      .test(
+        'is-less-than-stock',
+        'Ngưỡng cảnh báo nên nhỏ hơn hoặc bằng tồn kho hiện tại',
+        function (value) {
+          const { stock_quantity } = this.parent;
+          if (stock_quantity && value) {
+            return value <= stock_quantity;
+          }
+          return true;
+        }
+      ),
+  });
+
+  const formikUpdate = useFormik({
+    initialValues: {
+      ingredient_name: editIngredient?.ingredient_name || "",
+      category_ingredient_id: editIngredient?.category_ingredient_id || "",
+      unit: editIngredient?.unit || "",
+      price: editIngredient?.price || "",
+      stock_quantity: editIngredient?.stock_quantity || "",
+      min_stock_level: editIngredient?.min_stock_level || "",
+    },
+    validationSchema: updateIngredientSchema,
+    enableReinitialize: true,
+
+    onSubmit: async (values, { setSubmitting, setFieldError }) => {
+      notify.info("Đang cập nhật...");
+
+      try {
+        const payload = {
+          ingredient_name: values.ingredient_name,
+          category_ingredient_id: values.category_ingredient_id,
+          price: values.price,
+          unit: values.unit,
+          stock_quantity: values.stock_quantity,
+          min_stock_level: values.min_stock_level,
+          updated_at: editIngredient.updated_at
+        };
+
+        const { data } = await axios.put(
+          `${endPoint}/ingredients/${editIngredient.ingredient_id}`,
+          payload
+        );
+
+        notify.dismiss();
+
+        if (data.success) {
+          notify.success("Cập nhật nguyên liệu thành công!");
+          onSuccess();
+          onClose();
+        } else {
+          notify.error(data.message || "Cập nhật thất bại!");
+        }
+
+      } catch (error) {
+        notify.dismiss();
+        setSubmitting(false);
+        if (error.response) {
+          const status = error.response.status;
+          const serverErrors = error.response.data?.errors;
+
+          switch (status) {
+            case 409:
+              notify.error("⚠️ Dữ liệu đã thay đổi. Vui lòng tải lại trang!");
+              break;
+
+            case 422:
+              if (serverErrors) {
+                Object.keys(serverErrors).forEach(field => {
+                  setFieldError(field, serverErrors[field][0]);
+                });
+                notify.error("Vui lòng kiểm tra lại thông tin!");
+              } else {
+                notify.error("Dữ liệu không hợp lệ!");
+              }
+              break;
+
+            case 404:
+              notify.error("Không tìm thấy nguyên liệu!");
+              onClose();
+              break;
+
+            case 500:
+              notify.error("Lỗi server! Vui lòng thử lại sau.");
+              break;
+
+            default:
+              notify.error(error.response.data?.message || "Cập nhật thất bại!");
+          }
+        } else if (error.request) {
+          notify.error("Không thể kết nối đến server!");
+        } else {
+          notify.error("Đã xảy ra lỗi!");
+        }
       }
-    } catch (error) {
-      notify.dismiss();
-      if (error.response?.status === 409) {
-        notify.error("Dữ liệu đã thay đổi. Vui lòng tải lại trang trước khi cập nhật.");
-        return;
-      }
-      notify.error("Lỗi khi cập nhật nguyên liệu!");
-    }
-  };
-
-
+    },
+  });
 
   //Fomat money
   const formatVND = (value) => {
@@ -359,75 +439,93 @@ const InventoryOverview = () => {
               <Button onClick={() => setOpenAdd(true)} type='submit' variant='contained' color='primary' className="">Thêm Nguyên liệu</Button>
 
               <Dialog open={openAdd} onClose={() => setOpenAdd(false)} maxWidth="sm" fullWidth>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={formikAdd.handleSubmit}>
                   <h3 className='text-center mt-3 border-b border-b-[#e8e8e8]'>Thêm mới nguyên liệu</h3>
                   <div className="formAdd-ingredient">
                     <div className="formAdd-info p-3">
 
                       <div>
                         <label htmlFor="">Tên nguyên liệu</label>
-                        <input className='form-control' type="text" onChange={handleChange} name="ingredient_name" value={formData.ingredient_name} />
-                        {formErrors.ingredient_name && <p className="text-red-500 text-xs">{formErrors.ingredient_name}</p>}
+                        <input className='form-control' type="text" onChange={formikAdd.handleChange} name="ingredient_name" onBlur={formikAdd.handleBlur} value={formikAdd.values.ingredient_name} />
+                        {formikAdd.touched.ingredient_name && formikAdd.errors.ingredient_name && (
+                          <p className="text-red-500 text-xs">{formikAdd.errors.ingredient_name}</p>
+                        )}
                       </div>
                       <div>
-                        <label htmlFor="">Danh mục</label>
-                        <Select name='category_ingredient_id'
-                          value={formData.category_ingredient_id}
-                          onChange={handleChange} className='w-full' required sx={{
-                            '& .MuiSelect-select': {
-                              padding: '8px',
-                            },
-                          }}>
-                          {selectedCategoryId.map(ca => (
-                            <MenuItem
-                              key={ca.category_ingredient_id}
-                              value={ca.category_ingredient_id}
-                            >
+                        <label>Danh mục</label>
+                        <Select
+                          name="category_ingredient_id"
+                          value={formikAdd.values.category_ingredient_id}
+                          onChange={formikAdd.handleChange}
+                          onBlur={formikAdd.handleBlur}
+                          className="w-full"
+                        >
+                          {selectedCategoryId.map((ca) => (
+                            <MenuItem key={ca.category_ingredient_id} value={ca.category_ingredient_id}>
                               {ca.category_ingredient_name}
                             </MenuItem>
                           ))}
                         </Select>
-                        {formErrors.category_ingredient_id && (
-                          <p className="text-red-500 text-xs mt-1">{formErrors.category_ingredient_id}</p>
+                        {formikAdd.touched.category_ingredient_id && formikAdd.errors.category_ingredient_id && (
+                          <p className="text-red-500 text-xs">{formikAdd.errors.category_ingredient_id}</p>
                         )}
                       </div>
                       <div>
-                        <label htmlFor="">Tồn kho</label>
-                        <input className='form-control' type="number"
+                        <label>Tồn kho</label>
+                        <input
+                          className="form-control"
+                          type="number"
                           name="stock_quantity"
-                          value={formData.stock_quantity}
-                          onChange={handleChange} />
-                        {formErrors.stock_quantity && <p className="text-red-500 text-xs">{formErrors.stock_quantity}</p>}
+                          value={formikAdd.values.stock_quantity}
+                          onChange={formikAdd.handleChange}
+                        />
+                        {formikAdd.errors.stock_quantity && formikAdd.touched.stock_quantity && (
+                          <p className="text-red-500 text-xs">{formikAdd.errors.stock_quantity}</p>
+                        )}
                       </div>
                       <div>
-                        <label htmlFor="">Ngưỡng cảnh báo</label>
-                        <input className='form-control' type="number"
+                        <label>Ngưỡng cảnh báo</label>
+                        <input
+                          className="form-control"
+                          type="number"
                           name="min_stock_level"
-                          value={formData.min_stock_level}
-                          onChange={handleChange} />
-                        {formErrors.min_stock_level && <p className="text-red-500 text-xs">{formErrors.min_stock_level}</p>}
-
+                          value={formikAdd.values.min_stock_level}
+                          onChange={formikAdd.handleChange}
+                        />
+                        {formikAdd.errors.min_stock_level && formikAdd.touched.min_stock_level && (
+                          <p className="text-red-500 text-xs">{formikAdd.errors.min_stock_level}</p>
+                        )}
                       </div>
                       <div>
-                        <label htmlFor="">Đơn vị</label>
-                        <input className='form-control' type="text" name="unit"
-                          value={formData.unit}
-                          onChange={handleChange} />
-                        {formErrors.unit && <p className="text-red-500 text-xs">{formErrors.unit}</p>}
-
+                        <label>Đơn vị</label>
+                        <input
+                          className="form-control"
+                          type="text"
+                          name="unit"
+                          value={formikAdd.values.unit}
+                          onChange={formikAdd.handleChange}
+                        />
+                        {formikAdd.errors.unit && formikAdd.touched.unit && (
+                          <p className="text-red-500 text-xs">{formikAdd.errors.unit}</p>
+                        )}
                       </div>
                       <div>
-                        <label htmlFor="">Giá</label>
-                        <input className='form-control' type="number" name="price"
-                          value={formData.price}
-                          onChange={handleChange} />
-                        {formErrors.price && <p className="text-red-500 text-xs">{formErrors.price}</p>}
-
+                        <label>Giá</label>
+                        <input
+                          className="form-control"
+                          type="number"
+                          name="price"
+                          value={formikAdd.values.price}
+                          onChange={formikAdd.handleChange}
+                        />
+                        {formikAdd.errors.price && formikAdd.touched.price && (
+                          <p className="text-red-500 text-xs">{formikAdd.errors.price}</p>
+                        )}
                       </div>
                       <div className="formAdd-button flex">
                         <div className='flex ms-auto py-3 gap-1.5'>
                           <div className="formAdd-button-right">
-                            <Button type='submit' variant='contained' color='primary'>Thêm</Button>
+                            <Button type='submit' variant='contained' color='primary' disabled={formikAdd.isSubmitting}>{formikAdd.isSubmitting ? "Đang thêm..." : "Thêm"}</Button>
                           </div>
                         </div>
                       </div>
@@ -510,78 +608,127 @@ const InventoryOverview = () => {
 
             {/* Form edit ingredient */}
             <Dialog open={openUpdate} onClose={() => setOpenUpdate(false)} maxWidth="sm" fullWidth>
-              <h3 className='text-center mt-3 border-b border-b-[#e8e8e8]'>Cập nhật nguyên liệu</h3>
-              {editIngredient && (
-                <div className="formUpdate-ingredient">
-                  <div className="fromUpdate-info p-3">
-                    <div>
-                      <label htmlFor="">Mã NL</label>
-                      <input className='form-control' type="text" value={editIngredient.ingredient_id} readOnly />
-                    </div>
-                    <div>
-                      <label htmlFor="">Tên nguyên liệu</label>
-                      <input className='form-control' type="text" value={editIngredient.ingredient_name}
-                        onChange={(e) => setEditIngredient({ ...editIngredient, ingredient_name: e.target.value })} />
-                    </div>
-                    <div>
-                      <label htmlFor="">Danh mục</label>
-                      <Select
-                        value={editIngredient.category_ingredient_id}
-                        onChange={(e) =>
-                          setEditIngredient({
-                            ...editIngredient,
-                            category_ingredient_id: e.target.value,
-                          })
-                        }
-                        className="w-full"
-                        sx={{ "& .MuiSelect-select": { padding: "8px" } }}
-                      >
-                        {selectedCategoryId.map(ca => (
-                          <MenuItem
-                            key={ca.category_ingredient_id}
-                            value={ca.category_ingredient_id}
-                          >
-                            {ca.category_ingredient_name}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </div>
-                    <div>
-                      <label htmlFor="">Tồn kho</label>
-                      <input className='form-control' type="number" value={editIngredient.stock_quantity}
-                        onChange={(e) =>
-                          setEditIngredient({
-                            ...editIngredient,
-                            stock_quantity: e.target.value,
-                          })
-                        } />
-                    </div>
-                    <div>
-                      <label htmlFor="">Ngưỡng cảnh báo</label>
-                      <input className='form-control' type="text" name="" id="" value={editIngredient.min_stock_level}
-                        onChange={(e) => setEditIngredient({ ...editIngredient, min_stock_level: e.target.value })} />
-                    </div>
-                    <div>
-                      <label htmlFor="">Đơn vị</label>
-                      <input className='form-control' type="text" value={editIngredient.unit}
-                        onChange={(e) => setEditIngredient({ ...editIngredient, unit: e.target.value })} />
-                    </div>
-                    <div>
-                      <label htmlFor="">Giá</label>
-                      <input className='form-control' type="number" value={editIngredient.price}
-                        onChange={(e) => setEditIngredient({ ...editIngredient, price: e.target.value })} />
-                    </div>
-                    <div className="fromUpdate-button flex">
-                      <div className='flex ms-auto py-3 gap-1.5'>
-                        <div className="fromUpdate-button-right">
-                          <Button variant='contained' color='primary' onClick={handleUpdateIngredient}>Cập nhật</Button>
+              <form onSubmit={formikUpdate.handleSubmit}>
+                <h3 className='text-center mt-3 border-b border-b-[#e8e8e8]'>Cập nhật nguyên liệu</h3>
+                {editIngredient && (
+                  <div className="formUpdate-ingredient">
+                    <div className="fromUpdate-info p-3">
+                      <div>
+                        <label htmlFor="">Mã NL</label>
+                        <input className='form-control' type="text" value={editIngredient.ingredient_id} readOnly />
+                      </div>
+
+                      <div>
+                        <label htmlFor="">Tên nguyên liệu</label>
+                        <input
+                          className='form-control'
+                          type="text"
+                          name="ingredient_name"
+                          value={formikUpdate.values.ingredient_name}
+                          onChange={formikUpdate.handleChange}
+                          onBlur={formikUpdate.handleBlur}
+                        />
+                        {formikUpdate.touched.ingredient_name && formikUpdate.errors.ingredient_name && (
+                          <p className="text-red-500 text-xs">{formikUpdate.errors.ingredient_name}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label htmlFor="">Danh mục</label>
+                        <Select
+                          name="category_ingredient_id"
+                          value={formikUpdate.values.category_ingredient_id}
+                          onChange={formikUpdate.handleChange}
+                          onBlur={formikUpdate.handleBlur}
+                          className="w-full"
+                          sx={{ "& .MuiSelect-select": { padding: "8px" } }}
+                        >
+                          {selectedCategoryId.map(ca => (
+                            <MenuItem key={ca.category_ingredient_id} value={ca.category_ingredient_id}>
+                              {ca.category_ingredient_name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {formikUpdate.touched.category_ingredient_id && formikUpdate.errors.category_ingredient_id && (
+                          <p className="text-red-500 text-xs">{formikUpdate.errors.category_ingredient_id}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label htmlFor="">Tồn kho</label>
+                        <input
+                          className='form-control'
+                          type="number"
+                          name="stock_quantity"
+                          value={formikUpdate.values.stock_quantity}
+                          onChange={formikUpdate.handleChange}
+                          onBlur={formikUpdate.handleBlur}
+                        />
+                        {formikUpdate.touched.stock_quantity && formikUpdate.errors.stock_quantity && (
+                          <p className="text-red-500 text-xs">{formikUpdate.errors.stock_quantity}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label htmlFor="">Ngưỡng cảnh báo</label>
+                        <input
+                          className='form-control'
+                          type="number"
+                          name="min_stock_level"
+                          value={formikUpdate.values.min_stock_level}
+                          onChange={formikUpdate.handleChange}
+                          onBlur={formikUpdate.handleBlur}
+                        />
+                        {formikUpdate.touched.min_stock_level && formikUpdate.errors.min_stock_level && (
+                          <p className="text-red-500 text-xs">{formikUpdate.errors.min_stock_level}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label htmlFor="">Đơn vị</label>
+                        <input
+                          className='form-control'
+                          type="text"
+                          name="unit"
+                          value={formikUpdate.values.unit}
+                          onChange={formikUpdate.handleChange}
+                          onBlur={formikUpdate.handleBlur}
+                        />
+                        {formikUpdate.touched.unit && formikUpdate.errors.unit && (
+                          <p className="text-red-500 text-xs">{formikUpdate.errors.unit}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label htmlFor="">Giá</label>
+                        <input
+                          className='form-control'
+                          type="number"
+                          name="price"
+                          value={formikUpdate.values.price}
+                          onChange={formikUpdate.handleChange}
+                          onBlur={formikUpdate.handleBlur}
+                        />
+                        {formikUpdate.touched.price && formikUpdate.errors.price && (
+                          <p className="text-red-500 text-xs">{formikUpdate.errors.price}</p>
+                        )}
+                      </div>
+
+                      <div className="fromUpdate-button flex">
+                        <div className='flex ms-auto py-3 gap-1.5'>
+                          <div className="fromUpdate-button-right">
+                            <Button type="submit" variant='contained' color='primary' disabled={formikUpdate.isSubmitting}>
+                              {formikUpdate.isSubmitting ? "Đang cập nhật..." : "Cập nhật"}
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </form>
             </Dialog>
+
             <div className="pagination-ingredient-input flex justify-center pt-3">
               <Pagination count={totalPages} page={page} onChange={handlePageChange} variant="outlined" color="primary" />
             </div>

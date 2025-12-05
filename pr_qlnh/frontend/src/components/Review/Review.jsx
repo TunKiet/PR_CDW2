@@ -126,7 +126,7 @@ const Review = ({ menuItemId }) => {
     //Handle button submit
     const handleSubmit = async () => {
         if (!rating) {
-            notify.info('Vui lòng chọn số sao');
+            notify.error('Vui lòng chọn số sao');
             return;
         }
 
