@@ -26,9 +26,24 @@ axiosClient.interceptors.response.use(
     console.error("🚨 API Error:", error.response?.data || error.message);
 
     if (error.response?.status === 401) {
-      console.log("⚠️ Hết phiên đăng nhập — chuyển sang login");
-      // redirect login nếu cần
-      // window.location.href = "/login";
+      const errorMessage = error.response?.data?.message || "";
+      
+      // Kiểm tra nếu token expired
+      if (errorMessage.includes("expired") || errorMessage.includes("Token has expired")) {
+        console.log("⚠️ Token đã hết hạn — đăng xuất và chuyển sang login");
+        
+        // Xóa token
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        
+        // Hiển thị thông báo
+        alert("⚠️ Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        
+        // Redirect về login (route "/" là LoginPage)
+        window.location.href = "/";
+      } else {
+        console.log("⚠️ Không có quyền truy cập");
+      }
     }
 
     throw error;

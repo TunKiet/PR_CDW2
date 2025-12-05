@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import RoleTable from "../components/RoleTable";
-import RoleDetailsModal from "../components/RoleDetailsModal";
+import RoleEditModal from "../components/RoleEditModal";
+import RoleAddModal from "../components/RoleAddModal";
 import { Search } from "lucide-react";
 import "../pages/Dashboard/Sales_Statistics_Dashboard.css";
 import {
@@ -16,6 +17,7 @@ const RoleManagementPage = () => {
   const [Role, setRole] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -33,25 +35,27 @@ const RoleManagementPage = () => {
     } catch (err) {
       console.error("❌ Lỗi tải vai trò:", err);
       console.error("❌ Error details:", err.response?.data || err.message);
-      alert(`Lỗi tải vai trò: ${err.response?.data?.message || err.message}`);
+      
+      // Không hiển thị alert nếu là lỗi token expired (đã xử lý ở interceptor)
+      const errorMessage = err.response?.data?.message || err.message;
+      if (!errorMessage.includes("expired") && !errorMessage.includes("Token has expired")) {
+        alert(`Lỗi tải vai trò: ${errorMessage}`);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddRole = async () => {
+  const handleAddRole = async (roleData) => {
     try {
-      const payload = { name: "vai trò mới", phone: "" };
-      const res = await addRole(payload);
-      // support different shapes
-      const newRole = res?.data ?? res;
-      // if wrapper { data: Role }:
-      const item = newRole?.data ?? newRole;
-      setRole((prev) => [item, ...prev]);
-      setSelectedRole(item);
+      const res = await addRole(roleData);
+      setShowAddModal(false);
+      await loadRole();
+      alert("Thêm vai trò thành công!");
     } catch (err) {
-      console.error("Lỗi thêm vai trò", err);
-      alert("Thêm vai trò lỗi.");
+      console.error("❌ Lỗi thêm vai trò:", err);
+      const errorMsg = err.response?.data?.message || "Thêm vai trò lỗi.";
+      alert(`Lỗi: ${errorMsg}`);
     }
   };
 
@@ -69,8 +73,16 @@ const RoleManagementPage = () => {
       alert("Cập nhật vai trò thành công!");
     } catch (err) {
       console.error("❌ Lỗi cập nhật vai trò:", err);
-      const errorMsg = err.response?.data?.message || err.message || "Cập nhật lỗi";
-      alert(`Lỗi: ${errorMsg}`);
+      
+      // Xử lý trường hợp đã bị xóa ở tab khác
+      if (err.response?.status === 404 && err.response?.data?.deleted) {
+        alert(`⚠️ ${err.response.data.message}\n\nVui lòng tải lại trang để cập nhật dữ liệu mới nhất.`);
+        setSelectedRole(null);
+        await loadRole();
+      } else {
+        const errorMsg = err.response?.data?.message || err.message || "Cập nhật lỗi";
+        alert(`Lỗi: ${errorMsg}`);
+      }
     }
   };
 
@@ -84,8 +96,12 @@ const RoleManagementPage = () => {
     } catch (err) {
       console.error("❌ Lỗi xóa vai trò:", err);
       
-      // Xử lý lỗi từ backend
-      if (err.response?.status === 400) {
+      // Xử lý trường hợp đã bị xóa ở tab khác
+      if (err.response?.status === 404 && err.response?.data?.deleted) {
+        alert(`⚠️ ${err.response.data.message}\n\nDữ liệu đã được cập nhật.`);
+        await loadRole();
+      } else if (err.response?.status === 400) {
+        // Vai trò đang được sử dụng bởi người dùng
         const errorData = err.response.data;
         alert(`❌ ${errorData.message}\n\nSố người dùng: ${errorData.users_count || 0}`);
       } else {
@@ -149,10 +165,10 @@ const RoleManagementPage = () => {
               </button>
 
               <button
-                onClick={handleAddRole}
+                onClick={() => setShowAddModal(true)}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg shadow-md transition"
               >
-                + Thêm nhân viên
+                + Thêm vai trò
               </button>
             </div>
           </div>
@@ -165,9 +181,18 @@ const RoleManagementPage = () => {
         </div>
       </main>
 
+      {/* Modal thêm vai trò */}
+      {showAddModal && (
+        <RoleAddModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleAddRole}
+        />
+      )}
+
+      {/* Modal sửa vai trò */}
       {selectedRole && (
-        <RoleDetailsModal
-          Role={selectedRole}
+        <RoleEditModal
+          role={selectedRole}
           onClose={() => setSelectedRole(null)}
           onSave={handleSaveRole}
           onDelete={() => handleDeleteRole(selectedRole.id, selectedRole.name)}
