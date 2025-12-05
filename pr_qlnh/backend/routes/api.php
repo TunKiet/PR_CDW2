@@ -175,7 +175,7 @@ Route::get('/menu-items', [MenuItemController::class, 'index']);
 Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/tables', [TableController::class, 'index']);
-// Route::apiResource('tables', TableController::class);
+Route::apiResource('tables', TableController::class);
 
 
 /*
