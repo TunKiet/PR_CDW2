@@ -175,18 +175,20 @@
   align-items: center;
   justify-content: center;
   z-index: 99;
+  pointer-events: none;
 }
+
+
 
 .modal-box {
   background: white;
-  width: 520px;
-  max-height: 90vh;
   padding: 25px;
   border-radius: 12px;
+  max-height: 90vh;
   overflow-y: auto;
   animation: fadeIn 0.2s ease-out;
+  pointer-events: auto;    /* ⬅ cho phép bấm */
 }
-
 .modal-box h3 {
   font-size: 20px;
   font-weight: 700;
@@ -228,7 +230,19 @@
   gap: 8px;
   margin-top: 15px;
 }
-
+.toast-msg {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+  font-size: 15px;
+}
 .modal-actions button {
   padding: 8px 12px;
   border-radius: 8px;

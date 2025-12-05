@@ -188,14 +188,15 @@ export default function HomePage() {
 
   // ================= FETCH DATA =================
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/menu-items")
-      .then((res) => res.json())
-      .then((data) => {
-        setMenuItems(data);
-        setFilteredItems(data);
-      })
-      .catch((err) => console.error("Lỗi tải menu:", err));
-  }, []);
+  fetch("http://127.0.0.1:8000/api/menu-items")
+    .then((res) => res.json())
+    .then((data) => {
+      const items = Array.isArray(data) ? data : data.data ?? [];
+      setMenuItems(items);
+      setFilteredItems(items);
+    })
+    .catch((err) => console.error("Lỗi tải menu:", err));
+}, []);
 
   // ================= FILTER BY CATEGORY =================
   const filterByCategory = (cat) => {

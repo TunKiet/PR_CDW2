@@ -58,7 +58,7 @@ Route::apiResource('dishes', DishController::class);
 
 Route::prefix('reviews')->group(function () {
     Route::post('/', [ReviewController::class, 'store']);
-    Route::get('/{menuItemId}', [ReviewController::class, 'index']);
+    // Route::get('/{menuItemId}', [ReviewController::class, 'index']);
     Route::get('/{menuItemId}/average', [ReviewController::class, 'averageRating']);
 
     // Additional review features
@@ -328,6 +328,7 @@ Route::prefix('order-online')->group(function () {
     Route::get('/', [OrderOnlineController::class, 'index']);
     Route::get('/{id}', [OrderOnlineController::class, 'show']);
     Route::put('/{id}', [OrderOnlineController::class, 'update']);
+    
 });
 
 /*
