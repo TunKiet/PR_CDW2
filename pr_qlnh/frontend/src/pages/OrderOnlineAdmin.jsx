@@ -67,28 +67,25 @@ export default function OrderOnlineAdmin() {
 
   // ===================================================
   // LẤY CHI TIẾT ĐƠN HÀNG
-  // ============================
+  // ===================================================
   async function openDetail(id) {
     setIsLoadingDetail(true);
     setSelectedOrder(null);
 
     try {
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/order-online/${id}`
-      );
+      const res = await fetch(`http://127.0.0.1:8000/api/order-online/${id}`);
       const data = await res.json();
       setSelectedOrder(data);
     } catch (err) {
-      console.error("Detail API error:", err);
       alert("Không tải được chi tiết đơn hàng");
     }
 
     setIsLoadingDetail(false);
   }
 
-  // ============================
+  // ===================================================
   // CẬP NHẬT TRẠNG THÁI
-  // ============================
+  // ===================================================
   async function updateStatus(id, newStatus) {
     const statusText = statusLabel;
 
@@ -190,6 +187,7 @@ export default function OrderOnlineAdmin() {
                 <td>{o.customer_name}</td>
                 <td>{o.phone}</td>
                 <td>{formatCurrency(o.total)}</td>
+
                 <td>
                   <span
                     className={`status ${o.status} status-clickable`}
@@ -198,6 +196,7 @@ export default function OrderOnlineAdmin() {
                     {statusLabel[o.status]}
                   </span>
                 </td>
+
                 <td>{new Date(o.created_at).toLocaleString()}</td>
                 <td>
                   <button onClick={() => openDetail(o.id)}>Xem</button>
@@ -207,7 +206,7 @@ export default function OrderOnlineAdmin() {
           </tbody>
         </table>
 
-        {/* PAGINATION */}
+        {/* PHÂN TRANG */}
         <div className="pagination">
           <button
             disabled={pageInfo.current_page === 1}
@@ -228,13 +227,11 @@ export default function OrderOnlineAdmin() {
           </button>
         </div>
 
-        {/* ======================== */}
-        {/* MODAL CHI TIẾT ĐƠN */}
-        {/* ======================== */}
+        {/* MODAL CHI TIẾT */}
         {(isLoadingDetail || selectedOrder) && (
           <div className="modal" onClick={() => setSelectedOrder(null)}>
             <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-              {isLoadingDetail || !selectedOrder ? (
+              {!selectedOrder ? (
                 <p>Đang tải chi tiết...</p>
               ) : (
                 <>
@@ -289,9 +286,11 @@ export default function OrderOnlineAdmin() {
                   <p>
                     <b>Phí ship:</b> {formatCurrency(selectedOrder.ship_fee)}
                   </p>
+
                   <p>
                     <b>Giảm giá:</b> {formatCurrency(selectedOrder.discount)}
                   </p>
+
                   <p>
                     <b>Tổng cộng:</b> {formatCurrency(selectedOrder.total)}
                   </p>

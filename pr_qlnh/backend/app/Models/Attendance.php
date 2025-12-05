@@ -26,8 +26,8 @@ class Attendance extends Model
 
     protected $casts = [
         'date' => 'date',
-        'check_in' => 'datetime:H:i:s',
-        'check_out' => 'datetime:H:i:s',
+        'check_in' => 'datetime',
+        'check_out' => 'datetime',
         'hours_worked' => 'decimal:2',
     ];
 
@@ -149,7 +149,7 @@ class Attendance extends Model
         $earlyLeaveThreshold = config('attendance.work_hours.early_leave_threshold');
 
         // Kiểm tra giờ chấm công ra hợp lý
-        $checkIn = Carbon::parse($attendance->date . ' ' . $attendance->check_in);
+        $checkIn = Carbon::parse($attendance->check_in);
         $minCheckOutTime = $checkIn->copy()->addHours($minWorkHours);
 
         if ($now->lt($minCheckOutTime)) {

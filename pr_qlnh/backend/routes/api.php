@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\OrderOnlineController;
 use App\Http\Controllers\Api\OrderOnlineAdminController;
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceReportController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Models\Ingredient;
@@ -58,7 +59,7 @@ Route::get('/test', fn () => response()->json(['message' => 'API loaded']));
 
 Route::prefix('reviews')->group(function () {
     Route::post('/', [ReviewController::class, 'store']);
-    Route::get('/{menuItemId}', [ReviewController::class, 'index']);
+    // Route::get('/{menuItemId}', [ReviewController::class, 'index']);
     Route::get('/{menuItemId}/average', [ReviewController::class, 'averageRating']);
 
     // Additional review features
@@ -175,7 +176,7 @@ Route::get('/menu-items', [MenuItemController::class, 'index']);
 Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/tables', [TableController::class, 'index']);
-// Route::apiResource('tables', TableController::class);
+Route::apiResource('tables', TableController::class);
 
 
 /*
@@ -420,6 +421,7 @@ Route::prefix('order-online')->group(function () {
     Route::get('/', [OrderOnlineController::class, 'index']);
     Route::get('/{id}', [OrderOnlineController::class, 'show']);
     Route::put('/{id}', [OrderOnlineController::class, 'update']);
+    
 });
 
 /*
@@ -449,4 +451,10 @@ Route::prefix('attendance')->group(function () {
     Route::post('/', [AttendanceController::class, 'store']);
     Route::put('/{id}', [AttendanceController::class, 'update']);
     Route::delete('/{id}', [AttendanceController::class, 'destroy']);
+    
+    // Export routes
+    Route::get('/export/test', [AttendanceReportController::class, 'testData']);
+    Route::get('/export/by-date', [AttendanceReportController::class, 'exportByDate']);
+    Route::get('/export/by-month', [AttendanceReportController::class, 'exportByMonth']);
+    Route::get('/export/by-range', [AttendanceReportController::class, 'exportByRange']);
 });

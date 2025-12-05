@@ -10,6 +10,7 @@ import {
   Trash2,
   Plus,
   Download,
+  FileSpreadsheet,
 } from "lucide-react";
 import {
   getMonthlyAttendance,
@@ -17,6 +18,7 @@ import {
   getAttendanceReport,
   deleteAttendance,
 } from "../data/attendanceApi";
+import axiosClient from "../api/axiosClient";
 
 const AttendanceManagement = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
@@ -28,6 +30,28 @@ const AttendanceManagement = () => {
   const [viewMode, setViewMode] = useState("calendar"); // calendar, list, report
   const [allAttendances, setAllAttendances] = useState([]);
   const [report, setReport] = useState(null);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportType, setExportType] = useState("month");
+  const [exportLoading, setExportLoading] = useState(false);
+
+  // Debug: Kiểm tra dữ liệu trước khi xuất
+  const checkDataBeforeExport = async () => {
+    try {
+      const response = await axiosClient.get("/attendance/export/test", {
+        params: { month: currentMonth, year: currentYear },
+      });
+      console.log("📊 Dữ liệu chấm công:", response.data);
+      if (response.data.count === 0) {
+        alert(`Không có dữ liệu chấm công trong tháng ${currentMonth}/${currentYear}`);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("❌ Lỗi kiểm tra dữ liệu:", error);
+      alert("Không thể kiểm tra dữ liệu. Vui lòng thử lại.");
+      return false;
+    }
+  };
 
   // Lấy danh sách chấm công theo tháng
   const fetchMonthlyAttendance = async () => {
@@ -81,6 +105,82 @@ const AttendanceManagement = () => {
       console.error("Error fetching report:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Hàm xuất báo cáo Excel
+  const handleExportExcel = async () => {
+    // Kiểm tra dữ liệu trước
+    const hasData = await checkDataBeforeExport();
+    if (!hasData) return;
+
+    setExportLoading(true);
+    try {
+      let url = "";
+      let params = {};
+
+      if (exportType === "month") {
+        url = "/attendance/export/by-month";
+        params = { month: currentMonth, year: currentYear };
+      } else if (exportType === "date") {
+        const today = new Date().toISOString().split("T")[0];
+        url = "/attendance/export/by-date";
+        params = { date: today };
+      }
+
+      const response = await axiosClient.get(url, {
+        params,
+        responseType: "blob",
+      });
+
+      // Kiểm tra nếu response là JSON error (blob có type application/json)
+      if (response.data.type === "application/json") {
+        const text = await response.data.text();
+        const errorData = JSON.parse(text);
+        throw new Error(errorData.message || "Lỗi xuất báo cáo");
+      }
+
+      // Tạo blob và download
+      const blob = new Blob([response.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+
+      let fileName = `Bao_cao_cham_cong`;
+      if (exportType === "month") {
+        fileName += `_thang_${currentMonth}_${currentYear}`;
+      } else {
+        fileName += `_${new Date().toISOString().split("T")[0]}`;
+      }
+      fileName += ".csv"; // Changed to CSV
+
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+
+      alert("Xuất báo cáo thành công!");
+      setShowExportModal(false);
+    } catch (error) {
+      console.error("❌ Error exporting:", error);
+      
+      // Xử lý lỗi blob response
+      if (error.response?.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const errorData = JSON.parse(text);
+          alert(`Lỗi xuất báo cáo: ${errorData.message || "Không xác định"}`);
+        } catch (e) {
+          alert(`Lỗi xuất báo cáo: ${error.message}`);
+        }
+      } else {
+        alert(`Lỗi xuất báo cáo: ${error.response?.data?.message || error.message}`);
+      }
+    } finally {
+      setExportLoading(false);
     }
   };
 
@@ -409,6 +509,13 @@ const AttendanceManagement = () => {
             </h1>
             <div className="flex gap-2">
               <button
+                onClick={() => setShowExportModal(true)}
+                className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition flex items-center gap-2"
+              >
+                <FileSpreadsheet size={18} />
+                Xuất CSV
+              </button>
+              <button
                 onClick={() => setViewMode("calendar")}
                 className={`px-4 py-2 rounded-lg ${
                   viewMode === "calendar"
@@ -491,6 +598,114 @@ const AttendanceManagement = () => {
           </>
         )}
       </div>
+
+      {/* Modal Xuất Báo Cáo */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8">
+            <div className="flex justify-between items-center mb-6 border-b pb-4">
+              <div className="flex items-center gap-3">
+                <FileSpreadsheet className="text-green-600" size={28} />
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Xuất Báo Cáo CSV
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="text-gray-500 hover:text-gray-800 transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Chọn loại báo cáo
+              </label>
+              <div className="space-y-3">
+                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                  <input
+                    type="radio"
+                    name="exportType"
+                    value="month"
+                    checked={exportType === "month"}
+                    onChange={(e) => setExportType(e.target.value)}
+                    className="mr-3 w-4 h-4 text-indigo-600"
+                  />
+                  <div>
+                    <div className="font-semibold text-gray-800">
+                      Báo cáo theo tháng
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Tháng {currentMonth}/{currentYear}
+                    </div>
+                  </div>
+                </label>
+                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition">
+                  <input
+                    type="radio"
+                    name="exportType"
+                    value="date"
+                    checked={exportType === "date"}
+                    onChange={(e) => setExportType(e.target.value)}
+                    className="mr-3 w-4 h-4 text-indigo-600"
+                  />
+                  <div>
+                    <div className="font-semibold text-gray-800">
+                      Báo cáo hôm nay
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {new Date().toLocaleDateString("vi-VN")}
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-blue-800">
+                <strong>Lưu ý:</strong> File CSV sẽ bao gồm thông tin chi tiết
+                về giờ vào, giờ ra, số giờ làm việc và trạng thái của tất cả nhân
+                viên. File CSV có thể mở bằng Excel hoặc Google Sheets.
+              </p>
+            </div>
+
+            {/* Debug button */}
+            <button
+              onClick={checkDataBeforeExport}
+              className="w-full mb-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
+            >
+              🔍 Kiểm tra dữ liệu (Debug)
+            </button>
+
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleExportExcel}
+                disabled={exportLoading}
+                className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {exportLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Đang xuất...
+                  </>
+                ) : (
+                  <>
+                    <Download size={20} />
+                    Xuất CSV
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
