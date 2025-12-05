@@ -46,15 +46,17 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
+# Copy composer files first for better caching
+COPY composer.json composer.lock ./
+
+# Install dependencies
+RUN composer install --no-dev --no-interaction --optimize-autoloader --no-scripts
+
 # Copy application files
 COPY . /var/www
 
-COPY composer.json composer.lock ./
-
-COPY .env ./
-
-# Install dependencies
-RUN composer install --no-interaction --optimize-autoloader
+# Run post-install scripts
+RUN composer dump-autoload --optimize
 
 # # Install PHP extensions
 # RUN pecl install redis && docker-php-ext-enable redis \

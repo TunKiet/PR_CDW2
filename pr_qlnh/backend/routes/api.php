@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\OrderOnlineController;
 use App\Http\Controllers\Api\OrderOnlineAdminController;
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceReportController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Models\Ingredient;
@@ -358,4 +359,10 @@ Route::prefix('attendance')->group(function () {
     Route::post('/', [AttendanceController::class, 'store']);
     Route::put('/{id}', [AttendanceController::class, 'update']);
     Route::delete('/{id}', [AttendanceController::class, 'destroy']);
+    
+    // Export routes
+    Route::get('/export/test', [AttendanceReportController::class, 'testData']);
+    Route::get('/export/by-date', [AttendanceReportController::class, 'exportByDate']);
+    Route::get('/export/by-month', [AttendanceReportController::class, 'exportByMonth']);
+    Route::get('/export/by-range', [AttendanceReportController::class, 'exportByRange']);
 });

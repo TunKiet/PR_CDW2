@@ -21,6 +21,9 @@ const RoleTable = ({
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               MÔ TẢ
             </th>
+            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+              SỐ NGƯỜI DÙNG
+            </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
               NGÀY TẠO
             </th>
@@ -36,13 +39,13 @@ const RoleTable = ({
         <tbody className="bg-white divide-y divide-gray-200">
           {loading ? (
             <tr>
-              <td colSpan={6} className="text-center py-8 text-gray-500">
+              <td colSpan={7} className="text-center py-8 text-gray-500">
                 Đang tải dữ liệu...
               </td>
             </tr>
           ) : roles.length === 0 ? (
             <tr>
-              <td colSpan={6} className="text-center px-3 py-8 text-gray-500">
+              <td colSpan={7} className="text-center px-3 py-8 text-gray-500">
                 Chưa có vai trò
               </td>
             </tr>
@@ -63,6 +66,16 @@ const RoleTable = ({
                     {u.description || "—"}
                   </td>
 
+                  <td className="px-6 py-4 text-sm text-center">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      (u.users_count || 0) > 0 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {u.users_count || 0} người
+                    </span>
+                  </td>
+
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {u.created_at || "—"}
                   </td>
@@ -80,8 +93,17 @@ const RoleTable = ({
 
                     {onDelete && (
                       <button
-                        onClick={() => onDelete(u.Role_id)}
-                        className="text-red-500 hover:text-red-700 p-1"
+                        onClick={() => onDelete(u.id, u.name)}
+                        className={`p-1 ${
+                          (u.users_count || 0) > 0
+                            ? 'text-gray-400 hover:text-gray-600 cursor-not-allowed'
+                            : 'text-red-500 hover:text-red-700'
+                        }`}
+                        title={
+                          (u.users_count || 0) > 0
+                            ? `Không thể xóa - Có ${u.users_count} người dùng`
+                            : 'Xóa vai trò'
+                        }
                       >
                         <Trash2 size={18} />
                       </button>

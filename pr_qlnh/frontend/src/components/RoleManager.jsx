@@ -26,10 +26,14 @@ const RoleManagementPage = () => {
     setLoading(true);
     try {
       const res = await getAllRole();
+      console.log("📥 Response from API:", res);
       const data = Array.isArray(res) ? res : res?.data ?? res;
+      console.log("📊 Processed data:", data);
       setRole(data || []);
     } catch (err) {
-      console.error("Lỗi tải vai tro:", err);
+      console.error("❌ Lỗi tải vai trò:", err);
+      console.error("❌ Error details:", err.response?.data || err.message);
+      alert(`Lỗi tải vai trò: ${err.response?.data?.message || err.message}`);
     } finally {
       setLoading(false);
     }
@@ -53,28 +57,41 @@ const RoleManagementPage = () => {
 
   const handleSaveRole = async (updatedFields) => {
     try {
-      const id = selectedRole?.Role_id;
+      const id = selectedRole?.id;
       if (!id) {
         console.error("Không có mã vai trò để update");
+        alert("Không tìm thấy vai trò để cập nhật");
         return;
       }
       await updateRole(id, updatedFields);
       setSelectedRole(null);
       await loadRole();
+      alert("Cập nhật vai trò thành công!");
     } catch (err) {
-      console.error("Lỗi cập nhật nhân viên:", err);
-      alert("Cập nhật lỗi. Kiểm tra console.");
+      console.error("❌ Lỗi cập nhật vai trò:", err);
+      const errorMsg = err.response?.data?.message || err.message || "Cập nhật lỗi";
+      alert(`Lỗi: ${errorMsg}`);
     }
   };
 
-  const handleDeleteRole = async (id) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa nhân viên có mã ${id} này không?`)) return;
+  const handleDeleteRole = async (id, roleName) => {
+    if (!window.confirm(`Bạn có chắc muốn xóa vai trò "${roleName}" không?`)) return;
+    
     try {
       await deleteRole(id);
       await loadRole();
+      alert("Xóa vai trò thành công!");
     } catch (err) {
-      console.error("Lỗi xóa nhân viên:", err);
-      alert("Xóa lỗi. Kiểm tra console.");
+      console.error("❌ Lỗi xóa vai trò:", err);
+      
+      // Xử lý lỗi từ backend
+      if (err.response?.status === 400) {
+        const errorData = err.response.data;
+        alert(`❌ ${errorData.message}\n\nSố người dùng: ${errorData.users_count || 0}`);
+      } else {
+        const errorMsg = err.response?.data?.message || err.message || "Xóa lỗi";
+        alert(`Lỗi: ${errorMsg}`);
+      }
     }
   };
 
@@ -153,7 +170,7 @@ const RoleManagementPage = () => {
           Role={selectedRole}
           onClose={() => setSelectedRole(null)}
           onSave={handleSaveRole}
-          onDelete={() => handleDeleteRole(selectedRole.Role_id)}
+          onDelete={() => handleDeleteRole(selectedRole.id, selectedRole.name)}
         />
       )}
     </div>
