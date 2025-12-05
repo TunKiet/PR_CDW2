@@ -8,7 +8,7 @@ import { SlLike } from "react-icons/sl";
 import Receiver from "./Receiver";
 import Sender from "./Sender";
 import axios from 'axios';
-import Pusher from 'pusher-js';
+// import Pusher from 'pusher-js';
 import EmojiPicker from 'emoji-picker-react';
 import { Popover } from '@headlessui/react';
 import { notify, confirmAction } from '../../utils/notify'
