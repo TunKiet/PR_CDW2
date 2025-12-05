@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\OrderOnlineAdminController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceReportController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\RestaurantInfoController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Models\Ingredient;
 use App\Http\Controllers\ChatController;
@@ -365,4 +366,16 @@ Route::prefix('attendance')->group(function () {
     Route::get('/export/by-date', [AttendanceReportController::class, 'exportByDate']);
     Route::get('/export/by-month', [AttendanceReportController::class, 'exportByMonth']);
     Route::get('/export/by-range', [AttendanceReportController::class, 'exportByRange']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 🏢 Restaurant Info Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['jwt.auth'])->prefix('restaurant-info')->group(function () {
+    Route::get('/', [RestaurantInfoController::class, 'index']);
+    Route::put('/', [RestaurantInfoController::class, 'update']);
+    Route::post('/logo', [RestaurantInfoController::class, 'uploadLogo']);
+    Route::delete('/logo', [RestaurantInfoController::class, 'deleteLogo']);
 });

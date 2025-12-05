@@ -58,22 +58,43 @@ const PermissionManager = () => {
       await loadPermissions();
       alert("Cập nhật quyền thành công!");
     } catch (err) {
-      console.error("Lỗi cập nhật quyền:", err);
-      const errorMsg = err.response?.data?.message || "Cập nhật lỗi.";
-      alert(errorMsg);
+      console.error("❌ Lỗi cập nhật quyền:", err);
+      
+      // Xử lý trường hợp đã bị xóa ở tab khác
+      if (err.response?.status === 404 && err.response?.data?.deleted) {
+        alert(`⚠️ ${err.response.data.message}\n\nVui lòng tải lại trang để cập nhật dữ liệu mới nhất.`);
+        setShowEditModal(false);
+        setSelectedPermission(null);
+        await loadPermissions();
+      } else {
+        const errorMsg = err.response?.data?.message || "Cập nhật lỗi.";
+        alert(`Lỗi: ${errorMsg}`);
+      }
     }
   };
 
-  const handleDeletePermission = async (id) => {
-    if (!window.confirm(`Bạn có chắc muốn xóa quyền này không?`)) return;
+  const handleDeletePermission = async (id, name) => {
+    if (!window.confirm(`Bạn có chắc muốn xóa quyền "${name}" không?`)) return;
+    
     try {
       await deletePermission(id);
       await loadPermissions();
       alert("Xóa quyền thành công!");
     } catch (err) {
-      console.error("Lỗi xóa quyền:", err);
-      const errorMsg = err.response?.data?.message || "Xóa lỗi.";
-      alert(errorMsg);
+      console.error("❌ Lỗi xóa quyền:", err);
+      
+      // Xử lý trường hợp đã bị xóa ở tab khác
+      if (err.response?.status === 404 && err.response?.data?.deleted) {
+        alert(`⚠️ ${err.response.data.message}\n\nDữ liệu đã được cập nhật.`);
+        await loadPermissions();
+      } else if (err.response?.status === 400) {
+        // Quyền đang được sử dụng bởi vai trò
+        const errorData = err.response.data;
+        alert(`❌ ${errorData.message}\n\nSố vai trò: ${errorData.roles_count || 0}`);
+      } else {
+        const errorMsg = err.response?.data?.message || "Xóa lỗi.";
+        alert(`Lỗi: ${errorMsg}`);
+      }
     }
   };
 
@@ -194,8 +215,17 @@ const PermissionManager = () => {
                           <Edit size={18} />
                         </button>
                         <button
-                          onClick={() => handleDeletePermission(permission.id)}
-                          className="text-red-600 hover:text-red-900"
+                          onClick={() => handleDeletePermission(permission.id, permission.name)}
+                          className={`${
+                            (permission.roles_count || 0) > 0
+                              ? 'text-gray-400 hover:text-gray-600 cursor-not-allowed'
+                              : 'text-red-600 hover:text-red-900'
+                          }`}
+                          title={
+                            (permission.roles_count || 0) > 0
+                              ? `Không thể xóa - Có ${permission.roles_count} vai trò`
+                              : 'Xóa quyền'
+                          }
                         >
                           <Trash2 size={18} />
                         </button>

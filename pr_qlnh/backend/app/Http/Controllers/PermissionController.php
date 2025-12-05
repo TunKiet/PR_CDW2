@@ -59,7 +59,14 @@ class PermissionController extends Controller
     // ✅ Cập nhật quyền
     public function update(Request $request, $id)
     {
-        $permission = Permission::findOrFail($id);
+        $permission = Permission::find($id);
+        
+        if (!$permission) {
+            return response()->json([
+                'message' => 'Quyền không tồn tại. Có thể đã bị xóa bởi người dùng khác.',
+                'deleted' => true
+            ], 404);
+        }
 
         $request->validate([
             'name' => 'required|max:100|unique:permissions,name,' . $permission->id,
@@ -77,7 +84,14 @@ class PermissionController extends Controller
     // ✅ Xóa quyền
     public function destroy($id)
     {
-        $permission = Permission::findOrFail($id);
+        $permission = Permission::find($id);
+        
+        if (!$permission) {
+            return response()->json([
+                'message' => 'Quyền không tồn tại. Có thể đã bị xóa bởi người dùng khác.',
+                'deleted' => true
+            ], 404);
+        }
 
         // Kiểm tra ràng buộc: không cho xóa nếu có role đang sử dụng
         $rolesCount = $permission->roles()->count();

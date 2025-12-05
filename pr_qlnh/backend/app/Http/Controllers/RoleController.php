@@ -75,32 +75,39 @@ class RoleController extends Controller
     // Cập nhật vai trò
     public function update(Request $request, $id)
     {
-        $role = Role::findOrFail($id);
+        $role = Role::find($id);
+        
+        if (!$role) {
+            return response()->json([
+                'message' => 'Vai trò không tồn tại. Có thể đã bị xóa bởi người dùng khác.',
+                'deleted' => true
+            ], 404);
+        }
 
         $request->validate([
-            'name' => 'required|max:255|unique:roles,name,' . $id,
-            'description' => 'nullable|string|max:500',
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'exists:permissions,id'
+            'name' => 'required|unique:roles,name,' . $role->id . '|max:100',
+            'description' => 'nullable|string|max:255'
         ]);
 
         $role->update($request->only(['name', 'description']));
 
-        // Cập nhật quyền
-        if ($request->has('permissions')) {
-            $role->permissions()->sync($request->permissions);
-        }
-
         return response()->json([
             'message' => 'Cập nhật vai trò thành công!',
-            'role' => $role->load('permissions')
+            'role' => $role
         ]);
     }
 
     // Xóa vai trò
     public function destroy($id)
     {
-        $role = Role::findOrFail($id);
+        $role = Role::find($id);
+        
+        if (!$role) {
+            return response()->json([
+                'message' => 'Vai trò không tồn tại. Có thể đã bị xóa bởi người dùng khác.',
+                'deleted' => true
+            ], 404);
+        }
 
         // Kiểm tra ràng buộc: không cho xóa nếu có user đang sử dụng
         $usersCount = $role->users()->count();
