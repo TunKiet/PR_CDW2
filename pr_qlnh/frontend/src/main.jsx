@@ -7,7 +7,7 @@ if (typeof setImmediate === 'undefined') {
   };
 }
 
-import React from 'react'
+import * as React from 'react';
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import 'bootstrap/dist/css/bootstrap.min.css'
