@@ -209,3 +209,27 @@
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
+
+/* ✅ MODAL BACKDROP - ĐẢM BẢO TƯƠNG TÁC ĐƯỢC */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* Đảm bảo cao nhất */
+    pointer-events: auto; /* Cho phép click */
+}
+
+/* ✅ MODAL CONTENT - PHẢI TƯƠNG TÁC ĐƯỢC */
+.modal-content {
+    position: relative;
+    z-index: 10000; /* Cao hơn backdrop */
+    pointer-events: auto; /* Quan trọng! */
+    max-height: 90vh;
+    overflow-y: auto;
+}

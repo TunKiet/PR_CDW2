@@ -73,7 +73,7 @@ const UnavailableReasonModal = ({ isVisible, onClose, onSave, dishName }) => {
 
   return (
     <div
-      className="modal is-active"
+      
       style={{
         position: "fixed",
         top: 0,
@@ -86,8 +86,9 @@ const UnavailableReasonModal = ({ isVisible, onClose, onSave, dishName }) => {
         justifyContent: "center",
         zIndex: 1000,
       }}
+      onClick={onClose}
     >
-      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
+      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl" style={{ position: "relative", zIndex: 10001 }} onClick={(e) => e.stopPropagation()}>
         <h3 className="text-xl font-bold mb-4 text-gray-800">
           Lý do hết hàng: {dishName}
         </h3>
@@ -444,8 +445,12 @@ export default function DishStatusManagement() {
           justifyContent: "center",
           zIndex: 2000,
         }}
+        onClick={() => {
+          setShowConflictModal(false);
+          setConflictData(null);
+        }}
       >
-        <div className="bg-white p-6 rounded-xl max-w-md shadow-2xl">
+        <div className="bg-white p-6 rounded-xl max-w-md shadow-2xl" onClick={(e) => e.stopPropagation()}>
           {/* Header */}
           <div className="flex items-center mb-4">
             <span className="text-4xl mr-3">⚠️</span>
