@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class MessageSeeder extends Seeder
 {
-    const MAX_RECORDS = 30; // số lượng bản ghi muốn tạo
+    const MAX_RECORDS = 50; // số lượng message muốn tạo
 
     /**
      * Run the database seeds.
@@ -24,24 +24,44 @@ class MessageSeeder extends Seeder
             'Tôi muốn thay đổi thông tin đơn hàng.'
         ];
 
-        for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
-            // Random user_id giả sử từ 1 đến 10
-            $userId = rand(1, 10);
+        // Lấy tất cả conversation có sẵn
+        $conversations = DB::table('conversations')->pluck('conversation_id')->toArray();
 
-            // Chọn loại người gửi ngẫu nhiên
+        if (empty($conversations)) {
+            $this->command->info('No conversations found. Please seed conversations first.');
+            return;
+        }
+
+        foreach (range(1, self::MAX_RECORDS) as $i) {
+            // Chọn conversation ngẫu nhiên
+            $conversationId = $conversations[array_rand($conversations)];
+
+            // Lấy admin_id và customer_id của conversation
+            $conversation = DB::table('conversations')->where('conversation_id', $conversationId)->first();
+
+            // Chọn sender ngẫu nhiên giữa admin và customer
             $senderType = $senderTypes[array_rand($senderTypes)];
+            $userId = $senderType === 'admin' ? $conversation->admin_id : $conversation->customer_id;
 
-            // Chọn nội dung tin nhắn ngẫu nhiên
+            // Chọn message ngẫu nhiên
             $messageText = $sampleMessages[array_rand($sampleMessages)];
 
-            DB::table('messages')->insert([
+            // Tạo message
+            $messageId = DB::table('messages')->insertGetId([
+                'conversation_id' => $conversationId,
                 'user_id' => $userId,
                 'sender_type' => $senderType,
                 'message' => $messageText,
                 'status' => 'sent',
+                'is_read' => $senderType === 'admin' ? true : false, // ví dụ admin đọc luôn
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+
+            // Cập nhật last_message_id của conversation
+            DB::table('conversations')
+                ->where('conversation_id', $conversationId)
+                ->update(['last_message_id' => $messageId, 'updated_at' => now()]);
         }
     }
 }

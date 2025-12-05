@@ -6,7 +6,7 @@ const Star = () => {
     return (
         <>
             <div className="star flex text-2xl py-1">
-                <Rating name="simple-controlled" value={5}/>
+                <Rating name="simple-controlled" readOnly value={5} />
             </div>
         </>
     )

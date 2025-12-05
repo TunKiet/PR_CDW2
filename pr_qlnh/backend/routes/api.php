@@ -14,6 +14,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginLogController;
+
 use App\Http\Controllers\Api\DishController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Api\CategoryController;
@@ -23,40 +24,62 @@ use App\Http\Controllers\CategoryIngredientController;
 use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\TableController;
-use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\PaymentController;
-
 use App\Http\Controllers\Api\PreOrderController;
 
-// Online Order (Frontend)
 use App\Http\Controllers\Api\OrderOnlineController;
-
-// Online Order (Admin)
 use App\Http\Controllers\Api\OrderOnlineAdminController;
 
-// Attendance (Chấm công)
 use App\Http\Controllers\AttendanceController;
-
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Models\Ingredient;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ReviewReplyController;
+use App\Models\Review;
+use App\Models\ReviewReply;
 
 /*
 |--------------------------------------------------------------------------
 | 🔥 Test API
 |--------------------------------------------------------------------------
 */
-Route::get('/test', fn() => response()->json(['message' => 'API loaded']));
-
+Route::get('/test', fn () => response()->json(['message' => 'API loaded']));
 
 /*
 |--------------------------------------------------------------------------
-| 🍽️ Dish & Review
+| 🍽️ Dishes & Reviews
 |--------------------------------------------------------------------------
 */
 Route::apiResource('dishes', DishController::class);
 
-Route::post('/reviews', [ReviewController::class, 'store']);
-Route::get('/reviews/{menuItemId}', [ReviewController::class, 'index']);
-Route::get('/reviews/{menuItemId}/average', [ReviewController::class, 'averageRating']);
+Route::prefix('reviews')->group(function () {
+    Route::post('/', [ReviewController::class, 'store']);
+    // Route::get('/{menuItemId}', [ReviewController::class, 'index']);
+    Route::get('/{menuItemId}/average', [ReviewController::class, 'averageRating']);
 
+    // Additional review features
+    Route::get('/all-review', [ReviewController::class, 'getAllReviews']);
+    Route::post('/add-review', [ReviewController::class, 'store']);
+    Route::get('/chart/data', [ReviewController::class, 'getDataChartReview']);
+    Route::get('/item/{menuItemId}', [ReviewController::class, 'getDataReview']);
+    Route::post('/{reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
+    Route::delete('/{reviewId}/delete', [ReviewController::class, 'delete']);
+    Route::patch('/{reviewId}/hide', [ReviewController::class, 'hide']);
+    Route::patch('/{reviewId}/approve', [ReviewController::class, 'approved']);
+});
+
+Route::prefix('reply')->group(function () {
+    Route::post('/add-reply', [ReviewReplyController::class, 'store']);
+    Route::get('/chart', [ReviewReplyController::class, 'getAllReplies']);
+    Route::delete('/{replyId}/delete', [ReviewReplyController::class, 'delete']);
+    Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);
+    Route::patch('/{replyId}/approve', [ReviewReplyController::class, 'approved']);
+});
+Route::post('/send-message', [MessageController::class, 'sendMessage']);
 
 /*
 |--------------------------------------------------------------------------
@@ -70,9 +93,12 @@ Route::delete('/ingredients/delete/{id}', [IngredientController::class, 'destroy
 Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
 Route::get('/alert', [IngredientController::class, 'alertIngredient']);
 Route::get('/export', [IngredientController::class, 'exportPDF']);
-
+Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
 Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
-
+Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
+Route::get('/purchase-orders-all', [PurchaseOrderController::class, 'index']); // danh sách + tổng quan
+Route::get('/purchase-orders/{id}', [PurchaseOrderController::class, 'show']); // chi tiết
+Route::patch('/purchase-orders/{id}/update-status', [PurchaseOrderController::class, 'updateStatus']);
 
 /*
 |--------------------------------------------------------------------------
@@ -86,11 +112,21 @@ Route::post('/verify-login-otp', [AuthController::class, 'verifyLoginOTP']);
 Route::middleware(['jwt.auth'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    
+
     // Login Logs
     Route::get('/login-logs', [LoginLogController::class, 'getUserLogs']);
 });
 
+/*
+|--------------------------------------------------------------------------
+| 🔐 Password Reset
+|--------------------------------------------------------------------------
+*/
+Route::prefix('password')->group(function () {
+    Route::post('/forgot', [ForgotPasswordController::class, 'sendOtp']);
+    Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
+    Route::post('/reset', [ForgotPasswordController::class, 'resetPassword']);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -115,9 +151,12 @@ Route::prefix('permissions')->group(function () {
     Route::delete('/{id}', [PermissionController::class, 'destroy']);
     Route::get('/{id}/roles', [PermissionController::class, 'getRolesByPermission']);
 });
-/**
- * User Management
- */
+
+/*
+|--------------------------------------------------------------------------
+| 👤 User Management
+|--------------------------------------------------------------------------
+*/
 Route::prefix('users')->group(function () {
     Route::get('/', [UserController::class, 'index']);
     Route::get('/{id}', [UserController::class, 'show']);
@@ -129,37 +168,14 @@ Route::prefix('users')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| 🔐 Password Reset
-|--------------------------------------------------------------------------
-*/
-Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
-Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
-Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);
-
-/*
-|--------------------------------------------------------------------------
-| 🔒 Two-Factor Authentication (2FA)
-|--------------------------------------------------------------------------
-*/
-Route::prefix('2fa')->group(function () {
-    Route::post('/send-otp/{userId}', [App\Http\Controllers\TwoFactorController::class, 'sendOTP']);
-    Route::post('/verify-otp/{userId}', [App\Http\Controllers\TwoFactorController::class, 'verifyOTP']);
-    Route::post('/disable/{userId}', [App\Http\Controllers\TwoFactorController::class, 'disable2FA']);
-    Route::get('/status/{userId}', [App\Http\Controllers\TwoFactorController::class, 'check2FAStatus']);
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| 🛒 MENU & TABLE
+| 🛒 Menu & Tables
 |--------------------------------------------------------------------------
 */
 Route::get('/menu-items', [MenuItemController::class, 'index']);
 Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
-
 Route::get('/categories', [CategoryController::class, 'index']);
-
 Route::get('/tables', [TableController::class, 'index']);
+Route::apiResource('tables', TableController::class);
 
 
 /*
@@ -175,31 +191,121 @@ Route::prefix('customers')->group(function () {
     Route::get('/search', [CustomerController::class, 'search']);
 });
 
+/*
+|--------------------------------------------------------------------------
+| 🧾 Orders (Eat in restaurant)
+|--------------------------------------------------------------------------
+*/
+// ✅ Test route kiểm tra API hoạt động
+Route::get('/test', function () {
+    return response()->json(['message' => 'API file is loaded']);
+});
 
 /*
 |--------------------------------------------------------------------------
-| 🧾 Orders (Ăn tại nhà hàng)
+| 🍽️ Dish & Review Routes
 |--------------------------------------------------------------------------
 */
+Route::apiResource('dishes', DishController::class);
+Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
+Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
+Route::post('/add', [IngredientController::class, 'store']);
+Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
+Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
+Route::get('/export', [IngredientController::class, 'exportPDF']);
+Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
+Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
+Route::get('/ingredients/used', [IngredientController::class, 'getUsedIngredients']);
+Route::post('/send-message', [MessageController::class, 'sendMessage']);
+Route::get('/conversations', [MessageController::class, 'getConversations']);
+Route::get('/messages/{conversationId}', [MessageController::class, 'getMessages']);
+Route::post('/mark-read', [MessageController::class, 'markAsRead']);
+Route::post('/chat', [ChatController::class, 'message']);
+
+//Review
+Route::prefix('reviews')->group(function () {
+    Route::get('/all-review', action: [ReviewController::class, 'getAllReviews']);
+    Route::post('/add-review', [ReviewController::class, 'store']);
+    Route::get('/chart/data', [ReviewController::class, 'getDataChartReview']);
+    Route::get('/item/{menuItemId}', [ReviewController::class, 'getDataReview']);
+    Route::get('/reply/{reviewId}', [ReviewReplyController::class, 'getDataReply']);
+    Route::post('/{reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
+    Route::delete('/{reviewId}/delete', [ReviewController::class, 'delete']);
+    Route::patch('/{reviewId}/hide', [ReviewController::class, 'hide']);
+    Route::patch('/{reviewId}/approve', [ReviewController::class, 'approved']);
+});
+
+Route::prefix('reply')->group(function () {
+    Route::post('/add-reply/{reviewId}', [ReviewReplyController::class, 'store']);
+    Route::get('/chart', [ReviewReplyController::class, 'getAllReplies']);
+    Route::delete('/{replyId}/delete', [ReviewReplyController::class, 'delete']);
+    Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);
+    Route::patch('/{replyId}/approve', [ReviewReplyController::class, 'approved']);
+});
+Route::post('/create-conversation', [ConversationController::class, 'createConversation']);
+Route::delete('/delete-message/{messageId}', [MessageController::class, 'delete']);
+
+
+
+/*
+|--------------------------------------------------------------------------
+| 👤 Auth Routes (JWT)
+|--------------------------------------------------------------------------
+*/
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| 🛡️ Role & Permission Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::apiResource('/roles', RoleController::class);
+    Route::apiResource('/permissions', PermissionController::class);
+});
+
+Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
+Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);
+
+Route::get('/categories', [CategoryController::class, 'index']);
+
+
+Route::get('/pre-orders', [PreOrderController::class, 'index']);
+Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
+Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
+
+
+Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
+Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
+
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']);
     Route::get('/{id}', [OrderController::class, 'show']);
     Route::post('/', [OrderController::class, 'store']);
     Route::delete('/{id}', [OrderController::class, 'destroy']);
+    Route::put('/{id}', [OrderController::class, 'update']);
+    Route::get('/{id}/export', [OrderController::class, 'exportData']);
 });
 
 Route::get('/menu', [OrderController::class, 'menu']);
 
-
 /*
 |--------------------------------------------------------------------------
-| 📦 Pre-Order (Đặt trước)
+| 📦 Pre-Order
 |--------------------------------------------------------------------------
 */
-Route::get('/pre-orders', [PreOrderController::class, 'index']);
-Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
-Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
-
+Route::prefix('pre-orders')->group(function () {
+    Route::get('/', [PreOrderController::class, 'index']);
+    Route::get('/details/{id}', [PreOrderController::class, 'showDetails']);
+    Route::put('/{id}/status', [PreOrderController::class, 'updateStatus']);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -212,49 +318,44 @@ Route::prefix('payments')->group(function () {
     Route::post('/', [PaymentController::class, 'store']);
 });
 
-
 /*
 |--------------------------------------------------------------------------
-| 🛍️ ORDER ONLINE (Frontend Website)
+| 🛍️ ORDER ONLINE (Frontend)
 |--------------------------------------------------------------------------
 */
-Route::post('/order-online', [OrderOnlineController::class, 'store']);
-Route::get('/order-online', [OrderOnlineController::class, 'index']);
-Route::get('/order-online/{id}', [OrderOnlineController::class, 'show']);
-Route::put('/order-online/{id}', [OrderOnlineController::class, 'update']);
-
+Route::prefix('order-online')->group(function () {
+    Route::post('/', [OrderOnlineController::class, 'store']);
+    Route::get('/', [OrderOnlineController::class, 'index']);
+    Route::get('/{id}', [OrderOnlineController::class, 'show']);
+    Route::put('/{id}', [OrderOnlineController::class, 'update']);
+    
+});
 
 /*
 |--------------------------------------------------------------------------
 | 🛒 ORDER ONLINE ADMIN
 |--------------------------------------------------------------------------
 */
-Route::get('/admin/order-online', [OrderOnlineAdminController::class, 'index']);
-Route::get('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'show']);
-Route::put('/admin/order-online/{id}', [OrderOnlineAdminController::class, 'updateStatus']);
-
+Route::prefix('admin/order-online')->group(function () {
+    Route::get('/', [OrderOnlineAdminController::class, 'index']);
+    Route::get('/{id}', [OrderOnlineAdminController::class, 'show']);
+    Route::put('/{id}', [OrderOnlineAdminController::class, 'updateStatus']);
+});
 
 /*
 |--------------------------------------------------------------------------
-| ⏰ ATTENDANCE (Chấm công)
+| ⏰ Attendance
 |--------------------------------------------------------------------------
 */
-// Chấm công cho nhân viên
 Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn']);
 Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut']);
 Route::post('/attendance/today-status', [AttendanceController::class, 'getTodayStatus']);
 
-// Xem chấm công của nhân viên
-Route::get('/attendance/monthly', [AttendanceController::class, 'getMonthlyAttendance']);
-Route::get('/attendance/weekly', [AttendanceController::class, 'getWeeklyHours']);
-
-// Quản lý chấm công (Admin/Manager)
 Route::prefix('attendance')->group(function () {
-    Route::get('/', [AttendanceController::class, 'index']); // Lấy tất cả
-    Route::get('/report', [AttendanceController::class, 'getReport']); // Báo cáo tổng hợp
-    Route::get('/{id}', [AttendanceController::class, 'show']); // Chi tiết
-    Route::post('/', [AttendanceController::class, 'store']); // Tạo mới
-    Route::put('/{id}', [AttendanceController::class, 'update']); // Cập nhật
-    Route::delete('/{id}', [AttendanceController::class, 'destroy']); // Xóa
+    Route::get('/', [AttendanceController::class, 'index']);
+    Route::get('/report', [AttendanceController::class, 'getReport']);
+    Route::get('/{id}', [AttendanceController::class, 'show']);
+    Route::post('/', [AttendanceController::class, 'store']);
+    Route::put('/{id}', [AttendanceController::class, 'update']);
+    Route::delete('/{id}', [AttendanceController::class, 'destroy']);
 });
-

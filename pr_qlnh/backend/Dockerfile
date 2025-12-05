@@ -49,6 +49,10 @@ WORKDIR /var/www
 # Copy application files
 COPY . /var/www
 
+COPY composer.json composer.lock ./
+
+COPY .env ./
+
 # Install dependencies
 RUN composer install --no-interaction --optimize-autoloader
 

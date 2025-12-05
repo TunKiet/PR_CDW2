@@ -27,7 +27,6 @@ const CustomerManagementPage = () => {
     setLoading(true);
     try {
       const res = await getCustomers();
-      // res might be array or res.data
       const data = Array.isArray(res) ? res : res?.data ?? res;
       setCustomers(data || []);
     } catch (err) {
@@ -37,55 +36,85 @@ const CustomerManagementPage = () => {
     }
   };
 
-  const handleAddCustomer = async () => {
-    try {
-      const payload = { name: "Khách hàng mới", phone: "" };
-      const res = await addCustomer(payload);
-      // support different shapes
-      const newCustomer = res?.data ?? res;
-      // if wrapper { data: customer }:
-      const item = newCustomer?.data ?? newCustomer;
-      setCustomers((prev) => [item, ...prev]);
-      setSelectedCustomer(item);
-    } catch (err) {
-      console.error("Lỗi thêm khách hàng:", err);
-      alert("Thêm khách hàng lỗi. Kiểm tra console.");
-    }
+  // =========== ADD CUSTOMER (OPEN MODAL) ===========
+  const handleAddCustomer = () => {
+    setSelectedCustomer({
+      customer_id: null,
+      name: "",
+      phone: "",
+      total_spent: 0,
+      points: 0,
+      isNew: true,
+    });
   };
 
+  // =========== SAVE CUSTOMER (ADD OR UPDATE) ===========
   const handleSaveCustomer = async (updatedFields) => {
-    // updatedFields should only contain name + phone
-    try {
-      const id = selectedCustomer?.customer_id;
-      if (!id) {
-        console.error("Không có customer_id để update");
+  try {
+    // Nếu là khách hàng mới => gọi addCustomer
+    if (selectedCustomer?.isNew) {
+      const payload = {
+        name: updatedFields.name.trim(),
+        phone: updatedFields.phone.trim(),
+      };
+
+      try {
+        const res = await addCustomer(payload);
+        const newCustomer = res?.data ?? res;
+        const item = newCustomer?.data ?? newCustomer;
+
+        setCustomers((prev) => [item, ...prev]);
+        setSelectedCustomer(null);
+
+        alert("Thêm khách hàng thành công!");
+        return;
+
+      } catch (error) {
+        console.error("Lỗi thêm khách hàng:", error);
+        alert("Thêm khách hàng thất bại!");
         return;
       }
-      await updateCustomer(id, updatedFields);
-      setSelectedCustomer(null);
-      await loadCustomers();
-    } catch (err) {
-      console.error("Lỗi cập nhật khách hàng:", err);
-      alert("Cập nhật lỗi. Kiểm tra console.");
     }
-  };
 
+    // Nếu là UPDATE khách hàng cũ
+    const id = selectedCustomer?.customer_id;
+    if (!id) {
+      console.error("Không có customer_id để update");
+      alert("Không tìm thấy ID khách hàng để cập nhật.");
+      return;
+    }
+
+    await updateCustomer(id, updatedFields);
+
+    setSelectedCustomer(null);
+    await loadCustomers();
+
+    alert("Cập nhật khách hàng thành công!");
+
+  } catch (err) {
+    console.error("Lỗi cập nhật khách hàng:", err);
+    alert("Cập nhật khách hàng thất bại!");
+  }
+};
+
+
+  // =========== DELETE CUSTOMER ===========
   const handleDeleteCustomer = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa khách hàng này không?")) return;
     try {
       await deleteCustomer(id);
       await loadCustomers();
+      showToast("Xóa khách hàng thành công!", "success");
     } catch (err) {
       console.error("Lỗi xóa khách hàng:", err);
-      alert("Xóa lỗi. Kiểm tra console.");
+      showToast("Xóa khách hàng thất bại!", "error");
     }
   };
 
-  // local filter OR server search by phone
+  // =========== SEARCH CUSTOMER ===========
   const handleSearch = async (value) => {
     setSearchTerm(value);
     const trimmed = value.trim();
-    // if looks like a phone (digits and length >= 6) then call API search
     const digits = trimmed.replace(/\D/g, "");
     if (digits.length >= 6) {
       try {
@@ -97,13 +126,9 @@ const CustomerManagementPage = () => {
           setCustomers([item]);
           return;
         }
-      } catch (err) {
-        // if not found, just fallback to client filtering
-        // console.warn("Search API failed, fallback to client filter", err);
-      }
+      } catch (err) {}
     }
 
-    // fallback client-side filter on loaded customers
     if (!trimmed) {
       loadCustomers();
     } else {
@@ -123,15 +148,16 @@ const CustomerManagementPage = () => {
     <div className="flex min-h-screen bg-gray-50">
     <Sidebar />
 
-      <div className="flex-1 ml-64 p-6">
+      <div className="flex-1 ml-64 p-6 px-4 py-4">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">
           Quản Lý Khách Hàng & Tích Điểm
         </h1>
 
-        <div className="flex justify-between items-center mb-6 space-x-4">
-          <div className="relative flex-1">         
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-            <input class = "ps-5"
+        <div className="flex justify-between items-center mb-6 space-x-4 pb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+
+            <input
               type="text"
               placeholder=" Tìm khách hàng theo tên hoặc SĐT..." 
               value={searchTerm}

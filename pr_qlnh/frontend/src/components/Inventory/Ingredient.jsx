@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CiSearch } from "react-icons/ci";
 import Button from '@mui/material/Button';
 import { MdOutlineInventory } from "react-icons/md";
@@ -16,29 +16,14 @@ import exportPDF from '../../utils/exportPDF'
 import axios from "axios";
 import CategoryIngredient from './CategoryIngredient';
 
-const Ingredient = () => {
-
-
+const Ingredient = ({loading, ingredients, page, setPage, totalPages, setSelectedCategory, fetchIngredients}) => {
     //Open dialog add ingredient
     const [openAdd, setOpenAdd] = useState(false);
-
     //Open dialog update ingredient
     const [openUpdate, setOpenUpdate] = useState(false);
-
-    //Set ingredient category
-    // const [category, setCategory] = useState(false);
-
-    const [ingredients, setIngredients] = useState([]);
-    const [loading, setLoading] = useState(true);
-    // const [error, setError] = useState(null);
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-
     //Save change when edit ingredient
     const [editIngredient, setEditIngredient] = useState(null);
-
     const [selectedCategoryId, setSelectedCategoryId] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('all');
     const [formData, setFormData] = useState({
         ingredient_name: "",
         category_ingredient_id: "",
@@ -61,30 +46,6 @@ const Ingredient = () => {
             [e.target.name]: e.target.value
         });
     };
-
-    //fetch data
-    const fetchIngredients = useCallback(async () => {
-        try {
-            let url = `http://localhost:8000/api/ingredients?page=${page}`;
-            console.log(selectedCategory);
-            if (selectedCategory !== 'all') {
-                url += `&category_ingredient_id=${selectedCategory}`;
-            }
-
-            console.log("📡 Gọi API:", url);
-
-            const res = await axios.get(url);
-            console.log("📦 Dữ liệu nhận được:", res.data);
-
-            setIngredients(res.data.data);
-            setTotalPages(res.data.last_page);
-            setLoading(false);
-        } catch (error) {
-            console.error("❌ Lỗi fetch nguyên liệu:", error);
-            setLoading(false);
-        }
-    }, [page, selectedCategory]); // 👈 thêm selectedCategory
-
 
 
     const handleCategoryFilter = (categoryId) => {

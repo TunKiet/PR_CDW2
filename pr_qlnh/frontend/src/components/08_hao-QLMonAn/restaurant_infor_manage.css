@@ -70,6 +70,9 @@
 .modal.is-active {
     display: flex;
 }
+.modal:not(.is-active) {
+    pointer-events: none;
+}
 
 /* Note: Các transition scale-95/100 và opacity 0/100 đã được thêm trực tiếp vào JSX
    để tận dụng class Tailwind và React state.

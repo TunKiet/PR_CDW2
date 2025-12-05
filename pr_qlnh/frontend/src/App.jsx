@@ -6,11 +6,10 @@ import {
   Navigate,
 } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
 // import React from 'react'
 import "./App.css";
-import MenuList from "./components/MenuList";
+// import MenuList from "./components/MenuList";
 
 import Sidebar from "./components/Sidebar/Sidebar";
 import Header from "./components/Header/Header";
@@ -39,20 +38,28 @@ import DishTable from "./components/08_hao-QLMonAn/DishCRUDTable";
 import HomePage from "./components/08_hao-QLMonAn/HomePage";
 import RestaurantInfoManage from "./components/08_hao-QLMonAn/restaurant_infor_manage";
 import CategoryManager from "./components/08_hao-QLMonAn/CategoryManager";
+import DishModal from "./components/08_hao-QLMonAn/DishModal";
+import UserChat from "./components/Chat/UserChat";
+import AdminChat from "./components/Chat/AdminChat";
 import DishStatusManagement from "./components/08_hao-QLMonAn/DishStatusManagement";
 import OrderOnlineAdmin from "./pages/OrderOnlineAdmin";
+
 import AttendancePage from "./pages/AttendancePage";
 import AttendanceManagementPage from "./pages/AttendanceManagementPage";
+
+import CreateOrder from "./components/InventoryOverview/CreateOrder";
+import OrderPuscher from "./components/InventoryOverview/OrderPuscher";
+import OrderPuscherDetail from "./components/InventoryOverview/OrderPuscherDetail";
+import SupplierOrder from "./components/InventoryOverview/SupplierOrder";
+import SupplierOrderDetail from "./components/InventoryOverview/SupplierOrderDetail";
+
 
 function App() {
   return (
     <BrowserRouter>
-     <ToastContainer />
       <Routes>
-        <Route
-          path="/dish-status-management"
-          element={<DishStatusManagement />}
-        />
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/dish-status-management" element={<DishStatusManagement />} />
         <Route path="/category-manager" element={<CategoryManager />} />
         <Route path="/" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -72,14 +79,15 @@ function App() {
 
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/review" element={<Review />} />
+
         <Route path="/restaurant-info" element={<RestaurantInfoManage />} />
-        <Route path="/inventory" element={<Invertory />} />
-        <Route path="/export" element={<IngredientInOut />} />
         <Route path="/inventory" element={<Invertory />} />
         <Route path="/export" element={<IngredientInOut />} />
         <Route path="/inventory-overview" element={<InventoryOverview />} />
         <Route path="/category-manager" element={<CategoryManager />} />
         <Route path="/tables" element={<TableManagementAdmin />} />
+        <Route path="/attendance" element={<AttendancePage />} />
+        <Route path="/attendance-management" element={<AttendanceManagementPage />} />
 
         {/* Định tuyến cho các trang khác nhau */}
         <Route
@@ -122,8 +130,24 @@ function App() {
             </ProtectedRoute>
           }
         />
+       
+        {/* <Route path="/restaurant-info" element={<RestaurantInforManage />} /> */}
+        <Route path="/category-manager" element={<CategoryManager />} />
         
-        <Route path="/analytics" element={<UserDashboard />} />
+        <Route path="/chat" element={<UserChat />} />
+        <Route path="/admin-chat" element={<AdminChat />} />
+        <Route path="/restaurant-info" element={<RestaurantInfoManage />} />
+
+        <Route path="/tables" element={<TableManagementAdmin />} />
+        {/* Định tuyến cho các trang khác nhau */}
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path='/analytics' element={<UserDashboard />} />
+        <Route path="/create-order" element={<CreateOrder/>}/>
+        <Route path="/puscher-order" element={<OrderPuscher/>}/>
+        <Route path="/puscher-order-detail/:purchase_order_id" element={<OrderPuscherDetail/>}/>
+        <Route path="/supplier" element={<SupplierOrder/>}/>
+        <Route path="/supplier-detail" element={<SupplierOrderDetail/>}/>
+
 
         {/* Route cho trang Đơn Hàng Mới (tạo đơn) */}
           <Route
@@ -153,18 +177,10 @@ function App() {
           }
         />
 
-        {/* ROUTE: Trang Chấm Công */}
-        <Route path="/attendance" element={<AttendancePage />} />
-        
-        {/* ROUTE: Trang Quản Lý Chấm Công */}
-        <Route
-          path="/attendance-management"
-          element={
-            <ProtectedRoute>
-              <AttendanceManagementPage />
-            </ProtectedRoute>
-          }
-        />
+        {/* <Route path="/customers" element={<CustomerManagementPage />} /> */}
+
+        {/* Thêm các route khác nếu có: /invoices, /menu, ... */}
+        {/* <Route path="/invoices" element={<InvoicePage />} /> */}
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
         <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} />

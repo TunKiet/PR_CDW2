@@ -32,7 +32,7 @@ class ReviewSeeder extends Seeder
 
         for ($i = 1; $i <= self::MAX_RECORDS; $i++) {
             $userId = rand(1, 10);        // giả sử user_id từ 1 đến 10
-            $menuItemId = rand(1, 20);    // giả sử menu_item_id từ 1 đến 20
+            $menuItemId = rand(1, 6);    // giả sử menu_item_id từ 1 đến 20
 
             $rating = rand(1, 5);
             $comment = $sampleComments[array_rand($sampleComments)];
@@ -48,7 +48,7 @@ class ReviewSeeder extends Seeder
                 'image_url' => $imageUrl,
                 'like' => $like,
                 'dislike' => $dislike,
-                'status' => 'pending',
+                'status' => 'appored',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
