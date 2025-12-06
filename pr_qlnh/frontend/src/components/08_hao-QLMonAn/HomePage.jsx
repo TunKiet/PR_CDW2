@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom";
 import "./HomePage.css";
 import "./ReservationForm.css";
 import MenuItemModal from "../MenuItemModal";
+<<<<<<< HEAD
 import OrderOnlineForm from "../OrderOnlineForm";
+=======
+import OrderOnlineForm from "../OrderOnlineForm"; // <-- đảm bảo đường dẫn đúng
+>>>>>>> 18-kiet/UpOp
 import UserChat from "../Chat/UserChat";
 
 const API_BASE_URL = "http://127.0.0.1:8000/api";
@@ -146,6 +150,7 @@ export default function HomePage() {
   // User state
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   
   // Modal & Cart state
   const [cart, setCart] = useState([]);
@@ -183,7 +188,22 @@ export default function HomePage() {
     }
   }, []);
 
+<<<<<<< HEAD
   // ================= LOGOUT HANDLER =================
+=======
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showUserDropdown && !event.target.closest('.user-dropdown-container')) {
+        setShowUserDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showUserDropdown]);
+  
+  // Logout handler
+>>>>>>> 18-kiet/UpOp
   const handleLogout = () => {
     if (window.confirm("Bạn có chắc muốn đăng xuất?")) {
       localStorage.removeItem("token");
@@ -331,15 +351,60 @@ export default function HomePage() {
           <div className="flex items-center gap-4">
             {isLoggedIn && user && (
               <div className="flex items-center gap-3">
-                <div className="text-sm text-gray-700">
-                  <span className="font-medium">👤 {user.full_name || user.username || "Khách"}</span>
+                <div className="user-dropdown-container relative">
+                  <button
+                    onClick={() => setShowUserDropdown(!showUserDropdown)}
+                    className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg transition text-sm font-medium text-gray-700"
+                  >
+                    <span>👤</span>
+                    <span>{user.full_name || user.username || "Khách"}</span>
+                    <span className="text-xs">{showUserDropdown ? '▲' : '▼'}</span>
+                  </button>
+                  
+                  {showUserDropdown && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-semibold text-gray-900">{user.full_name || user.username}</p>
+                        <p className="text-xs text-gray-500">{user.email}</p>
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          setShowUserDropdown(false);
+                          navigate('/settings');
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                      >
+                        <span>👤</span>
+                        <span>Thông tin cá nhân</span>
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          setShowUserDropdown(false);
+                          navigate('/activity-log');
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                      >
+                        <span>📋</span>
+                        <span>Nhật ký hoạt động</span>
+                      </button>
+                      
+                      <div className="border-t border-gray-100 mt-2 pt-2">
+                        <button
+                          onClick={() => {
+                            setShowUserDropdown(false);
+                            handleLogout();
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        >
+                          <span>🚪</span>
+                          <span>Đăng xuất</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition text-sm font-medium"
-                >
-                  Đăng xuất
-                </button>
               </div>
             )}
             {!isLoggedIn && (
