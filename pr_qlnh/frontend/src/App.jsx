@@ -46,6 +46,8 @@ import OrderOnlineAdmin from "./pages/OrderOnlineAdmin";
 
 import AttendancePage from "./pages/AttendancePage";
 import AttendanceManagementPage from "./pages/AttendanceManagementPage";
+import CustomerProfilePage from "./pages/CustomerProfilePage";
+import CustomerActivityLogPage from "./pages/CustomerActivityLogPage";
 
 import CreateOrder from "./components/InventoryOverview/CreateOrder";
 import OrderPuscher from "./components/InventoryOverview/OrderPuscher";
@@ -63,7 +65,10 @@ function App() {
         <Route path="/category-manager" element={<CategoryManager />} />
         <Route path="/" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/home" element={<HomePage />} />
         <Route path="/user/homepage" element={<HomePage />} />
+        <Route path="/settings" element={<CustomerProfilePage />} />
+        <Route path="/activity-log" element={<CustomerActivityLogPage />} />
         <Route path="/dishtable" element={<DishTable />} />
         <Route path="/moderator" element={<ReviewModerator />} />
         <Route path="/cart-management" element={<CartManagement />} />
