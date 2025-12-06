@@ -56,8 +56,6 @@ const UserChat = () => {
         };
     }, [openChat, conversationId]);
 
-
-
     // Scroll
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -77,7 +75,6 @@ const UserChat = () => {
             });
 
     }, [openChat, userId]);
-
 
     // Send message
     const sendMessage = async () => {
@@ -112,7 +109,6 @@ const UserChat = () => {
     const handleEmojiClick = (emojiData) => {
         setInput(prev => prev + emojiData.emoji);
     };
-
 
     // Trong component UserChat
     const sendEmoji = (emoji) => {

@@ -13,7 +13,7 @@ import Pusher from 'pusher-js';
 import EmojiPicker from 'emoji-picker-react';
 import { Popover } from '@headlessui/react';
 import { confirmDialog } from '../../utils/notify'
-
+import { notify, confirmAction } from '../../utils/notify'
 const endPoint = 'http://localhost:8000/api';
 
 const AdminChat = () => {
@@ -145,6 +145,23 @@ const AdminChat = () => {
             .catch(err => console.error("❌ Send emoji error:", err));
     };
 
+    const handleDelete = async (messageId) => {
+        const isConfirmed = await confirmAction('Bạn chắc chắn muốn xóa tin nhắn này?');
+        if (!isConfirmed) return;
+
+        try {
+            notify.info('Đang xóa...');
+            notify.dismiss();
+
+            await axios.delete(`${endPoint}/delete-message/${messageId}`);
+            setMessages(prev => prev.filter(msg => msg.message_id !== messageId));
+            notify.success('Xóa tin nhắn thành công');
+        } catch (error) {
+            notify.error('Xóa tin nhắn không hợp lệ. Vui lòng tải lại trang');
+            console.log(error);
+        }
+    }
+
     return (
         <>
             <div className="section">
@@ -224,6 +241,9 @@ const AdminChat = () => {
                                                     key={`${msg.conversation_id}-${msg.message_id}`}
                                                     content={msg.message}
                                                     time={msg.created_at}
+                                                    messageId={msg.message_id}
+                                                    handleDelete={handleDelete}
+
                                                 />
                                             ) : (
                                                 <Receiver
