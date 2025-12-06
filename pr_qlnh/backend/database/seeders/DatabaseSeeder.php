@@ -56,6 +56,7 @@ class DatabaseSeeder extends Seeder
 
             // 🔟 Phiên làm việc, dữ liệu tạm
             SessionSeeder::class,
+            NotificationSeeder::class,
         ]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');

@@ -147,4 +147,30 @@ class TableController extends Controller
             return response()->json(['success'=>false,'error'=>'Lỗi server khi xóa'],500);
         }
     }
+    public function floorplan()
+    {
+        $tables = Table::orderBy('capacity')->orderBy('table_name')->get();
+
+        // Gom theo số chỗ
+        $grouped = $tables->groupBy('capacity');
+
+        return response()->json([
+            "data" => $grouped
+        ]);
+    }
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string'
+        ]);
+
+        $table = Table::findOrFail($id);
+        $table->status = $request->status;
+        $table->save();
+
+        return response()->json([
+            "message" => "Cập nhật trạng thái thành công",
+            "data" => $table
+        ]);
+    }
 }

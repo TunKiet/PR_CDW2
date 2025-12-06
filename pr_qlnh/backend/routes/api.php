@@ -210,6 +210,11 @@ Route::prefix('customers')->group(function () {
 Route::get('/menu-items', [MenuItemController::class, 'index']);
 Route::post('/orders', [OrderController::class, 'store']);
 
+use App\Http\Controllers\API\ReservationController;
+use App\Http\Controllers\API\ReservationManagementController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\ReportController;
+
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
 // use App\Http\Controllers\Api\MenuItemController;
@@ -485,4 +490,39 @@ Route::middleware(['jwt.auth'])->prefix('restaurant-info')->group(function () {
     Route::delete('/logo', [RestaurantInfoController::class, 'deleteLogo']);
 });
 
+//Table
+Route::apiResource('tables', TableController::class);
+Route::post('/reservations', [ReservationController::class, 'store']);
+Route::prefix('reservation-management')->group(function () {
+
+    Route::get('/', [ReservationManagementController::class, 'index']);        // lấy danh sách + filter
+    Route::get('/{id}', [ReservationManagementController::class, 'show']);      // chi tiết đơn
+
+    Route::put('/{id}/status', [ReservationManagementController::class, 'updateStatus']); // cập nhật trạng thái
+    Route::put('/{id}/cancel', [ReservationManagementController::class, 'cancel']);       // hủy đơn
+
+    Route::delete('/{id}', [ReservationManagementController::class, 'destroy']);          // xóa đơn
+});
+Route::get('/floorplan', [TableController::class, 'floorplan']);
+Route::put('/tables/{id}/status', [TableController::class, 'updateStatus']);
+
+Route::prefix('notifications')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::post('/', [NotificationController::class, 'store']);
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::get('/{id}', [NotificationController::class, 'show']);
+    Route::put('/{id}', [NotificationController::class, 'update']);
+    Route::delete('/{id}', [NotificationController::class, 'destroy']);
+
+    Route::post('/{id}/mark-read', [NotificationController::class, 'markRead']);
+    Route::post('/mark-all-read', [NotificationController::class, 'markAllRead']);
+});
+
+Route::get('/reports/frequent-customers', [ReportController::class, 'frequentCustomers']);
+
+
+
+
+//login mới được đặt bàn
+//Route::middleware('auth:sanctum')->post('/reservations', [ReservationController::class, 'store']);
 
