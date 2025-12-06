@@ -8,8 +8,15 @@ import {
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // import React from 'react'
-import "./App.css";
-// import MenuList from "./components/MenuList";
+import './App.css'
+import MenuList from "./components/MenuList";
+
+import Sidebar from './components/Sidebar/Sidebar'
+import Header from './components/Header/Header'
+import Review from './components/Review/Review'
+import ReviewModerator from './components/ReviewModerator/ReviewModerator'
+import Invertory from './components/Inventory/Inventory'
+import IngredientInOut from './components/Inventory/IngredientInOut'
 
 import Sidebar from "./components/Sidebar/Sidebar";
 import Header from "./components/Header/Header";
@@ -55,8 +62,12 @@ import SupplierOrderDetail from "./components/InventoryOverview/SupplierOrderDet
 
 
 function App() {
+  // Lấy user từ localStorage sau khi đăng nhập
+  // const user = JSON.parse(localStorage.getItem("users"));
   return (
-    <BrowserRouter>
+    <BrowserRouter> 
+    {/* {user && <NotificationBell userId={users.user_id} />} */}
+        <NotificationBellFloating userId={1} />
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/dish-status-management" element={<DishStatusManagement />} />
@@ -136,6 +147,13 @@ function App() {
         <Route path="/admin-chat" element={<AdminChat />} />
 
         <Route path="/tables" element={<TableManagementAdmin />} />
+
+		    <Route path="/tables" element={<TableManagementAdmin/>} />
+        <Route path="/reservation" element={<Reservation/>} />
+        <Route path="/reservationcreate" element={<ReservationCreate/>} />
+        <Route path="/notifications" element={<NotificationManagementAdmin />} />
+        <Route path="/reports/frequent-customers" element={<FrequentCustomerReport />} />
+
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path='/analytics' element={<UserDashboard />} />

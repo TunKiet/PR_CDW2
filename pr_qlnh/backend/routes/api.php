@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| 🔹 Import Controllers
+| Import Controllers
 |--------------------------------------------------------------------------
 */
 use App\Http\Controllers\AuthController;
@@ -20,7 +20,6 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\CategoryIngredientController;
-
 use App\Http\Controllers\Api\MenuItemController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\TableController;
@@ -36,10 +35,8 @@ use App\Http\Controllers\AttendanceReportController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RestaurantInfoController;
 use App\Http\Controllers\PurchaseOrderController;
-use App\Models\Ingredient;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\ConversationController;
-// use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ReviewReplyController;
 use App\Models\Review;
 use App\Models\ReviewReply;
@@ -75,88 +72,47 @@ Route::prefix('reviews')->group(function () {
 });
 
 Route::prefix('reply')->group(function () {
-    Route::post('/add-reply', [ReviewReplyController::class, 'store']);
-    Route::get('/chart', [ReviewReplyController::class, 'getAllReplies']);
-    Route::delete('/{replyId}/delete', [ReviewReplyController::class, 'delete']);
-    Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);
-    Route::patch('/{replyId}/approve', [ReviewReplyController::class, 'approved']);
-});
-Route::post('/send-message', [MessageController::class, 'sendMessage']);
+use App\Http\Controllers\API\ReservationController;
+use App\Http\Controllers\API\ReservationManagementController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Api\PromotionController;
+use App\Http\Controllers\Api\StatisticController;
+
 
 /*
 |--------------------------------------------------------------------------
-| 🧂 Ingredients
+| Test API
 |--------------------------------------------------------------------------
 */
-Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
-Route::post('/ingredients', [IngredientController::class, 'store']);
-Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
-Route::delete('/ingredients/delete/{id}', [IngredientController::class, 'destroy']);
-Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
-Route::get('/alert', [IngredientController::class, 'alertIngredient']);
-Route::get('/export/{id}', [IngredientController::class, 'exportPDF']);
-Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
-Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
-Route::post('/purchase-order', [PurchaseOrderController::class, 'store']);
-Route::get('/purchase-orders-all', [PurchaseOrderController::class, 'index']);
-Route::get('/purchase-orders/{id}', [PurchaseOrderController::class, 'show']);
-Route::patch('/purchase-orders/{id}/update-status', [PurchaseOrderController::class, 'updateStatus']);
+Route::get('/test', fn () => response()->json(['message' => 'API loaded'])));
+
 
 /*
 |--------------------------------------------------------------------------
-| 👤 Auth (JWT)
+| Auth (JWT)
 |--------------------------------------------------------------------------
 */
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/verify-login-otp', [AuthController::class, 'verifyLoginOTP']);
 
-Route::middleware(['jwt.auth'])->group(function () {
-    Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-
-    // Login Logs
-    Route::get('/login-logs', [LoginLogController::class, 'getUserLogs']);
-});
-
-/*
-|--------------------------------------------------------------------------
-| 🔐 Password Reset
-|--------------------------------------------------------------------------
-*/
 Route::prefix('password')->group(function () {
     Route::post('/forgot', [ForgotPasswordController::class, 'sendOtp']);
     Route::post('/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
     Route::post('/reset', [ForgotPasswordController::class, 'resetPassword']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| 🛡️ Roles & Permissions
-|--------------------------------------------------------------------------
-*/
-Route::prefix('roles')->group(function () {
-    Route::get('/', [RoleController::class, 'index']);
-    Route::get('/{id}', [RoleController::class, 'show']);
-    Route::post('/', [RoleController::class, 'store']);
-    Route::put('/{id}', [RoleController::class, 'update']);
-    Route::delete('/{id}', [RoleController::class, 'destroy']);
-    Route::post('/{id}/permissions', [RoleController::class, 'assignPermissions']);
-    Route::get('/{id}/users', [RoleController::class, 'getUsersByRole']);
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/login-logs', [LoginLogController::class, 'getUserLogs']);
 });
 
-Route::prefix('permissions')->group(function () {
-    Route::get('/', [PermissionController::class, 'index']);
-    Route::get('/{id}', [PermissionController::class, 'show']);
-    Route::post('/', [PermissionController::class, 'store']);
-    Route::put('/{id}', [PermissionController::class, 'update']);
-    Route::delete('/{id}', [PermissionController::class, 'destroy']);
-    Route::get('/{id}/roles', [PermissionController::class, 'getRolesByPermission']);
-});
 
 /*
 |--------------------------------------------------------------------------
-| 👤 User Management
+| User Management
 |--------------------------------------------------------------------------
 */
 Route::prefix('users')->group(function () {
@@ -168,21 +124,96 @@ Route::prefix('users')->group(function () {
     Route::get('/role-names/{id}', [UserController::class, 'getRoleNames']);
 });
 
+
 /*
 |--------------------------------------------------------------------------
-| 🛒 Menu & Tables
+| Roles & Permissions
 |--------------------------------------------------------------------------
 */
-Route::get('/menu-items', [MenuItemController::class, 'index']);
-Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
-Route::get('/categories', [CategoryController::class, 'index']);
-Route::get('/tables', [TableController::class, 'index']);
-Route::apiResource('tables', TableController::class);
+Route::middleware(['jwt.auth'])->group(function () {
+    Route::apiResource('roles', RoleController::class);
+    Route::apiResource('permissions', PermissionController::class);
+});
 
 
 /*
 |--------------------------------------------------------------------------
-| 👤 Customers
+| Ingredients & Purchase Orders
+|--------------------------------------------------------------------------
+*/
+Route::prefix('ingredients')->group(function () {
+    Route::get('/', [IngredientController::class, 'getAllIngredient']);
+    Route::post('/', [IngredientController::class, 'store']);
+    Route::put('/{id}', [IngredientController::class, 'update']);
+    Route::delete('/delete/{id}', [IngredientController::class, 'destroy']);
+    Route::get('/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
+    Route::get('/used', [IngredientController::class, 'getUsedIngredients']);
+    Route::get('/alert', [IngredientController::class, 'alertIngredient']);
+    Route::get('/export/{id}', [IngredientController::class, 'exportPDF']);
+});
+
+Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
+
+Route::prefix('purchase-orders')->group(function () {
+    Route::get('/', [PurchaseOrderController::class, 'index']);
+    Route::post('/', [PurchaseOrderController::class, 'store']);
+    Route::get('/received', [PurchaseOrderController::class, 'getReceivedOrders']);
+    Route::get('/{id}', [PurchaseOrderController::class, 'show']);
+    Route::patch('/{id}/update-status', [PurchaseOrderController::class, 'updateStatus']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Categories, Dishes, Menu
+|--------------------------------------------------------------------------
+*/
+Route::apiResource('categories', CategoryController::class);
+Route::apiResource('dishes', DishController::class);
+
+Route::prefix('dishes')->group(function () {
+    Route::patch('/{id}/status', [DishController::class, 'updateStatus']);
+    Route::post('/bulk-update-status', [DishController::class, 'bulkUpdateStatus']);
+    Route::get('/{id}/status-history', [DishController::class, 'getStatusHistory']);
+    Route::get('/status-stats', [DishController::class, 'getStatusStats']);
+    Route::get('/low-stock', [DishController::class, 'getLowStock']);
+    Route::get('/filter', [DishController::class, 'filter']);
+});
+
+Route::get('/menu', [OrderController::class, 'menu']);
+Route::apiResource('menu-items', MenuItemController::class);
+
+
+/*
+|--------------------------------------------------------------------------
+| Tables
+|--------------------------------------------------------------------------
+*/
+// Route::prefix('orders')->group(function () {
+//     Route::post('/', [OrderController::class, 'store'])->name('orders.store');
+//     Route::get('/', [OrderController::class, 'index'])->name('orders.index');
+//     Route::get('/{order_id}', [OrderController::class, 'show'])->name('orders.show');
+// });
+// Route::get('/orders', [OrderController::class, 'index']);
+
+
+Route::get('/categories', [CategoryController::class, 'index']);
+
+
+Route::get('/pre-orders', [PreOrderController::class, 'index']);
+Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
+Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
+
+
+//Table
+Route::apiResource('tables', TableController::class);
+Route::put('/tables/{id}/status', [TableController::class, 'updateStatus']);
+Route::get('/floorplan', [TableController::class, 'floorplan']);
+
+
+/*
+|--------------------------------------------------------------------------
+| Customers
 |--------------------------------------------------------------------------
 */
 Route::prefix('customers')->group(function () {
@@ -194,147 +225,24 @@ Route::prefix('customers')->group(function () {
 });
 
 
-Route::get('/menu-items', [MenuItemController::class, 'index']);
-Route::post('/orders', [OrderController::class, 'store']);
-
-// 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
-// use App\Http\Controllers\Api\TableController;
-// use App\Http\Controllers\Api\MenuItemController;
-
-
-
 /*
 |--------------------------------------------------------------------------
-| 🧾 Orders (Eat in restaurant)
+| Orders (Eat-in)
 |--------------------------------------------------------------------------
 */
-// ✅ Test route kiểm tra API hoạt động
-Route::get('/test', function () {
-    return response()->json(['message' => 'API file is loaded']);
-});
-
-/*
-|--------------------------------------------------------------------------
-| 🍽️ Dish & Review Routes
-|--------------------------------------------------------------------------
-*/
-Route::apiResource('dishes', DishController::class);
-Route::get('/ingredients', [IngredientController::class, 'getAllIngredient']);
-Route::put('/ingredients/{id}', [IngredientController::class, 'update']);
-Route::post('/add', [IngredientController::class, 'store']);
-Route::get('/category-ingredient', [CategoryIngredientController::class, 'getAllCategoryIngredient']);
-Route::delete('ingredients/delete/{id}', [IngredientController::class, 'destroy']);
-Route::get('/export', [IngredientController::class, 'exportPDF']);
-Route::get('/ingredients/filter/{categoryId}', [IngredientController::class, 'filterCategory']);
-Route::get('/received-orders', [PurchaseOrderController::class, 'getReceivedOrders']);
-Route::get('/ingredients/used', [IngredientController::class, 'getUsedIngredients']);
-Route::post('/send-message', [MessageController::class, 'sendMessage']);
-Route::get('/conversations', [MessageController::class, 'getConversations']);
-Route::get('/messages/{conversationId}', [MessageController::class, 'getMessages']);
-Route::post('/mark-read', [MessageController::class, 'markAsRead']);
-Route::post('/chat', [ChatController::class, 'message']);
-
-//Review
-Route::prefix('reviews')->group(function () {
-    Route::get('/all-review', action: [ReviewController::class, 'getAllReviews']);
-    Route::post('/add-review', [ReviewController::class, 'store']);
-    Route::get('/chart/data', [ReviewController::class, 'getDataChartReview']);
-    Route::get('/item/{menuItemId}', [ReviewController::class, 'getDataReview']);
-    Route::get('/reply/{reviewId}', [ReviewReplyController::class, 'getDataReply']);
-    Route::post('/{reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
-    Route::delete('/{reviewId}/delete', [ReviewController::class, 'delete']);
-    Route::patch('/{reviewId}/hide', [ReviewController::class, 'hide']);
-    Route::patch('/{reviewId}/approve', [ReviewController::class, 'approved']);
-});
-
-Route::prefix('reply')->group(function () {
-    Route::post('/add-reply/{reviewId}', [ReviewReplyController::class, 'store']);
-    Route::get('/chart', [ReviewReplyController::class, 'getAllReplies']);
-    Route::delete('/{replyId}/delete', [ReviewReplyController::class, 'delete']);
-    Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);
-    Route::patch('/{replyId}/approve', [ReviewReplyController::class, 'approved']);
-});
-Route::post('/create-conversation', [ConversationController::class, 'createConversation']);
-Route::delete('/delete-message/{messageId}', [MessageController::class, 'delete']);
-
-
-
-/*
-|--------------------------------------------------------------------------
-| 👤 Auth Routes (JWT)
-|--------------------------------------------------------------------------
-*/
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-
-Route::middleware(['jwt.auth'])->group(function () {
-    Route::get('/me', [AuthController::class, 'me']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-});
-
-/*
-|--------------------------------------------------------------------------
-| 🛡️ Role & Permission Routes
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['jwt.auth'])->group(function () {
-    Route::apiResource('/roles', RoleController::class);
-    Route::apiResource('/permissions', PermissionController::class);
-});
-
-Route::post('/password/forgot', [ForgotPasswordController::class, 'sendOtp']);
-Route::post('/password/verify-otp', [ForgotPasswordController::class, 'verifyOtp']);
-Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword']);
-
-Route::get('/categories', [CategoryController::class, 'index']);
-
-
-Route::get('/pre-orders', [PreOrderController::class, 'index']);
-Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
-Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
-
-
-Route::get('/order/create', [OrderController::class, 'create'])->name('order.create');
-Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
-
 Route::prefix('orders')->group(function () {
     Route::get('/', [OrderController::class, 'index']);
     Route::get('/{id}', [OrderController::class, 'show']);
     Route::post('/', [OrderController::class, 'store']);
-    Route::delete('/{id}', [OrderController::class, 'destroy']);
     Route::put('/{id}', [OrderController::class, 'update']);
+    Route::delete('/{id}', [OrderController::class, 'destroy']);
     Route::get('/{id}/export', [OrderController::class, 'exportData']);
 });
 
-//Menu
-Route::get('/menu', [OrderController::class, 'menu']); // lấy menu
-
- //12/11/2025
-// Route::get('/customers', [OrderController::class, 'customers']); // lấy danh sách KH
-// Route::get('/customers/search', [CustomerController::class, 'search']);   
-
-// Payments
-// Route::get('/payments', [PaymentController::class, 'index']);
-// Route::get('/payments/{id}', [PaymentController::class, 'show']);
-// Route::post('/payments', [PaymentController::class, 'store']);
-Route::prefix('payments')->group(function () {
-    Route::get('/', [PaymentController::class, 'index']);
-    Route::get('/{id}', [PaymentController::class, 'show']);
-    Route::post('/', [PaymentController::class, 'store']);
-});
-// Promotions
-// use App\Http\Controllers\PromotionController;
-// Route::get('/promotions', [PromotionController::class, 'index']);
-// Route::get('/promotions/{id}', [PromotionController::class, 'show']);
-// Route::post('/promotions', [PromotionController::class, 'store']);
-// Route::put('/promotions/{id}', [PromotionController::class, 'update']);
-// Route::delete('/promotions/{id}', [PromotionController::class, 'destroy']);
-// Route::post('/promotions/validate', [PromotionController::class, 'validateCode']);
-Route::get('/menu', [OrderController::class, 'menu']);
 
 /*
 |--------------------------------------------------------------------------
-| 📦 Pre-Order
+| Pre-orders
 |--------------------------------------------------------------------------
 */
 Route::prefix('pre-orders')->group(function () {
@@ -342,68 +250,51 @@ Route::prefix('pre-orders')->group(function () {
     Route::get('/details/{id}', [PreOrderController::class, 'showDetails']);
     Route::put('/{id}/status', [PreOrderController::class, 'updateStatus']);
 });
-Route::get('/pre-orders', [PreOrderController::class, 'index']);
-Route::get('/pre-order-details/{id}', [PreOrderController::class, 'showDetails']);
-Route::put('/pre-orders/{id}/status', [PreOrderController::class, 'updateStatus']);
 
-Route::get('/menu-items/{id}', [MenuItemController::class, 'show']);
-
-// hao chuc nang
-
-use App\Http\Controllers\Api\PromotionController;
-// Protected routes (cần authentication - thêm middleware 'auth:sanctum' khi đã setup)
-Route::prefix('v1')->group(function () {
-    
-    // CRUD Promotion routes
-    Route::apiResource('promotions', PromotionController::class);
-    
-    // Additional promotion routes
-    Route::post('/promotions/{id}/apply', [PromotionController::class, 'apply']);
-    // Public routes for homepage
-    Route::get('/featured-dishes', [DishController::class, 'getFeatured']);
-    Route::get('/active-promotions', [PromotionController::class, 'getActive']);
-    
-});
-// routes/api.php
-
-use App\Http\Controllers\Api\StatisticController;
-
-// ⭐ STATISTICS ROUTES
-Route::prefix('statistics')->group(function () {
-    Route::get('/dashboard', [StatisticController::class, 'dashboard']);
-    Route::get('/revenue-chart', [StatisticController::class, 'revenueChart']);
-    Route::get('/top-dishes', [StatisticController::class, 'topDishes']);
-    Route::get('/comparison', [StatisticController::class, 'comparison']);
-    Route::get('/top-customers', [StatisticController::class, 'topCustomers']);
-    Route::get('/summary', [StatisticController::class, 'summary']); // Bonus
-});
-
-Route::apiResource('dishes', DishController::class);
-// ⭐ THÊM ROUTES MỚI CHO STATUS MANAGEMENT
-Route::prefix('dishes')->group(function () {
-    // Toggle status đơn lẻ
-    Route::patch('/{id}/status', [DishController::class, 'updateStatus']);
-    
-    // Cập nhật hàng loạt
-    Route::post('/bulk-update-status', [DishController::class, 'bulkUpdateStatus']);
-    
-    // Lịch sử thay đổi
-    Route::get('/{id}/status-history', [DishController::class, 'getStatusHistory']);
-    
-    // Thống kê
-    Route::get('/status-stats', [DishController::class, 'getStatusStats']);
-    
-    // Món sắp hết
-    Route::get('/low-stock', [DishController::class, 'getLowStock']);
-    
-    // Lọc nâng cao
-    Route::get('/filter', [DishController::class, 'filter']);
-});
-Route::apiResource('categories', CategoryController::class);
 
 /*
 |--------------------------------------------------------------------------
-| 💳 Payments
+| Reviews & Replies
+|--------------------------------------------------------------------------
+*/
+Route::prefix('reviews')->group(function () {
+    Route::post('/', [ReviewController::class, 'store']);
+    Route::get('/all-review', [ReviewController::class, 'getAllReviews']);
+    Route::get('/chart/data', [ReviewController::class, 'getDataChartReview']);
+    Route::get('/item/{menuItemId}', [ReviewController::class, 'getDataReview']);
+    Route::get('/{menuItemId}/average', [ReviewController::class, 'averageRating']);
+    Route::post('/{reviewId}/toggle-like', [ReviewController::class, 'toggleLike']);
+    Route::delete('/{reviewId}/delete', [ReviewController::class, 'delete']);
+    Route::patch('/{reviewId}/hide', [ReviewController::class, 'hide']);
+    Route::patch('/{reviewId}/approve', [ReviewController::class, 'approved']);
+});
+
+Route::prefix('reply')->group(function () {
+    Route::post('/add/{reviewId}', [ReviewReplyController::class, 'store']);
+    Route::get('/chart', [ReviewReplyController::class, 'getAllReplies']);
+    Route::delete('/{replyId}/delete', [ReviewReplyController::class, 'delete']);
+    Route::patch('/{replyId}/hide', [ReviewReplyController::class, 'hide']);
+    Route::patch('/{replyId}/approve', [ReviewReplyController::class, 'approved']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Messages & Chat
+|--------------------------------------------------------------------------
+*/
+Route::post('/send-message', [MessageController::class, 'sendMessage']);
+Route::post('/chat', [ChatController::class, 'message']);
+Route::get('/conversations', [MessageController::class, 'getConversations']);
+Route::get('/messages/{conversationId}', [MessageController::class, 'getMessages']);
+Route::post('/mark-read', [MessageController::class, 'markAsRead']);
+Route::delete('/delete-message/{id}', [MessageController::class, 'delete']);
+Route::post('/create-conversation', [ConversationController::class, 'createConversation']);
+
+
+/*
+|--------------------------------------------------------------------------
+| Payments
 |--------------------------------------------------------------------------
 */
 Route::prefix('payments')->group(function () {
@@ -412,33 +303,29 @@ Route::prefix('payments')->group(function () {
     Route::post('/', [PaymentController::class, 'store']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| 🛍️ ORDER ONLINE (Frontend)
-|--------------------------------------------------------------------------
-*/
-Route::prefix('order-online')->group(function () {
-    Route::post('/', [OrderOnlineController::class, 'store']);
-    Route::get('/', [OrderOnlineController::class, 'index']);
-    Route::get('/{id}', [OrderOnlineController::class, 'show']);
-    Route::put('/{id}', [OrderOnlineController::class, 'update']);
-    
-});
 
 /*
 |--------------------------------------------------------------------------
-| 🛒 ORDER ONLINE ADMIN
+| Order Online (Frontend & Admin)
 |--------------------------------------------------------------------------
 */
+Route::prefix('order-online')->group(function () {
+    Route::get('/', [OrderOnlineController::class, 'index']);
+    Route::get('/{id}', [OrderOnlineController::class, 'show']);
+    Route::post('/', [OrderOnlineController::class, 'store']);
+    Route::put('/{id}', [OrderOnlineController::class, 'update']);
+});
+
 Route::prefix('admin/order-online')->group(function () {
     Route::get('/', [OrderOnlineAdminController::class, 'index']);
     Route::get('/{id}', [OrderOnlineAdminController::class, 'show']);
     Route::put('/{id}', [OrderOnlineAdminController::class, 'updateStatus']);
 });
 
+
 /*
 |--------------------------------------------------------------------------
-| ⏰ Attendance
+| Attendance
 |--------------------------------------------------------------------------
 */
 Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn']);
@@ -452,17 +339,36 @@ Route::prefix('attendance')->group(function () {
     Route::post('/', [AttendanceController::class, 'store']);
     Route::put('/{id}', [AttendanceController::class, 'update']);
     Route::delete('/{id}', [AttendanceController::class, 'destroy']);
-    
-    // Export routes
-    Route::get('/export/test', [AttendanceReportController::class, 'testData']);
-    Route::get('/export/by-date', [AttendanceReportController::class, 'exportByDate']);
-    Route::get('/export/by-month', [AttendanceReportController::class, 'exportByMonth']);
-    Route::get('/export/by-range', [AttendanceReportController::class, 'exportByRange']);
+
+    Route::prefix('export')->group(function () {
+        Route::get('/test', [AttendanceReportController::class, 'testData']);
+        Route::get('/by-date', [AttendanceReportController::class, 'exportByDate']);
+        Route::get('/by-month', [AttendanceReportController::class, 'exportByMonth']);
+        Route::get('/by-range', [AttendanceReportController::class, 'exportByRange']);
+    });
 });
+
 
 /*
 |--------------------------------------------------------------------------
-| 🏢 Restaurant Info Routes
+| Notification
+|--------------------------------------------------------------------------
+*/
+Route::prefix('notifications')->group(function () {
+    Route::get('/', [NotificationController::class, 'index']);
+    Route::post('/', [NotificationController::class, 'store']);
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::get('/{id}', [NotificationController::class, 'show']);
+    Route::put('/{id}', [NotificationController::class, 'update']);
+    Route::delete('/{id}', [NotificationController::class, 'destroy']);
+    Route::post('/{id}/mark-read', [NotificationController::class, 'markRead']);
+    Route::post('/mark-all-read', [NotificationController::class, 'markAllRead']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Restaurant Info
 |--------------------------------------------------------------------------
 */
 Route::middleware(['jwt.auth'])->prefix('restaurant-info')->group(function () {
@@ -471,3 +377,32 @@ Route::middleware(['jwt.auth'])->prefix('restaurant-info')->group(function () {
     Route::post('/logo', [RestaurantInfoController::class, 'uploadLogo']);
     Route::delete('/logo', [RestaurantInfoController::class, 'deleteLogo']);
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Promotions (v1)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('v1')->group(function () {
+    Route::apiResource('promotions', PromotionController::class);
+    Route::post('/promotions/{id}/apply', [PromotionController::class, 'apply']);
+    Route::get('/featured-dishes', [DishController::class, 'getFeatured']);
+    Route::get('/active-promotions', [PromotionController::class, 'getActive']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Statistics
+|--------------------------------------------------------------------------
+*/
+Route::prefix('statistics')->group(function () {
+    Route::get('/dashboard', [StatisticController::class, 'dashboard']);
+    Route::get('/revenue-chart', [StatisticController::class, 'revenueChart']);
+    Route::get('/top-dishes', [StatisticController::class, 'topDishes']);
+    Route::get('/comparison', [StatisticController::class, 'comparison']);
+    Route::get('/top-customers', [StatisticController::class, 'topCustomers']);
+    Route::get('/summary', [StatisticController::class, 'summary']);
+});
+
