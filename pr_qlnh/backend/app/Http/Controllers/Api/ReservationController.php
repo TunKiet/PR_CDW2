@@ -115,7 +115,7 @@ class ReservationController extends Controller
         }
 
         // Tạo đặt bàn
-        $validated['user_id'] = auth()->id() ?? 2;
+        $validated['user_id'] = auth()->id() ?? 1;
         $validated['status'] = "pending";
 
         $reservation = Reservation::create($validated);
