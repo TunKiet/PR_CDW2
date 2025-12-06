@@ -22,6 +22,8 @@ const Review = ({ menuItemId }) => {
 
     console.log("user id: " + userId);
 
+    const maxLength = 500;
+
 
     const [activeFilter, setActiveFilter] = useState(1);
     const [openFormReview, setOpenFormReview] = useState(false);
@@ -39,6 +41,7 @@ const Review = ({ menuItemId }) => {
     const [preview, setPreview] = useState(null);
     const [image, setImage] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const fileInputRef = useRef(null);
 
     //Reply
@@ -123,10 +126,25 @@ const Review = ({ menuItemId }) => {
         }
     };
 
+    const handleChange = (e) => {
+        const value = e.target.value;
+        if (value.length <= maxLength) {
+            setComment(value);
+            setError(""); // xóa lỗi nếu hợp lệ
+        } else {
+            setError(`Đánh giá không được vượt quá ${maxLength} ký tự`);
+        }
+    };
+
     //Handle button submit
     const handleSubmit = async () => {
         if (!rating) {
             notify.error('Vui lòng chọn số sao');
+            return;
+        }
+
+        if (comment.length > maxLength) {
+            setError(`Đánh giá không được vượt quá ${maxLength} ký tự`);
             return;
         }
 
@@ -150,7 +168,7 @@ const Review = ({ menuItemId }) => {
             );
 
             console.log(res.data);
-            notify.success('Gửi đánh giá thành công')
+            notify.success('Gửi đánh giá thành công');
             handleClose();
 
         } catch (error) {
@@ -177,7 +195,7 @@ const Review = ({ menuItemId }) => {
                             <div className="count-review py-1 ">{total} lượt đánh giá</div>
                             <Button variant="contained" color='error' onClick={() => setOpenFormReview(true)}>Viết đánh giá</Button>
                             {/* Form write review for user */}
-                            <Dialog open={openFormReview} onClose={() => setOpenFormReview(false)} maxWidth="sm" fullWidth="sm" >
+                            <Dialog open={openFormReview} onClose={handleClose} maxWidth="sm" fullWidth>
                                 <div className="container p-3 m-3 max-w-xl w-full mx-auto">
                                     <div className="absolute top-1 right-1 p-3! rounded-full! me-auto! hover:bg-gray-300 w-10! cursor-pointer" onClick={() => setOpenFormReview(false)}><IoClose /></div>
                                     <h2 className='text-5xl font-bold pt-3'>Đánh giá về chúng tôi</h2>
@@ -227,7 +245,15 @@ const Review = ({ menuItemId }) => {
                                                 className='w-[500px] h-[200px] border border-[#333] focus:ring-0 focus:outline-none resize-none! p-2'
                                                 placeholder='Nhập đánh giá của bạn về chúng tôi...'
                                                 value={comment}
-                                                onChange={(e) => setComment(e.target.value)}></textarea>
+                                                onChange={handleChange}></textarea>
+                                            <div className="text-right text-sm text-gray-500 mt-1">
+                                                {comment.length}/{maxLength}
+                                            </div>
+                                            {error && (
+                                                <div className="text-red-500 text-sm mt-1">
+                                                    {error}
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                     <Button
@@ -264,7 +290,7 @@ const Review = ({ menuItemId }) => {
                         <div className="container-filter flex items-center">
                             {
                                 filters.map((filter) => (
-                                    <div key={filter.id} className={`filter-item py-1 px-2 rounded-2xl border border[#333] mx-2 cursor-pointer
+                                    <div key={filter.id} className={`filter-item py-1 px-2 rounded-2xl border border-[#333] mx-2 cursor-pointer
                                     ${activeFilter === filter.id ? "bg-blue-100 text-blue-600" : 'bg-gray-100'}`}
                                         onClick={() => setActiveFilter(filter.id)}>
                                         {filter.label}

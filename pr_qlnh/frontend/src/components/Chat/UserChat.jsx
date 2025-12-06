@@ -22,14 +22,16 @@ const UserChat = () => {
 
     console.log("user id: " + userId);
 
+    const maxLength = 2000;
+
     const [openChat, setOpenChat] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [conversationId, setConversationId] = useState(null);
-
+    const [error, setError] = useState("");
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
-   
+
 
     // Load conversation
     useEffect(() => {
@@ -78,6 +80,12 @@ const UserChat = () => {
     // Send message
     const sendMessage = () => {
         if (!input.trim()) return;
+
+        if (input.length > maxLength) {
+            setError(`Tin nhắn không được vượt quá ${maxLength} ký tự`);
+            return;
+        }
+
         if (!conversationId) {
             console.log("⚠️ Conversation chưa sẵn");
             return;
@@ -89,13 +97,22 @@ const UserChat = () => {
             sender_type: 'user',
             message: input
         })
-            .then(() => setInput(''))
+            .then(() => {
+                setInput('');
+                setError('');
+            })
             .catch(err => console.error(err));
     };
 
 
     const handleEmojiClick = (emojiData) => {
-        setInput(prev => prev + emojiData.emoji);
+        const newValue = input + emojiData.emoji;
+        if (newValue.length <= maxLength) {
+            setInput(newValue);
+            setError("");
+        } else {
+            setError(`Tin nhắn không được vượt quá ${maxLength} ký tự`);
+        }
     };
 
     // Trong component UserChat
@@ -201,57 +218,116 @@ const UserChat = () => {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    
 
-                    {/* Input */}
-                    <div className="chat-option flex items-center gap-2 p-2 border-t border-gray-300">
-                        <div className="flex gap-2">
-                            <ImAttachment size={23} className="cursor-pointer" />
-                            <FaImage onClick={handleImage} size={23} className="cursor-pointer" />
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleFileChange}
-                                style={{ display: 'none' }}
-                                accept="image/*"
-                            />
-                        </div>
 
-                        <div className="flex flex-1 relative">
-                            <input
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                                type="text"
-                                className="w-full rounded-full border border-gray-300 px-4 py-2 outline-none"
-                                placeholder="Nhập tin nhắn..."
-                            />
+                    {/* Input chat */}
+                    <div className="chat-option flex flex-col gap-1 p-2 border-t border-gray-300">
+                        {/* Thông báo lỗi */}
+                        {error && (
+                            <div className="text-red-500 text-xs px-2 animate-pulse">
+                                {error}
+                            </div>
+                        )}
 
-                            <CiPaperplane
-                                size={23}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600"
-                                onClick={sendMessage}
-                            />
-                        </div>
+                        {/* Main Input Row */}
+                        <div className="flex items-center gap-2">
+                            {/* Attachment & Image */}
+                            <div className="flex gap-2">
+                                <ImAttachment size={23} className="cursor-pointer text-gray-600 hover:text-gray-800 transition-colors" />
+                                <FaImage
+                                    onClick={handleImage}
+                                    size={23}
+                                    className="cursor-pointer text-gray-600 hover:text-gray-800 transition-colors"
+                                />
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    style={{ display: 'none' }}
+                                    accept="image/*"
+                                />
+                            </div>
 
-                        <div className="flex gap-2">
-                            <div>
+                            {/* Input chính với counter bên trong */}
+                            <div className="flex flex-1 relative">
+                                <input
+                                    value={input}
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        if (value.length <= maxLength) {
+                                            setInput(value);
+                                            setError("");
+                                        } else {
+                                            setError(`Tin nhắn không được vượt quá ${maxLength} ký tự`);
+                                        }
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" && input.trim() && input.length <= maxLength) {
+                                            sendMessage();
+                                        }
+                                    }}
+                                    type="text"
+                                    className={`w-full rounded-full border px-4 py-2 pr-24 outline-none transition-all ${error
+                                            ? "border-red-500 focus:ring-2 focus:ring-red-200"
+                                            : "border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                                        }`}
+                                    placeholder="Nhập tin nhắn..."
+                                />
+
+                                {/* Số ký tự bên trong input */}
+                                <span
+                                    className={`absolute right-12 top-1/2 transform -translate-y-1/2 text-xs font-medium transition-colors ${input.length > maxLength * 0.9
+                                            ? 'text-red-500'
+                                            : input.length > maxLength * 0.8
+                                                ? 'text-orange-500'
+                                                : 'text-gray-400'
+                                        }`}
+                                >
+                                    {input.length}/{maxLength}
+                                </span>
+
+                                {/* Nút gửi */}
+                                <CiPaperplane
+                                    size={26}
+                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-all ${input.trim() && input.length <= maxLength
+                                            ? "cursor-pointer text-blue-600 hover:text-blue-700 hover:scale-110"
+                                            : "opacity-30 cursor-not-allowed text-gray-400"
+                                        }`}
+                                    onClick={() => {
+                                        if (input.trim() && input.length <= maxLength) {
+                                            sendMessage();
+                                        }
+                                    }}
+                                />
+                            </div>
+
+                            {/* Emoji & Like */}
+                            <div className="flex gap-2">
                                 <Popover className="relative">
-                                    <Popover.Button>
-                                        <BsEmojiSmile size={23} className="cursor-pointer" />
+                                    <Popover.Button className="focus:outline-none">
+                                        <BsEmojiSmile
+                                            size={23}
+                                            className="cursor-pointer text-gray-600 hover:text-yellow-500 transition-colors"
+                                        />
                                     </Popover.Button>
-
                                     <Popover.Panel className="absolute z-10 right-0 bottom-full mb-2">
                                         <EmojiPicker
-                                            theme="dark"
+                                            theme="light"
                                             onEmojiClick={handleEmojiClick}
+                                            width={320}
+                                            height={400}
                                         />
                                     </Popover.Panel>
                                 </Popover>
+                                <SlLike
+                                    onClick={() => sendEmoji("👍")}
+                                    size={23}
+                                    className="cursor-pointer text-gray-600 hover:text-blue-600 transition-colors"
+                                />
                             </div>
-                            <SlLike onClick={() => sendEmoji("👍")} size={23} className="cursor-pointer" />
                         </div>
                     </div>
+
                 </div>
             )}
         </>
