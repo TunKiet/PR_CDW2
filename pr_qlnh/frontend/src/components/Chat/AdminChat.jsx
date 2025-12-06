@@ -12,18 +12,20 @@ import { useRef } from "react";
 import Pusher from 'pusher-js';
 import EmojiPicker from 'emoji-picker-react';
 import { Popover } from '@headlessui/react';
-import { confirmDialog } from '../../utils/notify'
 import { notify, confirmAction } from '../../utils/notify'
+
 const endPoint = 'http://localhost:8000/api';
 
 const AdminChat = () => {
 
     const adminId = JSON.parse(localStorage.getItem("user"))?.user_id;
+    const maxLength = 2000;
 
     const [conversations, setConversations] = useState([]);
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
+    const [error, setError] = useState("");
     const messagesEndRef = useRef(null);
     const [isSending, setIsSending] = useState(false);
 
@@ -47,7 +49,6 @@ const AdminChat = () => {
     }, [messages]);
 
     // Load messages khi chọn conversation
-
     useEffect(() => {
         if (!selectedConversation) return;
 
@@ -80,18 +81,18 @@ const AdminChat = () => {
             pusher.unsubscribe(`conversation.${selectedConversation.conversation_id}`);
         };
     }, [selectedConversation]);
-    // AdminChat.jsx
-
 
     // Gửi tin nhắn
     const sendMessage = async () => {
         if (!input.trim() || !selectedConversation || isSending) {
-            await confirmDialog('Không thể gửi', 'Vui lòng nhập nội dung.');
+            if (!input.trim()) {
+                setError('Vui lòng nhập nội dung tin nhắn');
+            }
             return;
         }
 
-        if (input.length > 1000) {
-            await confirmDialog('Không thể gửi', 'Vui lòng rút ngắn nội dung.');
+        if (input.length > maxLength) {
+            setError(`Tin nhắn không được vượt quá ${maxLength} ký tự`);
             return;
         }
 
@@ -124,13 +125,23 @@ const AdminChat = () => {
                 );
 
                 setInput('');
+                setError('');
             })
-            .catch(err => console.error("❌ Error sending message:", err))
+            .catch(err => {
+                console.error("❌ Error sending message:", err);
+                setError('Không thể gửi tin nhắn. Vui lòng thử lại');
+            })
             .finally(() => setIsSending(false));
     };
 
     const handleEmojiClick = (emojiData) => {
-        setInput(prev => prev + emojiData.emoji);
+        const newValue = input + emojiData.emoji;
+        if (newValue.length <= maxLength) {
+            setInput(newValue);
+            setError("");
+        } else {
+            setError(`Tin nhắn không được vượt quá ${maxLength} ký tự`);
+        }
     };
 
     // Gửi emoji ngay
@@ -150,7 +161,6 @@ const AdminChat = () => {
         })
             .then(res => {
                 console.log("✅ Emoji sent:", res.data);
-                // Không cần thêm vào state, Pusher sẽ xử lý
             })
             .catch(err => console.error("❌ Send emoji error:", err));
     };
@@ -237,8 +247,6 @@ const AdminChat = () => {
                                         </div>
                                     </div>
 
-
-                                    
                                     {/* Danh sách tin nhắn */}
                                     <div className="flex flex-col flex-1 bg-gray-200 p-2 overflow-y-auto 
                   [&::-webkit-scrollbar]:w-1 
@@ -253,7 +261,6 @@ const AdminChat = () => {
                                                     time={msg.created_at}
                                                     messageId={msg.message_id}
                                                     handleDelete={handleDelete}
-
                                                 />
                                             ) : (
                                                 <Receiver
@@ -263,60 +270,111 @@ const AdminChat = () => {
                                                 />
                                             )
                                         )}
-                                        {/* Thêm ref để scroll */}
                                         <div ref={messagesEndRef} />
                                     </div>
 
                                     {/* Input gửi tin nhắn */}
-                                    <div className="chat-option flex items-center gap-2 p-2 border">
-                                        <div className="flex gap-2">
-                                            <div className="icon-attach cursor-pointer">
-                                                <ImAttachment size={23} />
+                                    <div className="chat-option flex flex-col gap-1 p-2 border bg-white">
+                                        {/* Thông báo lỗi */}
+                                        {error && (
+                                            <div className="text-red-500 text-xs px-2 animate-pulse">
+                                                {error}
                                             </div>
-                                            <div className="icon-image cursor-pointer">
-                                                <FaImage size={23} />
-                                            </div>
-                                        </div>
+                                        )}
 
-                                        <div className="flex flex-1">
-                                            <div className="input-message flex relative w-full">
+                                        {/* Main Input Row */}
+                                        <div className="flex items-center gap-2">
+                                            {/* Attachment & Image */}
+                                            <div className="flex gap-2">
+                                                <div className="icon-attach cursor-pointer text-gray-600 hover:text-gray-800 transition-colors">
+                                                    <ImAttachment size={23} />
+                                                </div>
+                                                <div className="icon-image cursor-pointer text-gray-600 hover:text-gray-800 transition-colors">
+                                                    <FaImage size={23} />
+                                                </div>
+                                            </div>
+
+                                            {/* Input chính với counter */}
+                                            <div className="flex flex-1 relative">
                                                 <input
                                                     value={input}
-                                                    onChange={(e) => setInput(e.target.value)}
-                                                    onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        if (value.length <= maxLength) {
+                                                            setInput(value);
+                                                            setError("");
+                                                        } else {
+                                                            setError(`Tin nhắn không được vượt quá ${maxLength} ký tự`);
+                                                        }
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter' && input.trim() && input.length <= maxLength && !isSending) {
+                                                            sendMessage();
+                                                        }
+                                                    }}
                                                     type="text"
-                                                    className="w-full rounded-full border border-gray-300 px-4 py-2 outline-none"
+                                                    className={`w-full rounded-full border px-4 py-2 pr-24 outline-none transition-all ${error
+                                                            ? "border-red-500 focus:ring-2 focus:ring-red-200"
+                                                            : "border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                                                        }`}
                                                     placeholder="Nhập tin nhắn..."
+                                                    disabled={isSending}
                                                 />
+
+                                                {/* Số ký tự bên trong input */}
+                                                <span
+                                                    className={`absolute right-12 top-1/2 transform -translate-y-1/2 text-xs font-medium transition-colors ${input.length > maxLength * 0.9
+                                                            ? 'text-red-500'
+                                                            : input.length > maxLength * 0.8
+                                                                ? 'text-orange-500'
+                                                                : 'text-gray-400'
+                                                        }`}
+                                                >
+                                                    {input.length}/{maxLength}
+                                                </span>
+
+                                                {/* Nút gửi */}
                                                 <CiPaperplane
-                                                    size={23}
-                                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600 transition
-                                                    ${isSending ? "opacity-40 cursor-not-allowed" : "opacity-100"}`}
-                                                    onClick={!isSending ? sendMessage : undefined}
+                                                    size={26}
+                                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 transition-all ${input.trim() && input.length <= maxLength && !isSending
+                                                            ? "cursor-pointer text-blue-600 hover:text-blue-700 hover:scale-110"
+                                                            : "opacity-30 cursor-not-allowed text-gray-400"
+                                                        }`}
+                                                    onClick={() => {
+                                                        if (input.trim() && input.length <= maxLength && !isSending) {
+                                                            sendMessage();
+                                                        }
+                                                    }}
                                                 />
                                             </div>
-                                        </div>
 
-                                        <div className="flex gap-2">
-                                            <div className="icon-emoji cursor-pointer">
-
-                                                <div>
+                                            {/* Emoji & Like */}
+                                            <div className="flex gap-2">
+                                                <div className="icon-emoji">
                                                     <Popover className="relative">
-                                                        <Popover.Button>
-                                                            <BsEmojiSmile size={23} className="cursor-pointer" />
+                                                        <Popover.Button className="focus:outline-none">
+                                                            <BsEmojiSmile
+                                                                size={23}
+                                                                className="cursor-pointer text-gray-600 hover:text-yellow-500 transition-colors"
+                                                            />
                                                         </Popover.Button>
-
                                                         <Popover.Panel className="absolute z-10 right-0 bottom-full mb-2">
                                                             <EmojiPicker
-                                                                theme="dark"
+                                                                theme="light"
                                                                 onEmojiClick={handleEmojiClick}
+                                                                width={320}
+                                                                height={400}
                                                             />
                                                         </Popover.Panel>
                                                     </Popover>
                                                 </div>
-                                            </div>
-                                            <div className="icon-like cursor-pointer">
-                                                <SlLike onClick={() => sendEmoji("👍")} size={23} className="cursor-pointer" />
+                                                <div className="icon-like">
+                                                    <SlLike
+                                                        onClick={() => sendEmoji("👍")}
+                                                        size={23}
+                                                        className="cursor-pointer text-gray-600 hover:text-blue-600 transition-colors"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -328,7 +386,6 @@ const AdminChat = () => {
             </div>
         </>
     );
-
 }
 
 export default AdminChat
