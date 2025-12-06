@@ -4,7 +4,7 @@ import Sidebar from "../components/Sidebar";
 import UserTable from "../components/UserTable";
 import UserDetailsModal from "../components/UserDetailsModal";
 import AddUserModal from "../components/AddUserModal";
-import { Search } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import "../pages/Dashboard/Sales_Statistics_Dashboard.css";
 import {
   getAllUser,
@@ -20,6 +20,10 @@ const UserManagementPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     loadUser();
@@ -90,6 +94,7 @@ const UserManagementPage = () => {
   // local filter OR server search by phone
   const handleSearch = async (value) => {
     setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
     const trimmed = value.trim();
     // if looks like a phone (digits and length >= 6) then call API search
     const digits = trimmed.replace(/\D/g, "");
@@ -121,6 +126,31 @@ const UserManagementPage = () => {
             (String(c.user_id || c.id || "") || "").includes(trimmed)
         )
       );
+    }
+  };
+
+  // Pagination calculations
+  const totalPages = Math.ceil(User.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = User.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -165,12 +195,83 @@ const UserManagementPage = () => {
               </button>
             </div>
           </div>
+
+          {/* User Table */}
           <UserTable
-            users={User}
+            users={currentUsers}
             onViewDetails={(c) => setSelectedUser(c)}
             onDelete={handleDeleteUser}
             loading={loading}
           />
+
+          {/* Pagination */}
+          {User.length > itemsPerPage && (
+            <div className="mt-6 bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  Hiển thị {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, User.length)} trong tổng số {User.length} nhân viên
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className={`px-3 py-2 rounded-lg border transition flex items-center gap-1 ${
+                      currentPage === 1
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                    }`}
+                  >
+                    <ChevronLeft size={16} />
+                    Trước
+                  </button>
+                  
+                  <div className="flex items-center gap-1">
+                    {[...Array(totalPages)].map((_, index) => {
+                      const pageNumber = index + 1;
+                      if (
+                        pageNumber === 1 ||
+                        pageNumber === totalPages ||
+                        (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                      ) {
+                        return (
+                          <button
+                            key={pageNumber}
+                            onClick={() => handlePageChange(pageNumber)}
+                            className={`px-3 py-2 rounded-lg border transition ${
+                              currentPage === pageNumber
+                                ? 'bg-indigo-600 text-white border-indigo-600'
+                                : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                            }`}
+                          >
+                            {pageNumber}
+                          </button>
+                        );
+                      } else if (
+                        pageNumber === currentPage - 2 ||
+                        pageNumber === currentPage + 2
+                      ) {
+                        return <span key={pageNumber} className="px-2 text-gray-400">...</span>;
+                      }
+                      return null;
+                    })}
+                  </div>
+
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={`px-3 py-2 rounded-lg border transition flex items-center gap-1 ${
+                      currentPage === totalPages
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                    }`}
+                  >
+                    Sau
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
