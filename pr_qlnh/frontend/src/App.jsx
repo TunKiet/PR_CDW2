@@ -15,6 +15,7 @@ import Reservation from './pages/Reservations/ReservationCenter'
 import ReservationCreate from './pages/ReservationCreate'
 import NotificationManagementAdmin from "./pages/NotificationManagementAdmin";
 import NotificationBellFloating from "./components/Notification/NotificationBell";
+import FrequentCustomerReport from "./pages/FrequentCustomerReport";
 
 import InventoryOverview from './components/InventoryOverview/InventoryOverview'
 
@@ -66,6 +67,7 @@ function App() {
         <Route path="/reservation" element={<Reservation/>} />
         <Route path="/reservationcreate" element={<ReservationCreate/>} />
         <Route path="/notifications" element={<NotificationManagementAdmin />} />
+        <Route path="/reports/frequent-customers" element={<FrequentCustomerReport />} />
 
         {/* Định tuyến cho các trang khác nhau */}
         <Route path="/admin/dashboard" element={<AdminDashboard />} />

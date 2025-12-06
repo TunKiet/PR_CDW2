@@ -32,6 +32,8 @@ use App\Http\Controllers\API\TableController;
 use App\Http\Controllers\API\ReservationController;
 use App\Http\Controllers\API\ReservationManagementController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\ReportController;
+
 // 🔹 (Tùy chọn) Các controller liên quan khác nếu cần
 // use App\Http\Controllers\Api\TableController;
 // use App\Http\Controllers\Api\MenuItemController;
@@ -152,6 +154,8 @@ Route::prefix('notifications')->group(function () {
     Route::post('/{id}/mark-read', [NotificationController::class, 'markRead']);
     Route::post('/mark-all-read', [NotificationController::class, 'markAllRead']);
 });
+
+Route::get('/reports/frequent-customers', [ReportController::class, 'frequentCustomers']);
 
 
 
