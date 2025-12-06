@@ -4,7 +4,7 @@ import "./HomePage.css";
 import "./ReservationForm.css";
 import MenuItemModal from "../MenuItemModal";
 import OrderOnlineForm from "../OrderOnlineForm"; // <-- đảm bảo đường dẫn đúng
-import UserChat from "../Chat/UserChat"
+import UserChat from "../Chat/UserChat";
 
 // =========================
 // FORMAT TIỀN
