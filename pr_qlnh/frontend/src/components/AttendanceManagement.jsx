@@ -185,8 +185,13 @@ const AttendanceManagement = () => {
   };
 
   useEffect(() => {
-    if (viewMode === "calendar" && selectedUserId) {
-      fetchMonthlyAttendance();
+    if (viewMode === "calendar") {
+      if (selectedUserId) {
+        fetchMonthlyAttendance();
+      } else {
+        // Nếu không chọn nhân viên, lấy tất cả chấm công để hiển thị ngày có người đi làm
+        fetchAllAttendances();
+      }
     } else if (viewMode === "list") {
       fetchAllAttendances();
     } else if (viewMode === "report") {
@@ -240,8 +245,16 @@ const AttendanceManagement = () => {
         2,
         "0"
       )}-${String(day).padStart(2, "0")}`;
-      const attendance = attendances.find((a) => a.date === dateStr);
-      calendar.push({ day, attendance });
+      
+      if (selectedUserId) {
+        // Nếu đã chọn nhân viên, hiển thị chấm công của nhân viên đó
+        const attendance = attendances.find((a) => a.date === dateStr);
+        calendar.push({ day, attendance });
+      } else {
+        // Nếu chưa chọn nhân viên, kiểm tra xem ngày này có ai đi làm không
+        const attendancesOnDate = allAttendances.filter((a) => a.date === dateStr);
+        calendar.push({ day, attendancesOnDate, hasAttendance: attendancesOnDate.length > 0 });
+      }
     }
 
     return calendar;
@@ -292,7 +305,7 @@ const AttendanceManagement = () => {
               key={index}
               className={`min-h-24 border rounded-lg p-2 ${
                 item
-                  ? item.attendance
+                  ? (item.attendance || item.hasAttendance)
                     ? "bg-green-50 border-green-300"
                     : "bg-white border-gray-200"
                   : "bg-gray-50"
@@ -303,6 +316,7 @@ const AttendanceManagement = () => {
                   <div className="font-semibold text-gray-700 mb-1">
                     {item.day}
                   </div>
+                  {/* Hiển thị chi tiết khi đã chọn nhân viên */}
                   {item.attendance && (
                     <div className="text-xs space-y-1">
                       <div className="text-green-600 font-medium">
@@ -318,6 +332,17 @@ const AttendanceManagement = () => {
                       )}
                       <div className="text-indigo-600 font-semibold">
                         {item.attendance.hours_worked}h
+                      </div>
+                    </div>
+                  )}
+                  {/* Hiển thị số lượng người đi làm khi chưa chọn nhân viên */}
+                  {!selectedUserId && item.hasAttendance && (
+                    <div className="text-xs space-y-1">
+                      <div className="text-green-600 font-medium">
+                        ✓ Có người làm việc
+                      </div>
+                      <div className="text-gray-600">
+                        {item.attendancesOnDate.length} người
                       </div>
                     </div>
                   )}

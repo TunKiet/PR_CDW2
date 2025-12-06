@@ -1,12 +1,14 @@
 // src/components/Settings/ActivityLogSection.jsx
 import React, { useState, useEffect } from "react";
-import { Clock, MapPin, CheckCircle, XCircle, LogOut, RefreshCw, AlertCircle } from "lucide-react";
+import { Clock, MapPin, CheckCircle, XCircle, LogOut, RefreshCw, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { getUserLoginLogs } from "../../data/LoginLogData";
 
 const ActivityLogSection = ({ user }) => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(3); // Số mục trên mỗi trang
 
   useEffect(() => {
     if (user) {
@@ -163,6 +165,32 @@ const ActivityLogSection = ({ user }) => {
 
   const sessions = groupLogsBySession();
 
+  // Tính toán phân trang
+  const totalPages = Math.ceil(sessions.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentSessions = sessions.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Chuyển trang
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -172,7 +200,7 @@ const ActivityLogSection = ({ user }) => {
             Nhật ký hoạt động
           </h3>
           <p className="text-sm text-gray-600 mt-1">
-            Lịch sử đăng nhập và đăng xuất của tài khoản
+            Lịch sử đăng nhập và đăng xuất của tài khoản ({sessions.length} phiên)
           </p>
         </div>
         <button
@@ -229,7 +257,7 @@ const ActivityLogSection = ({ user }) => {
             <p className="text-gray-600 mt-4">Chưa có nhật ký hoạt động</p>
           </div>
         ) : (
-          sessions.map((session, index) => (
+          currentSessions.map((session, index) => (
             <div
               key={index}
               className={`border rounded-lg p-4 ${
@@ -299,6 +327,74 @@ const ActivityLogSection = ({ user }) => {
           ))
         )}
       </div>
+
+      {/* Pagination */}
+      {sessions.length > itemsPerPage && (
+        <div className="flex items-center justify-between border-t pt-4">
+          <div className="text-sm text-gray-600">
+            Hiển thị {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, sessions.length)} trong tổng số {sessions.length} phiên
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className={`px-3 py-2 rounded-lg border transition flex items-center gap-1 ${
+                currentPage === 1
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+              }`}
+            >
+              <ChevronLeft size={16} />
+              Trước
+            </button>
+            
+            <div className="flex items-center gap-1">
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNumber = index + 1;
+                // Hiển thị trang đầu, trang cuối, trang hiện tại và 2 trang xung quanh
+                if (
+                  pageNumber === 1 ||
+                  pageNumber === totalPages ||
+                  (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={pageNumber}
+                      onClick={() => handlePageChange(pageNumber)}
+                      className={`px-3 py-2 rounded-lg border transition ${
+                        currentPage === pageNumber
+                          ? 'bg-indigo-600 text-white border-indigo-600'
+                          : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+                      }`}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                } else if (
+                  pageNumber === currentPage - 2 ||
+                  pageNumber === currentPage + 2
+                ) {
+                  return <span key={pageNumber} className="px-2 text-gray-400">...</span>;
+                }
+                return null;
+              })}
+            </div>
+
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-2 rounded-lg border transition flex items-center gap-1 ${
+                currentPage === totalPages
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300'
+              }`}
+            >
+              Sau
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Info */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

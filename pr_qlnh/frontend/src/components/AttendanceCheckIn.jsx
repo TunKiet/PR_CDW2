@@ -51,7 +51,7 @@ const AttendanceCheckIn = () => {
     } catch (error) {
       setMessage({
         type: "error",
-        text: error.message || "Có lỗi xảy ra khi chấm công vào",
+        text: error.message || error.errors || "Có lỗi xảy ra khi chấm công vào",
       });
     } finally {
       setLoading(false);
@@ -79,7 +79,7 @@ const AttendanceCheckIn = () => {
     } catch (error) {
       setMessage({
         type: "error",
-        text: error.message || "Có lỗi xảy ra khi chấm công ra",
+        text: error.message || error.errors || "Có lỗi xảy ra khi chấm công ra",
       });
     } finally {
       setLoading(false);
