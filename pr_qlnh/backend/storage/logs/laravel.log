@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [2025-12-05 00:11:46] local.ERROR: Call to undefined method App\Http\Controllers\ReviewController::index() {"exception":"[object] (Error(code: 0): Call to undefined method App\\Http\\Controllers\\ReviewController::index() at /var/www/vendor/laravel/framework/src/Illuminate/Routing/ControllerDispatcher.php:46)
 [stacktrace]
 #0 /var/www/vendor/laravel/framework/src/Illuminate/Routing/Route.php(265): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ReviewController), 'index')
@@ -7317,3 +7318,5 @@
 #41 E:\\PR_CDW2\\pr_qlnh\\backend\\artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #42 {main}
 "} 
+=======
+>>>>>>> trieu/f12/export-pdf

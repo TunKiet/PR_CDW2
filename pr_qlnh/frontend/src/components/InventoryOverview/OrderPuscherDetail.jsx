@@ -18,7 +18,8 @@ import Button from '@mui/material/Button';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import CircularProgress from '@mui/material/CircularProgress';
-
+import { notify, confirmAction } from '../../utils/notify'
+import exportPDF from '../../utils/exportPDF'
 
 const endPoint = 'http://localhost:8000/api';
 
@@ -32,6 +33,7 @@ const OrderPuscherDetail = () => {
     const [ingredients, setIngredients] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeStep, setActiveStep] = useState(0);
+    const [notFound, setNotFound] = useState(false);
 
     const formatDateTime = (datetime) => {
         const dateObj = new Date(datetime);
@@ -55,25 +57,48 @@ const OrderPuscherDetail = () => {
         return Number(value).toLocaleString('vi-VN') + ' đ';
     };
 
-    useEffect(() => {
-        const fetchOrderDetail = async () => {
-            setLoading(true);
-            try {
-                const res = await axios.get(`${endPoint}/purchase-orders/${purchase_order_id}`);
-                setOrderDetail(res.data);
 
-                // Set activeStep dựa vào status trong DB
-                const stepIndex = orderSteps.findIndex(step => step.key === res.data.status);
-                setActiveStep(stepIndex !== -1 ? stepIndex : 0);
-                setIngredients(res.data.items);
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
-            }
-        };
+
+    useEffect(() => {
+        if (!/^\d+$/.test(purchase_order_id)) {
+            setNotFound(true);  // purchase_order_id không phải số
+            setLoading(false);
+            return;
+        }
+
+        if (Number(purchase_order_id) <= 0) {
+            setNotFound(true);
+            setLoading(false);
+            return;
+        }
+
         fetchOrderDetail();
     }, [purchase_order_id]);
+
+
+    useEffect(() => {
+        fetchOrderDetail();
+    }, [purchase_order_id]);
+
+    const fetchOrderDetail = async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${endPoint}/purchase-orders/${purchase_order_id}`);
+            setOrderDetail(res.data);
+
+            // Set activeStep dựa vào status trong DB
+            const stepIndex = orderSteps.findIndex(step => step.key === res.data.status);
+            setActiveStep(stepIndex !== -1 ? stepIndex : 0);
+            setIngredients(res.data.items);
+        } catch (error) {
+            if (error.response?.status === 404) {
+                setNotFound(true);
+            }
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const orderSteps = [
         {
@@ -139,6 +164,29 @@ const OrderPuscherDetail = () => {
         setActiveStep(prev => Math.max(prev - 1, 0));
     };
 
+    const handleExportPDF = async () => {
+        if (!ingredients.length) {
+            notify.error('Không có dữ liệu để xuất PDF');
+            return;
+        }
+        try {
+            const isConfirmed = await confirmAction('Xác nhận xuất đơn hàng');
+            if (!isConfirmed) return;
+
+            notify.info('Đang xuất...')
+            const res = await axios.get(`http://localhost:8000/api/export/${purchase_order_id}`);
+            const purchaseOrder = res.data;
+            notify.dismiss();
+            exportPDF(purchaseOrder);
+            notify.success("📄 Xuất file PDF thành công!");
+        } catch (error) {
+            console.error("Lỗi khi xuất PDF:", error);
+            notify.error("Đã xảy ra lỗi khi xuất file PDF");
+        }
+    }
+
+    if (notFound) return <h3 className='text-center'>404 Không tìm thấy trang</h3>;
+
 
     return (
         <div className="section">
@@ -150,7 +198,7 @@ const OrderPuscherDetail = () => {
                     <header className="bg-white p-4 flex justify-between items-center border-b border-gray-200 sticky top-0 z-10">
                         <div className="flex gap-2 items-center ms-auto">
                             <button className="px-3 py-1 border border-gray-300 rounded hover:border-blue-600 hover:text-blue-600 flex items-center"><FaPrint className="mr-1" /> In đơn</button>
-                            <button className="px-3 py-1 border border-gray-300 rounded hover:border-blue-600 hover:text-blue-600 flex items-center"><FaFilePdf className="mr-1" /> Tải PDF</button>
+                            <button onClick={handleExportPDF} className="px-3 py-1 border border-gray-300 rounded hover:border-blue-600 hover:text-blue-600 flex items-center"><FaFilePdf className="mr-1" /> Tải PDF</button>
 
                         </div>
                     </header>

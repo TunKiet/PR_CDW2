@@ -16,7 +16,7 @@ import exportPDF from '../../utils/exportPDF'
 import axios from "axios";
 import CategoryIngredient from './CategoryIngredient';
 
-const Ingredient = ({loading, ingredients, page, setPage, totalPages, setSelectedCategory, fetchIngredients}) => {
+const Ingredient = ({ loading, ingredients, page, setPage, totalPages, setSelectedCategory, fetchIngredients }) => {
     //Open dialog add ingredient
     const [openAdd, setOpenAdd] = useState(false);
     //Open dialog update ingredient

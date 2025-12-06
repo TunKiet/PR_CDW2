@@ -11,6 +11,7 @@ import BoxReview from './BoxReview';
 import { CiCamera } from "react-icons/ci";
 import { notify } from '../../utils/notify'
 import axios from "axios";
+import { validateImageFile } from "../../utils/validators";
 
 const endPoint = 'http://localhost:8000/api';
 
@@ -84,21 +85,40 @@ const Review = ({ menuItemId }) => {
     //Handle change file
     const handleChangeFile = async (e) => {
         const file = e.target.files[0];
+
+        //Validate trước khi upload
+        const errorMsg = validateImageFile(file, 2);
+        if (errorMsg) {
+            notify.error(errorMsg);
+            setPreview(null);
+            setImage(null);
+            return;
+        }
+
+        // Hiển thị preview
         setPreview(URL.createObjectURL(file));
 
-        const data = new FormData();
-        data.append("file", file);
-        data.append("upload_preset", "image_review");
-        data.append("cloud_name", "dpq6tyosc");
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "image_review");
+        formData.append("cloud_name", "dpq6tyosc");
 
         try {
+            notify.info("Đang tải ảnh lên...");
+
             const res = await axios.post(
                 "https://api.cloudinary.com/v1_1/dpq6tyosc/image/upload",
-                data
+                formData
             );
 
+            notify.dismiss();
+            notify.success("Tải ảnh thành công!");
+
             setImage(res.data.secure_url);
+
         } catch (error) {
+            notify.dismiss();
+            notify.error("Tải ảnh thất bại");
             console.log("Upload error:", error.response?.data);
         }
     };
@@ -106,7 +126,7 @@ const Review = ({ menuItemId }) => {
     //Handle button submit
     const handleSubmit = async () => {
         if (!rating) {
-            notify.info('Vui lòng chọn số sao');
+            notify.error('Vui lòng chọn số sao');
             return;
         }
 
@@ -140,8 +160,6 @@ const Review = ({ menuItemId }) => {
             setLoading(false);
         }
     };
-
-
 
     return (
         <>

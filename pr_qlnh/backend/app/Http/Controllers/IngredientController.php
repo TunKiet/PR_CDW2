@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ingredient;
+use App\Models\PurchaseOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -79,6 +80,7 @@ class IngredientController extends Controller
             'unit' => 'required|string|max:50',
             'stock_quantity' => 'required|integer|min:0',
             'min_stock_level' => 'required|integer|min:0',
+            'updated_at' => 'required|date',
         ]);
 
         $result = Ingredient::updateIngredient($id, $validated);
@@ -87,7 +89,7 @@ class IngredientController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $result['message']
-            ], 404);
+            ], $result['code']); // trả 404 hoặc 409
         }
 
         return response()->json([
@@ -97,9 +99,10 @@ class IngredientController extends Controller
         ]);
     }
 
-    public function exportPDF()
+
+    public function exportPDF($id)
     {
-        $dataExport = Ingredient::exportIngredient();
+        $dataExport = PurchaseOrder::getOrderDetail($id);
         return response()->json($dataExport);
     }
 
