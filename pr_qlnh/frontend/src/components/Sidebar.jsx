@@ -63,6 +63,9 @@ const menuItems = [
   { title: "Tin nhắn", icon: <AiOutlineMessage size={20} />, path: '/admin-chat' },
   { title: "Hệ thống", icon: <Settings size={20} />, path: '/system-settings' },
   { title: "Thiết lập nhà hàng", icon: <Building size={20} />, path: '/restaurant-info' },
+  { title: "Quản lý đặt bàn", icon: <AiOutlineMessage size={20} />, path: '/reservation' },
+  { title: "Quản lý thông báo", icon: <AiOutlineMessage size={20} />, path: '/notifications' },
+  { title: "Khách hàng thường xuyên", icon: <AiOutlineMessage size={20} />, path: '/reports/frequent-customers' },
   { title: "Đăng xuất", icon: <LogOut size={20} />, action: "logout" }, // thêm action
 ];
 

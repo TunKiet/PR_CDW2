@@ -65,11 +65,11 @@ import SupplierOrderDetail from "./components/InventoryOverview/SupplierOrderDet
 
 function App() {
   // Lấy user từ localStorage sau khi đăng nhập
-  const user = JSON.parse(localStorage.getItem("users"));
+    const userId = JSON.parse(localStorage.getItem("user"))?.user_id;
   return (
     <BrowserRouter> 
-    {user && <NotificationBell userId={user.user_id} />}
-        {/* <NotificationBellFloating userId={1} /> */}
+    {userId && <NotificationBellFloating userId={userId} />}
+        
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/dish-status-management" element={<DishStatusManagement />} />
@@ -105,7 +105,7 @@ function App() {
         <Route path="/attendance" element={<AttendancePage />} />
         <Route path="/attendance-management" element={<AttendanceManagementPage />} />
 
-		    <Route path="/tables" element={<TableManagementAdmin/>} />
+		    
         <Route path="/reservation" element={<Reservation/>} />
         <Route path="/reservationcreate" element={<ReservationCreate/>} />
         <Route path="/notifications" element={<NotificationManagementAdmin />} />
@@ -148,6 +148,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+          {/* ROUTE MỚI: Trang Quản Lý Khách Hàng */}
+         <Route
+          path="/system-settings"
+          element={
+            <ProtectedRoute>
+              <SystemSettings />
+            </ProtectedRoute>
+          }
+        />
+
 
         {/* <Route path="/customers" element={<CustomerManagementPage />} /> */}
 

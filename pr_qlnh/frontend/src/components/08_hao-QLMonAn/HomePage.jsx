@@ -340,7 +340,7 @@ export default function HomePage() {
             <li><a href="#featured">Món nổi bật</a></li>
             <li><a href="#menu">Thực đơn</a></li>
             <li><a href="#promotions">Ưu đãi</a></li>
-            <li><a href="#reservation">Đặt bàn</a></li>
+            <li><a href="/reservationcreate">Đặt bàn</a></li>
           </ul>
 
           <div className="flex items-center gap-4">
