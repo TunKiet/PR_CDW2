@@ -224,16 +224,17 @@ export default function HomePage() {
       .finally(() => setIsLoadingFeatured(false));
 
     // Fetch Categories
-    fetch(`${API_BASE_URL}/categories`)
+     fetch(`${API_BASE_URL}/categories`)
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "success") {
-          setCategories(data.data);
+          // ✅ Chỉ lấy categories KHÔNG bị ẩn
+          const visibleCategories = data.data.filter(cat => cat.is_hidden !== 1);
+          setCategories(visibleCategories);
         }
       })
       .catch((err) => console.error("Lỗi tải danh mục:", err))
       .finally(() => setIsLoadingCategories(false));
-
     // Fetch Active Promotions
     fetch(`${API_BASE_URL}/v1/active-promotions`)
       .then((res) => res.json())

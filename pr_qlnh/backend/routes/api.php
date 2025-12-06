@@ -484,3 +484,5 @@ Route::middleware(['jwt.auth'])->prefix('restaurant-info')->group(function () {
     Route::post('/logo', [RestaurantInfoController::class, 'uploadLogo']);
     Route::delete('/logo', [RestaurantInfoController::class, 'deleteLogo']);
 });
+
+
