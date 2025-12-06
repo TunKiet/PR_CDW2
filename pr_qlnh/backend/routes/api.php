@@ -14,6 +14,7 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginLogController;
+use App\Http\Controllers\TwoFactorController;
 
 use App\Http\Controllers\Api\DishController;
 use App\Http\Controllers\ReviewController;
@@ -132,7 +133,19 @@ Route::prefix('password')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| 🛡️ Roles & Permissions
+| � Two-Factor Authentication (2FA)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('2fa')->group(function () {
+    Route::post('/send-otp/{userId}', [TwoFactorController::class, 'sendOTP']);
+    Route::post('/verify-otp/{userId}', [TwoFactorController::class, 'verifyOTP']);
+    Route::post('/disable/{userId}', [TwoFactorController::class, 'disable2FA']);
+    Route::get('/status/{userId}', [TwoFactorController::class, 'check2FAStatus']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| �🛡️ Roles & Permissions
 |--------------------------------------------------------------------------
 */
 Route::prefix('roles')->group(function () {

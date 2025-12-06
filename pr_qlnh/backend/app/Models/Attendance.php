@@ -91,12 +91,12 @@ class Attendance extends Model
             $note = "Đi muộn {$minutesLate} phút";
         }
 
-        // Tạo bản ghi chấm công mới
+        // Tạo bản ghi chấm công mới - lưu thời gian thực tế khi nhân viên chấm công
         $attendance = self::create([
             'user_id' => $userId,
             'employee_code' => $employeeCode,
             'date' => $today,
-            'check_in' => $now->format('H:i:s'),
+            'check_in' => $now, // Lưu thời gian đầy đủ
             'status' => $status,
             'note' => $note,
         ]);
@@ -141,32 +141,26 @@ class Attendance extends Model
 
         // Lấy cấu hình từ config
         $workEndTime = Carbon::parse(config('attendance.work_hours.end_time'));
-        $minWorkHours = config('attendance.hours.minimum_work_hours');
         $standardWorkHours = config('attendance.hours.standard_work_hours');
         $lunchBreakStart = Carbon::parse(config('attendance.lunch_break.start_time'));
         $lunchBreakEnd = Carbon::parse(config('attendance.lunch_break.end_time'));
         $lunchBreakHours = config('attendance.lunch_break.duration_hours');
         $earlyLeaveThreshold = config('attendance.work_hours.early_leave_threshold');
 
-        // Kiểm tra giờ chấm công ra hợp lý
-        $checkIn = Carbon::parse($attendance->check_in);
-        $minCheckOutTime = $checkIn->copy()->addHours($minWorkHours);
-
-        if ($now->lt($minCheckOutTime)) {
-            return [
-                'success' => false,
-                'message' => "Chưa đủ thời gian làm việc tối thiểu ({$minWorkHours} giờ)"
-            ];
-        }
-
         // Tính số giờ làm việc (trừ giờ nghỉ trưa nếu có)
+        $checkIn = Carbon::parse($attendance->check_in);
         $totalMinutes = $now->diffInMinutes($checkIn);
         
-        // Kiểm tra có nghỉ trưa không
+        // Chỉ trừ giờ nghỉ trưa nếu làm qua giờ trưa VÀ tổng thời gian > 1 giờ
         $hasLunchBreak = false;
-        if ($checkIn->lt($lunchBreakStart) && $now->gt($lunchBreakEnd)) {
+        if ($checkIn->lt($lunchBreakStart) && $now->gt($lunchBreakEnd) && $totalMinutes > 60) {
             $hasLunchBreak = true;
             $totalMinutes -= ($lunchBreakHours * 60); // Trừ 1 giờ nghỉ trưa
+        }
+
+        // Đảm bảo không có số âm
+        if ($totalMinutes < 0) {
+            $totalMinutes = 0;
         }
 
         $hoursWorked = $totalMinutes / 60;
@@ -190,16 +184,21 @@ class Attendance extends Model
             $note .= ($note ? ' | ' : '') . "Thiếu {$missingHours} giờ";
         }
 
+        // Lưu thời gian chấm ra thực tế
         $attendance->update([
-            'check_out' => $now->format('H:i:s'),
+            'check_out' => $now, // Lưu thời gian đầy đủ
             'hours_worked' => round($hoursWorked, 2),
             'status' => $status,
             'note' => $note,
         ]);
 
+        // Tạo thông báo với định dạng phù hợp
         $message = 'Chấm công ra thành công';
         if ($hoursWorked >= $standardWorkHours) {
             $message .= '. Hoàn thành đủ giờ làm việc!';
+        } else if ($hoursWorked < 1) {
+            // Nếu < 1 giờ, hiển thị theo phút
+            $message .= ". Làm được " . round($totalMinutes) . " phút";
         } else {
             $message .= ". Làm được " . round($hoursWorked, 2) . " giờ";
         }

@@ -33,7 +33,7 @@ class AttendanceController extends Controller
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy nhân viên'
+                'message' => 'Chưa có mã nhân viên này trong hệ thống'
             ], 404);
         }
 
@@ -66,7 +66,7 @@ class AttendanceController extends Controller
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy nhân viên'
+                'message' => 'Chưa có mã nhân viên này trong hệ thống'
             ], 404);
         }
 
@@ -97,7 +97,7 @@ class AttendanceController extends Controller
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy nhân viên'
+                'message' => 'Chưa có mã nhân viên này trong hệ thống'
             ], 404);
         }
 
