@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,6 +20,9 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             MenuItemSeeder::class,
 
+            //mã ưu đãi
+            PromotionSeeder::class,
+
             // 3️⃣ Khách hàng và bàn ăn
             CustomerSeeder::class,
             TableSeeder::class,
@@ -27,8 +31,8 @@ class DatabaseSeeder extends Seeder
             ReservationSeeder::class,
 
             // 5️⃣ Đơn hàng & chi tiết đơn hàng
+            // OrderDetailSeeder::class,
             OrderSeeder::class,
-            OrderDetailSeeder::class,
 
             // 6️⃣ Thanh toán (phụ thuộc orders)
             PaymentSeeder::class,

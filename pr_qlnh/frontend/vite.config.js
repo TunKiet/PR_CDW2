@@ -7,13 +7,8 @@ export default defineConfig({
     react(),
     tailwindcss(),  // Tích hợp Tailwind trực tiếp
   ],
-  server: {
-    host: '0.0.0.0',
-    port: 3000,
-    strictPort: true,
-    fs: {
-      allow: ['.'],
-    },
+  define: {
+    // Thiết lập global thành một đối tượng rỗng cho môi trường build/dev
+    global: '({})' 
   },
-  base: '/',
 });

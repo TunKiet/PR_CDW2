@@ -4,16 +4,49 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+class CategorySeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Tạm tắt kiểm tra khóa ngoại (Tốt cho việc Seed)
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-class CategorySeeder extends Seeder {
-    public function run(): void {
-        DB::table('categories')->truncate();
+        // Xóa dữ liệu cũ
+        DB::table('categories')->truncate(); 
 
-        DB::table('categories')->insert([
-            ['category_name' => 'Món chính', 'description' => 'Các món ăn chính trong bữa ăn'],
-            ['category_name' => 'Món khai vị', 'description' => 'Các món ăn khai vị'],
-            ['category_name' => 'Đồ uống', 'description' => 'Cà phê, trà, nước ép...'],
-            ['category_name' => 'Tráng miệng', 'description' => 'Các món ngọt sau bữa chính'],
-        ]);
+        // Định nghĩa dữ liệu mẫu
+        $categories = [
+            'Món chính',
+            'Đồ uống',
+            'Món khai vị',
+            'Tráng miệng',
+            'Hải sản',
+        ];
+
+        // Chuẩn bị mảng dữ liệu để chèn
+        $dataToInsert = [];
+        $baseId = 1;
+
+        foreach ($categories as $name) {
+            $dataToInsert[] = [
+                'category_id' => $baseId++,
+                'category_name' => $name,
+                // Tự động tạo slug từ tên danh mục
+                'slug' => Str::slug($name), 
+                // Description: Tùy chọn, để null hoặc chuỗi rỗng
+                'description' => null, 
+                // is_hidden: Mặc định là false (Hiển thị)
+                'is_hidden' => false,
+                'created_at' => now(), 
+                'updated_at' => now(),
+            ];
+        }
+
+        // Chèn dữ liệu đã chuẩn bị
+        DB::table('categories')->insert($dataToInsert);
+
+        // Bật lại kiểm tra khóa ngoại
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

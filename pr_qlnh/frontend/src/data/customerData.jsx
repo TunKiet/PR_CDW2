@@ -61,4 +61,3 @@ export const getRankColor = (rank) => {
 export const getRankByPoints = (points) => {
   return getRankName(points);
 };
-

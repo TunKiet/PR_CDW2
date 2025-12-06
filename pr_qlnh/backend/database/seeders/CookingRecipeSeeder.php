@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class CookingRecipeSeeder extends Seeder
 {
+    
 
     const MAX_RECORDS = 100;
     public function run(): void

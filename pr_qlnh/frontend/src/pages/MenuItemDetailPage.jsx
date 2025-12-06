@@ -1,5 +1,42 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import draftToHtml from "draftjs-to-html"; 
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+
+// Hàm xử lý rendering mô tả
+const DescriptionRenderer = ({ description }) => {
+  let content;
+  
+  if (!description) {
+    return <p>Món ăn đang được cập nhật mô tả đầy đủ...</p>;
+  }
+
+  try {
+    // 1. CỐ GẮNG parse JSON (Dành cho Draft.js ContentState)
+    const contentState = JSON.parse(description);
+    
+    // Kiểm tra nếu nội dung đã được parse là một đối tượng hợp lệ của Draft.js
+    if (contentState && typeof contentState === 'object' && contentState.hasOwnProperty('blocks')) {
+      content = draftToHtml(contentState);
+    } else {
+      // Nếu JSON parse thành công nhưng không phải định dạng Draft.js (ví dụ: "true"), 
+      // thì coi nó là plain text.
+      content = description;
+    }
+  } catch (error) {
+    // 2. NẾU parse thất bại (Chắc chắn là Plain Text), trả về chính chuỗi đó
+    content = description;
+  }
+
+  // Sử dụng dangerouslySetInnerHTML để render HTML hoặc hiển thị plain text
+  return (
+    <div
+      dangerouslySetInnerHTML={{
+        __html: content,
+      }}
+    />
+  );
+};
 import Review from "../components/Review/Review";
 
 export default function MenuItemDetailPage() {
@@ -8,9 +45,9 @@ export default function MenuItemDetailPage() {
 
   useEffect(() => {
     fetch(`http://127.0.0.1:8000/api/menu-items/${id}`)
-      .then(res => res.json())
-      .then(data => setItem(data))
-      .catch(err => console.error(err));
+      .then((res) => res.json())
+      .then((data) => setItem(data))
+      .catch((err) => console.error(err));
   }, [id]);
 
   if (!item) return <p className="text-center mt-20">Đang tải...</p>;
@@ -30,10 +67,10 @@ export default function MenuItemDetailPage() {
       </p>
 
       <h2 className="text-xl font-bold mt-6">Mô tả món</h2>
-      <p className="text-gray-700 mt-2">
-        {item.description || "Món ăn đang được cập nhật mô tả đầy đủ..."}
-      </p>
-      
+      <div className="text-gray-700 mt-2">
+        {/* SỬ DỤNG COMPONENT MỚI ĐỂ XỬ LÝ DỮ LIỆU AN TOÀN */}
+        <DescriptionRenderer description={item.description} />
+      </div>
       <Review menuItemId={item.menu_item_id} />
     
     </div>

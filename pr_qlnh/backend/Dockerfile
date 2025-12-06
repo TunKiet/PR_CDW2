@@ -55,8 +55,13 @@ RUN composer install --no-dev --no-interaction --optimize-autoloader --no-script
 # Copy application files
 COPY . /var/www
 
-# Run post-install scripts
-RUN composer dump-autoload --optimize
+COPY composer.json composer.lock ./
+
+# COPY .env ./
+COPY .env.example .env
+
+# Install dependencies
+RUN composer install --no-interaction --optimize-autoloader
 
 # # Install PHP extensions
 # RUN pecl install redis && docker-php-ext-enable redis \

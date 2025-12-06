@@ -1,107 +1,155 @@
 // src/components/DetailModal.jsx
 
-import React from 'react';
+import React from "react";
+// === DRAFT.JS IMPORTS ===
+// Cần draftjs-to-html để chuyển JSON thành HTML
+import draftToHtml from "draftjs-to-html";
+// Cần convertFromRaw để chuyển đổi RawContentState JSON thành ContentState
+// import { convertFromRaw } from 'draft-js';
 
-// === HÀM HỖ TRỢ VÀ MAPS (Đồng bộ với DishCRUDTable.jsx) ===
-const categoryMap = {
-    '1': "Món Chính",
-    '2': "Tráng Miệng",
-    '3': "Đồ Uống",
-};
+// ========================
 
+// Status map
 const statusMap = {
-    'active': "Còn hàng",
-    'inactive': "Hết hàng",
-    'draft': "Nháp/Ẩn",
+  active: "Còn hàng",
+  inactive: "Hết hàng",
+  draft: "Nháp/Ẩn",
 };
+
+// Map danh mục (Bạn cần lấy dữ liệu categories từ API và truyền xuống DetailModal)
+// Giả định categories là một mảng object có cấu trúc { category_id, category_name }
+const categoryMap = {
+  1: "Món Chính",
+  2: "Tráng Miệng",
+  3: "Đồ Uống",
+}; // (Hãy điều chỉnh map này nếu categories của bạn khác)
 
 const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', { 
-        style: 'currency', 
-        currency: 'VND', 
-        minimumFractionDigits: 0 
-    }).format(amount);
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    minimumFractionDigits: 0,
+  }).format(amount);
 };
-// ============================================================
 
-export default function DetailModal({ isVisible, onClose, dish }) {
-    if (!isVisible || !dish) return null;
+export default function DetailModal({ isVisible, onClose, dish, categories }) {
+  if (!isVisible || !dish) return null;
 
-    // Lấy thông tin đã map
-    const categoryName = categoryMap[dish.categoryKey] || 'Chưa phân loại';
-    const statusName = statusMap[dish.statusKey] || 'N/A';
-    const priceFormatted = formatCurrency(dish.price);
+  console.log("Dữ liệu Mô tả (dish.description):", dish.description);
+  let htmlDescription = "Không có mô tả chi tiết.";
 
-    return (
-        // Modal Overlay
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm">
-            
-            {/* Modal Content */}
-            <div className="bg-white rounded-xl w-full max-w-lg shadow-2xl transform transition-all duration-300 max-h-[90vh] flex flex-col">
-                
-                {/* Header */}
-                <div className="p-6 border-b flex justify-between items-center">
-                    <h3 className="text-2xl font-bold text-gray-800">Chi Tiết Món Ăn: {dish.name}</h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-3xl leading-none">&times;</button>
-                </div>
+  // Tìm tên danh mục nếu categories được truyền vào
+  const categoryName =
+    categories?.find(
+      (cat) => String(cat.category_id) === String(dish.categoryKey)
+    )?.category_name ||
+    categoryMap[dish.categoryKey] ||
+    "N/A";
 
-                {/* Body Content (Có thể cuộn) */}
-                <div className="p-6 space-y-4 overflow-y-auto flex-1">
-                    
-                    {/* Hình ảnh */}
-                    <div className="flex justify-center mb-4">
-                        <img 
-                            src={dish.image} 
-                            alt={dish.name} 
-                            className="w-full max-h-64 object-cover rounded-lg border shadow-md"
-                            onError={(e) => e.target.src = 'https://placehold.co/400x200/e5e7eb/4b5563?text=No+Image'}
-                        />
-                    </div>
+  // === LOGIC XỬ LÝ CHUYỂN ĐỔI JSON MÔ TẢ THÀNH HTML (Draft.js -> HTML) ===
+  if (dish.description) {
+    try {
+      // 1. Thử parse chuỗi JSON từ Draft.js
+      const rawContentState = JSON.parse(dish.description);
 
-                    {/* Chi tiết */}
-                    <DetailItem label="ID Món Ăn" value={dish.id} />
-                    <DetailItem label="Giá Bán" value={priceFormatted} highlight={true} />
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                        <DetailItem label="Danh Mục" value={categoryName} />
-                        <DetailItem label="Trạng Thái" value={statusName} status={dish.statusKey} />
-                    </div>
-                    
-                    <div className="pt-4 border-t mt-4">
-                        <DetailItem label="Mô Tả Chi Tiết" value={dish.description || "Không có mô tả."} fullWidth={true} />
-                    </div>
-                    
-                </div>
-                
-                {/* Footer */}
-                <div className="p-4 border-t flex justify-end">
-                    <button onClick={onClose} className="dish-button-secondary dish-button-base">Đóng</button>
-                </div>
-            </div>
-        </div>
-    );
-}
+      // Kiểm tra xem có đúng định dạng Draft.js RawContentState không
+      if (rawContentState.blocks && Array.isArray(rawContentState.blocks)) {
+        // 2. Chuyển RawContentState object thành ContentState
+        // const contentState = convertFromRaw(rawContentState);
+        // 3. Chuyển ContentState thành HTML để hiển thị
+        htmlDescription = draftToHtml(rawContentState);
+        // console.log("HTML được tạo ra:", htmlDescription);
+      } else {
+        // Nếu JSON không đúng cấu trúc Draft.js, hiển thị nội dung thô
+        htmlDescription = dish.description;
+      }
+    } catch (e) {
+      // 4. Trường hợp lỗi parse JSON (dữ liệu cũ là text/HTML), hiển thị nội dung thô
+      console.warn(
+        `Lỗi khi tải description cũ: ${e.name}: ${e.message}. Chuyển đổi từ text/HTML.`
+      );
+      htmlDescription = dish.description;
+    }
+  }
+  // ===================================================================
 
-// Sub-component cho các item chi tiết
-function DetailItem({ label, value, highlight = false, fullWidth = false, status = null }) {
-    const statusClasses = status === 'active' 
-        ? 'bg-green-100 text-green-800' 
-        : status === 'inactive' 
-        ? 'bg-red-100 text-red-800' 
-        : status === 'draft'
-        ? 'bg-yellow-100 text-yellow-800'
-        : 'text-gray-900';
-    
-    return (
-        <div className={`flex flex-col ${fullWidth ? 'w-full' : 'w-1/2'}`}>
-            <span className="text-sm font-medium text-gray-500">{label}</span>
-            {status ? (
-                 <span className={`mt-1 px-2 py-0.5 inline-flex text-sm font-semibold rounded ${statusClasses}`}>
-                    {value}
+  return (
+    <div className="fixed inset-0 bg-black/75 z-[1000] flex items-center justify-center p-4 backdrop-blur-sm">
+      <div className="bg-white p-6 rounded-xl w-full max-w-2xl shadow-2xl transform transition-all duration-300 max-h-[90vh] flex flex-col">
+        <h3 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-3 flex-shrink-0">
+          Chi Tiết Món Ăn: {dish.name}
+        </h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-y-auto flex-grow pr-2">
+          {/* Cột 1: Ảnh và ID */}
+          <div className="md:col-span-1 space-y-4">
+            <img
+              src={dish.image}
+              alt={dish.name}
+              className="w-full h-auto object-cover rounded-lg shadow-md border"
+              onError={(e) =>
+                (e.target.src =
+                  "https://placehold.co/300x200/e5e7eb/4b5563?text=N/A")
+              }
+            />
+            <p className="text-sm text-gray-500">
+              <strong>ID:</strong> {dish.id}
+            </p>
+          </div>
+
+          {/* Cột 2 & 3: Thông tin chi tiết */}
+          <div className="md:col-span-2 space-y-4">
+            <div className="grid grid-cols-2 gap-4 text-gray-700">
+              <p>
+                <strong>Danh Mục:</strong> {categoryName}
+              </p>
+              <p>
+                <strong>Giá Bán:</strong>{" "}
+                <span className="text-xl font-semibold text-emerald-600">
+                  {formatCurrency(dish.price)}
                 </span>
-            ) : (
-                <span className={`text-lg font-semibold ${highlight ? 'text-emerald-600' : 'text-gray-900'}`}>{value}</span>
-            )}
+              </p>
+              <p>
+                <strong>Trạng Thái:</strong>
+                <span
+                  className={`ml-2 px-3 py-1 text-xs font-semibold rounded-full ${
+                    dish.statusKey === "active"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {statusMap[dish.statusKey] || "N/A"}
+                </span>
+              </p>
+              <p>
+                <strong>Tên Món:</strong> {dish.name}
+              </p>
+            </div>
+
+            {/* Mô tả Chi tiết */}
+            <div className="mt-4 border-t pt-4">
+              <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                Mô Tả Chi Tiết
+              </h4>
+              <div
+                className="p-3 border rounded-lg bg-gray-50 text-gray-600"
+                // SỬ DỤNG dangerouslySetInnerHTML để render HTML đã chuyển đổi
+                dangerouslySetInnerHTML={{ __html: htmlDescription }}
+              />
+            </div>
+          </div>
         </div>
-    );
+
+        {/* Nút Đóng */}
+        <div className="mt-4 flex justify-end pt-4 border-t border-gray-200 flex-shrink-0">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition duration-150"
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -178,6 +178,18 @@ function App() {
 
         {/* Thêm các route khác nếu có: /invoices, /menu, ... */}
         {/* <Route path="/invoices" element={<InvoicePage />} /> */}
+        {/* ROUTE: Trang Chấm Công */}
+        <Route path="/attendance" element={<AttendancePage />} />
+        
+        {/* ROUTE: Trang Quản Lý Chấm Công */}
+        <Route
+          path="/attendance-management"
+          element={
+            <ProtectedRoute>
+              <AttendanceManagementPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Route xử lý trường hợp không tìm thấy trang (404) */}
         <Route path="*" element={<h1>404 - Trang không tồn tại</h1>} />

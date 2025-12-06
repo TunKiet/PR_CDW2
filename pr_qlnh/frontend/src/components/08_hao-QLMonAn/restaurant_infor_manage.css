@@ -77,3 +77,33 @@
 /* Note: Các transition scale-95/100 và opacity 0/100 đã được thêm trực tiếp vào JSX
    để tận dụng class Tailwind và React state.
 */
+
+/* restaurant_infor_manage.css */
+
+.app-modal-overlay {
+    /* Đảm bảo z-index cực cao để nằm trên mọi thứ */
+    z-index: 9999; 
+    
+    /* Thiết lập lớp phủ (Backdrop) */
+    position: fixed;
+    inset: 0; 
+    background-color: rgba(0, 0, 0, 0.5); /* Lớp nền ĐEN trong suốt */
+    backdrop-filter: blur(2px);
+    
+    /* Thiết lập căn giữa nội dung */
+    display: none; /* Mặc định ẩn */
+    align-items: center; 
+    justify-content: center;
+    padding: 1rem;
+}
+
+.app-modal-overlay.is-active {
+    display: flex; /* Hiển thị modal */
+}
+
+/* Đảm bảo nội dung modal có vị trí tương đối để hiển thị chính xác */
+.app-modal-overlay > div {
+    /* Áp dụng cho div chứa nội dung modal (bg-white p-6...) */
+    position: relative; 
+    z-index: 1; /* Nằm trên lớp phủ */
+}
