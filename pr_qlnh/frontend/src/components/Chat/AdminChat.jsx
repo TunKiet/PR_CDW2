@@ -12,8 +12,8 @@ import { useRef } from "react";
 import Pusher from 'pusher-js';
 import EmojiPicker from 'emoji-picker-react';
 import { Popover } from '@headlessui/react';
-
-
+import { confirmDialog } from '../../utils/notify'
+import { notify, confirmAction } from '../../utils/notify'
 const endPoint = 'http://localhost:8000/api';
 
 const AdminChat = () => {
@@ -84,15 +84,14 @@ const AdminChat = () => {
 
 
     // Gửi tin nhắn
-    const sendMessage = () => {
-
-        if (!input.trim() || !selectedConversation) {
-            console.log("⚠️ Cannot send: input empty or no conversation selected");
+    const sendMessage = async () => {
+        if (!input.trim() || !selectedConversation || isSending) {
+            await confirmDialog('Không thể gửi', 'Vui lòng nhập nội dung.');
             return;
         }
 
-        if (isSending) {
-            console.log("⚠️ Message is being sent, please wait...");
+        if (input.length > 1000) {
+            await confirmDialog('Không thể gửi', 'Vui lòng rút ngắn nội dung.');
             return;
         }
 
@@ -155,6 +154,23 @@ const AdminChat = () => {
             })
             .catch(err => console.error("❌ Send emoji error:", err));
     };
+
+    const handleDelete = async (messageId) => {
+        const isConfirmed = await confirmAction('Bạn chắc chắn muốn xóa tin nhắn này?');
+        if (!isConfirmed) return;
+
+        try {
+            notify.info('Đang xóa...');
+            notify.dismiss();
+
+            await axios.delete(`${endPoint}/delete-message/${messageId}`);
+            setMessages(prev => prev.filter(msg => msg.message_id !== messageId));
+            notify.success('Xóa tin nhắn thành công');
+        } catch (error) {
+            notify.error('Xóa tin nhắn không hợp lệ. Vui lòng tải lại trang');
+            console.log(error);
+        }
+    }
 
     return (
         <>
@@ -235,6 +251,9 @@ const AdminChat = () => {
                                                     key={`${msg.conversation_id}-${msg.message_id}`}
                                                     content={msg.message}
                                                     time={msg.created_at}
+                                                    messageId={msg.message_id}
+                                                    handleDelete={handleDelete}
+
                                                 />
                                             ) : (
                                                 <Receiver
@@ -272,7 +291,9 @@ const AdminChat = () => {
                                                 <CiPaperplane
                                                     onClick={sendMessage}
                                                     size={23}
-                                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600`}
+                                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600 transition
+                                                    ${isSending ? "opacity-40 cursor-not-allowed" : "opacity-100"}`}
+                                                    onClick={!isSending ? sendMessage : undefined}
                                                 />
                                             </div>
                                         </div>
