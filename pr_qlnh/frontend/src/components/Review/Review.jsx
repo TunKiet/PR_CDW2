@@ -233,7 +233,13 @@ const Review = ({ menuItemId }) => {
                                                     <img src={preview} alt="preview" className='w-full h-full object-cover rounded-[5px]' />
                                                 ) : (<CiCamera size={50} />)
                                             }
-                                            <input type="file" className='hidden' accept='image/*' ref={fileInputRef} onChange={handleChangeFile} />
+                                            <input
+                                                type="file"
+                                                className="hidden"
+                                                accept="image/png, image/jpeg, image/jpg"
+                                                ref={fileInputRef}
+                                                onChange={handleChangeFile}
+                                            />
                                         </div>
                                     </div>
                                     <div className="formReview-comment">
