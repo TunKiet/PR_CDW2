@@ -289,7 +289,6 @@ const AdminChat = () => {
                                                     placeholder="Nhập tin nhắn..."
                                                 />
                                                 <CiPaperplane
-                                                    onClick={sendMessage}
                                                     size={23}
                                                     className={`absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-blue-600 transition
                                                     ${isSending ? "opacity-40 cursor-not-allowed" : "opacity-100"}`}
